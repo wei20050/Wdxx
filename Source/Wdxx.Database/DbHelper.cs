@@ -631,6 +631,11 @@ namespace Wdxx.Database
             var savedCount = 0;
             foreach (var propertyInfo in propertyInfoList)
             {
+                var val = propertyInfo.GetValue(obj, null);
+                if (val == null)
+                {
+                    continue;
+                }
                 propertyNameList.Add(propertyInfo.Name);
                 savedCount++;
             }
@@ -644,7 +649,8 @@ namespace Wdxx.Database
             {
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
-                var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val ?? DBNull.Value);
+                if (val == null) continue;
+                var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
             }
             return ExecuteSql(strSql.ToString(), parameters);
