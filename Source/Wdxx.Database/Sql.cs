@@ -68,7 +68,7 @@ namespace Wdxx.Database
         private string AddParam(object v)
         {
             _lastParamIndex++;
-            var paramName = "SqlTextP_" + _lastParamIndex;
+            var paramName = "SqlP_" + _lastParamIndex;
             ParamDict.Add(paramName, v);
             return paramName;
         }
