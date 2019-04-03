@@ -47,8 +47,14 @@ namespace Wdxx.Core
         /// </summary>
         private static int LocalPort
         {
-            get => CoreIni.Rini<int>(nameof(LocalPort));
-            set => CoreIni.Wini(nameof(LocalPort), value);
+            get
+            {
+                return CoreIni.Rini<int>("LocalPort");
+            }
+            set
+            {
+                CoreIni.Wini("LocalPort", value);
+            }
         }
 
         /// <inheritdoc />
@@ -57,16 +63,16 @@ namespace Wdxx.Core
         /// </summary>
         protected override void ApplyConfiguration()
         {
-            var configFileName = $"Local{LocalNamespace}.dll.config";
+            var configFileName = "Local" + LocalNamespace + ".dll.config";
             if (string.IsNullOrEmpty(LocalNamespace))
             {
                 throw new Exception("请先给 {localNamespace} 属性赋值!");
             }
             if (!File.Exists(configFileName))
             {
-                CoreLog.Info($"没找到{configFileName}文件 自动创建{configFileName}");
+                CoreLog.Info("没找到 " + configFileName + " 文件 自动创建 " + configFileName);
                 //替换config文件中的服务名称
-                var configValue = Config.Replace(nameof(LocalNamespace), LocalNamespace).Replace(nameof(LocalService), LocalService);
+                var configValue = Config.Replace("LocalNamespace", LocalNamespace).Replace("LocalService", LocalService);
                 //写本地服务配置
                 File.WriteAllText(configFileName, configValue);
             }
@@ -94,15 +100,15 @@ namespace Wdxx.Core
             if (!IsPortAvailble(port))
             {
                 port = GetFreeTcpPort();
-                CoreLog.Info($"默认端口{LocalPort}已被占用，采用动态获取的端口{port}");
+                CoreLog.Info("默认端口{" + LocalPort + "}已被占用，采用动态获取的端口{" + port + "}");
                 LocalPort = port;
             }
             if (serviceModel == null)
             {
-                throw new Exception($"服务配置异常,请删除{configFilename} 后重试!");
+                throw new Exception("服务配置异常,请删除{" + configFilename + "} 后重试!");
             }
             serviceModel.Services.Services[0].Host.BaseAddresses[0].BaseAddress =
-                $"http://{ServiceIp}:{port}/{LocalNamespace}/{LocalService}/";
+                "http://" + ServiceIp + ":" + port + "/" + LocalNamespace + "/" + LocalService + "/";
             var loaded = false;
             foreach (ServiceElement se in serviceModel.Services.Services)
             {
@@ -114,10 +120,9 @@ namespace Wdxx.Core
                 loaded = true;
                 break;
             }
-
             if (!loaded)
             {
-                throw new Exception($"服务配置异常,请删除{configFilename} 后重试!");
+                throw new Exception("服务配置异常,请删除{" + configFilename + "} 后重试!");
             }
         }
 

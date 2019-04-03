@@ -2,7 +2,7 @@
 
 namespace Client
 {
-    public class Setting
+    public static class Setting
     {
 
         /// <summary>
@@ -10,8 +10,14 @@ namespace Client
         /// </summary>
         public static string ServiceUrl
         {
-            get => CoreIni.Rini(nameof(ServiceUrl));
-            set => CoreIni.Wini(nameof(ServiceUrl), value);
+            get
+            {
+                return CoreIni.Rini("ServiceUrl");
+            }
+            set
+            {
+                CoreIni.Wini("ServiceUrl", value);
+            }
         }
 
         /// <summary>
@@ -19,8 +25,14 @@ namespace Client
         /// </summary>
         public static string HttpUrl
         {
-            get => CoreIni.Rini(nameof(HttpUrl));
-            set => CoreIni.Wini(nameof(HttpUrl), value);
+            get
+            {
+                return CoreIni.Rini("HttpUrl");
+            }
+            set
+            {
+                CoreIni.Wini("HttpUrl", value);
+            }
         }
 
         /// <summary>
@@ -28,9 +40,14 @@ namespace Client
         /// </summary>
         public static int Port
         {
-            get => CoreIni.Rini<int>(nameof(Port));
-            set => CoreIni.Wini(nameof(Port),value);
+            get
+            {
+                return CoreIni.Rini<int>("Port");
+            }
+            set
+            {
+                CoreIni.Wini("Port", value);
+            }
         }
-
     }
 }

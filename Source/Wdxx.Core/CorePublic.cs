@@ -14,9 +14,31 @@ namespace Wdxx.Core
     /// <summary>
     /// 公共方法核心
     /// </summary>
-    public class CorePublic
+    public static class CorePublic
     {
         #region 系统相关
+
+        /// <summary>
+        /// 应用程序目录
+        /// </summary>
+        /// <returns></returns>
+        public static string AppPath
+        {
+            get
+            {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    Assembly.GetEntryAssembly().GetName().Name);
+            }
+        }
+
+        /// <summary>
+        /// exe所在目录
+        /// </summary>
+        /// <returns></returns>
+        public static string ExePath
+        {
+            get { return AppDomain.CurrentDomain.BaseDirectory; }
+        }
 
         /// <summary>
         /// 管理员身份运行程序
@@ -61,7 +83,6 @@ namespace Wdxx.Core
         }
 
         #endregion
-
 
         #region 窗体操作
 
@@ -129,13 +150,17 @@ namespace Wdxx.Core
             try
             {
                 var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
+                if (rKey == null)
+                {
+                    throw new Exception(@"添加开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
+                }
                 if (string.IsNullOrEmpty(appPath))
                 {
-                    rKey?.SetValue(Assembly.GetEntryAssembly().GetName().Name, $@"""{AppDomain.CurrentDomain.BaseDirectory}{Assembly.GetEntryAssembly().GetName().Name}.exe""");
+                    rKey.SetValue(Assembly.GetEntryAssembly().GetName().Name, "\"" + AppDomain.CurrentDomain.BaseDirectory + Assembly.GetEntryAssembly().GetName().Name + ".exe\"");
                 }
                 else
                 {
-                    rKey?.SetValue(Path.GetFileNameWithoutExtension(appPath), $@"""{appPath}""");
+                    rKey.SetValue(Path.GetFileNameWithoutExtension(appPath), "\"" + appPath + "\"");
                 }
             }
             catch (Exception e)
@@ -153,14 +178,12 @@ namespace Wdxx.Core
             try
             {
                 var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                if (string.IsNullOrEmpty(appName))
+                if (rKey == null)
                 {
-                    rKey?.DeleteValue(Assembly.GetEntryAssembly().GetName().Name);
+                    throw new Exception(@"删除开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
                 }
-                else
-                {
-                    rKey?.DeleteValue(appName, true);
-                }
+                rKey.DeleteValue(string.IsNullOrEmpty(appName) ? Assembly.GetEntryAssembly().GetName().Name : appName,
+                    false);
             }
             catch (Exception e)
             {

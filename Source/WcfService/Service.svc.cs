@@ -19,22 +19,22 @@ namespace WcfService
         private readonly DbHelper _db = new DbHelper();
         public string Get(int id, string name)
         {
-            return $"id:{id} name:{name}";
+            return "id:" + id + " name:" + name;
         }
 
         public user GetUser(int id, string name)
         {
-            return new user {id = id + 111, name = $"GetName:{name}"};
+            return new user {id = id + 111, name = "GetName:" + name};
         }
 
         public string Post(int id, string name)
         {
-            return $"id:{id} name:{name}";
+            return "id:" + id + " name:" + name;
         }
 
         public user PostUser(int id, string name)
         {
-            return new user { id = id + 222, name = $"GetName:{name}" };
+            return new user { id = id + 111, name = "GetName:" + name };
         }
 
         public int Insert(user u)
@@ -44,7 +44,7 @@ namespace WcfService
 
         public int Delete(int id)
         {
-            return _db.Delete<user>(new SqlTextHelper().Add("id").Equal(id));
+            return _db.Delete<user>(new Sql().Add("id").Equal(id));
         }
 
         public int Update(user u)
@@ -54,7 +54,7 @@ namespace WcfService
 
         public user Select(int id,string name)
         {
-            return _db.Select<user>(new SqlTextHelper().Add("id").Equal(id).Or("name").Equal(name));
+            return _db.Select<user>(new Sql().Add("id").Equal(id).Or("name").Equal(name));
         }
 
         public List<user> SelectAll()

@@ -10,7 +10,7 @@ namespace Wdxx.Core
     /// <summary>
     /// 转换核心
     /// </summary>
-    public class CoreConvert
+    public static class CoreConvert
     {
 
         /// <summary>
@@ -158,11 +158,11 @@ namespace Wdxx.Core
                 try
                 {
                     var value = row[column.ColumnName];
-                    prop?.SetValue(obj, value, null);
+                    if (prop != null) prop.SetValue(obj, value, null);
                 }
                 catch(Exception ex)
                 {
-                    CoreLog.Error($"{column.ColumnName}转换失败:{ex}");
+                    CoreLog.Error(column.ColumnName + " 转换失败:" + ex);
                 }
             }
             return obj;

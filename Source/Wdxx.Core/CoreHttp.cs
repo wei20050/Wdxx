@@ -10,7 +10,7 @@ namespace Wdxx.Core
     /// <summary>
     /// Http通信核心 Get Post
     /// </summary>
-    public class CoreHttp
+    public static class CoreHttp
     {
 
         /// <summary>
@@ -21,7 +21,8 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T HttpGet<T>(string httpUri, string getData)
         {
-            if (HttpGet(httpUri, getData, out var ret))
+            string ret;
+            if (HttpGet(httpUri, getData, out ret))
             {
                 return JsonToObj<T>(ret);
             }
@@ -47,8 +48,9 @@ namespace Wdxx.Core
         /// <returns>调用是否成功</returns>
         public static T HttpPost<T>(string httpUri, object postData)
         {
+            string ret;
             var data = ObjToJson(postData);
-            if (HttpPost(httpUri, data, out var ret))
+            if (HttpPost(httpUri, data, out ret))
             {
                 return JsonToObj<T>(ret);
             }
@@ -74,7 +76,8 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T HttpPost<T>(string httpUri, string postData)
         {
-            if (HttpPost(httpUri, postData, out var ret))
+            string ret;
+            if (HttpPost(httpUri, postData, out ret))
             {
                 return JsonToObj<T>(ret);
             }
@@ -103,21 +106,30 @@ namespace Wdxx.Core
         {
             try
             {
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri + (getData == string.Empty ? string.Empty : $"?{getData}"));
+                var httpWebRequest =
+                    (HttpWebRequest) WebRequest.Create(
+                        httpUri + (getData == string.Empty ? string.Empty : "?" + getData));
                 httpWebRequest.Method = "GET";
                 httpWebRequest.ContentType = "text/html;charset=UTF-8";
                 var webResponse = httpWebRequest.GetResponse();
                 var httpWebResponse = (HttpWebResponse)webResponse;
                 var stream = httpWebResponse.GetResponseStream();
-                var streamReader = new StreamReader(stream ?? throw new InvalidOperationException(), Encoding.GetEncoding("UTF-8"));
-                result = streamReader.ReadToEnd();
-                streamReader.Close();
-                stream.Close();
+                if (stream != null)
+                {
+                    var streamReader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
+                    result = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    stream.Close();
+                }
+                else
+                {
+                    result = string.Empty;
+                }
                 return true;
             }
             catch (Exception ex)
             {
-                result = $"HttpGetErr uri:{httpUri} postData:{getData} err:{ex}";
+                result = "HttpGetErr uri:" + httpUri + " getData:" + getData + "err:" + ex;
                 return false;
             }
         }
@@ -146,16 +158,22 @@ namespace Wdxx.Core
                 var webResponse = httpWebRequest.GetResponse();
                 var httpWebResponse = (HttpWebResponse) webResponse;
                 var stream = httpWebResponse.GetResponseStream();
-                var streamReader = new StreamReader(stream ?? throw new InvalidOperationException(),
-                    Encoding.GetEncoding("UTF-8"));
-                result = streamReader.ReadToEnd();
-                streamReader.Close();
-                stream.Close();
+                if (stream != null)
+                {
+                    var streamReader = new StreamReader(stream,Encoding.GetEncoding("UTF-8"));
+                    result = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    stream.Close();
+                }
+                else
+                {
+                    result = string.Empty;
+                }
                 return true;
             }
             catch (Exception ex)
             {
-                result = $"HttpGetErr uri:{httpUri} postData:{postData} err:{ex}";
+                result = "HttpGetErr uri:" + httpUri + " postData:" + postData + "err:" + ex;
                 return false;
             }
         }

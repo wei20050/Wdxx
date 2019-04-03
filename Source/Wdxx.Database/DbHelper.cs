@@ -21,15 +21,15 @@ namespace Wdxx.Database
 
     /// <summary>
     /// 数据库操作类
-    /// 连接字符串示例:
-    /// <connectionStrings>
-    ///     //此处是默认连接对象名 连接的mysql
-    ///     <add name = "DbContext" connectionString="server=localhost;database=mydb;user id=root;password=123456;" providerName="MySql.Data.MySqlClient" />
-    ///     <add name = "SqliteConnection" connectionString="Data Source=D:\mydb.db;Version=3;" providerName="System.Data.SQLite"/>
-    ///     <add name = "MySqlConnection" connectionString="server=localhost;database=mydb;user id=root;password=123456;" providerName="MySql.Data.MySqlClient" />
-    ///     <add name = "MsSqlConnection" connectionString="Data Source=localhost;Initial Catalog=mydb;User ID=sa;Password=123456;Integrated Security=false;" providerName="System.Data.SqlClient" />
-    ///     <add name = "OracleConnection" connectionString="Data Source=(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = orcl)));Persist Security Info=True;User Id=mydb;Password=123456;" providerName="System.Data.OracleClient" />
-    ///</connectionStrings>
+    /// <para>连接字符串示例:</para>
+    /// <para>connectionStrings</para>
+    /// <para>    <!--默认连接--></para>
+    /// <para>    <add name = "DbContext" connectionString="server=localhost;database=mydb;user id=root;password=123456;" providerName="MySql.Data.MySqlClient" /></para>
+    /// <para>    <add name = "SqliteConnection" connectionString="Data Source=D:\mydb.db;Version=3;" providerName="System.Data.SQLite"/></para>
+    /// <para>    <add name = "MySqlConnection" connectionString="server=localhost;database=mydb;user id=root;password=123456;" providerName="MySql.Data.MySqlClient" /></para>
+    /// <para>    <add name = "MsSqlConnection" connectionString="Data Source=localhost;Initial Catalog=mydb;User ID=sa;Password=123456;Integrated Security=false;" providerName="System.Data.SqlClient" /></para>
+    /// <para>    <add name = "OracleConnection" connectionString="Data Source=(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = orcl)));Persist Security Info=True;User Id=mydb;Password=123456;" providerName="System.Data.OracleClient" /></para>
+    /// <para>/connectionStrings</para>
     /// </summary>
     public class DbHelper
     {
@@ -112,7 +112,7 @@ namespace Wdxx.Database
         /// <summary>
         /// 数据库sql操作日志(true开启日志  false关闭日志)
         /// </summary>
-        public bool SqlLog { get; set; } = false;
+        public bool SqlLog { get; set; }
 
         /// <summary>
         /// 数据库连接字符串
@@ -359,17 +359,25 @@ namespace Wdxx.Database
 
         #endregion
 
-        #region SQL日志记录
+        #region SQL日志
 
         /// <summary>
-        /// SQL日志记录
+        /// SQL记录日志
         /// </summary>
         public void Log(string sqlString, params DbParameter[] cmdParms)
         {
             if (SqlLog)
             {
-                DbLog.Info(sqlString + string.Concat(cmdParms.Select(m => $" {m.ParameterName}:{m.Value} ")));
+                DbLog.Info(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
             }
+        }
+
+        /// <summary>
+        /// SQL错误日志
+        /// </summary>
+        public void LogErr(string sqlString, params DbParameter[] cmdParms)
+        {
+            DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
         }
 
         #endregion
@@ -479,7 +487,7 @@ namespace Wdxx.Database
                 }
                 catch (Exception ex)
                 {
-                    DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => $" {m.ParameterName}:{m.Value} ")));
+                    LogErr(sqlString, cmdParms);
                     DbLog.Error(ex);
                     return 0;
                 }
@@ -515,7 +523,7 @@ namespace Wdxx.Database
             }
             catch (Exception ex)
             {
-                DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => $" {m.ParameterName}:{m.Value} ")));
+                LogErr(sqlString, cmdParms);
                 DbLog.Error(ex);
                 return null;
             }
@@ -548,7 +556,7 @@ namespace Wdxx.Database
                 }
                 catch (Exception ex)
                 {
-                    DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => $" {m.ParameterName}:{m.Value} ")));
+                    LogErr(sqlString, cmdParms);
                     DbLog.Error(ex);
                     return null;
                 }
@@ -587,21 +595,21 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 从SqlTextHelper中 获取sql与DbParameter[]
+        /// 从sql中 获取sqlstr与DbParameter[]
         /// </summary>
-        /// <param name="sqlTextHelper"></param>
         /// <param name="sql"></param>
+        /// <param name="sqlstr"></param>
         /// <param name="parms"></param>
-        private void GetSqlAndParms(SqlTextHelper sqlTextHelper, out string sql, out DbParameter[] parms)
+        private void GetSqlAndParms(Sql sql, out string sqlstr, out DbParameter[] parms)
         {
-            sql = sqlTextHelper.ToString();
-            parms = new DbParameter[sqlTextHelper.ParamDict.Count];
+            sqlstr = sql.ToString();
+            parms = new DbParameter[sql.ParamDict.Count];
             var i = 0;
-            foreach (var p in sqlTextHelper.ParamDict)
+            foreach (var p in sql.ParamDict)
             {
                 //这里参数化为了匹配不同的数据库 在这里补充下参数化的参数前缀
                 var parmsKey = GetParameterMark() + p.Key;
-                sql = sql.Replace(p.Key, parmsKey);
+                sqlstr = sqlstr.Replace(p.Key, parmsKey);
                 parms[i] = GetDbParameter(parmsKey, p.Value);
                 i++;
             }
@@ -624,8 +632,7 @@ namespace Wdxx.Database
         {
             var strSql = new StringBuilder();
             var type = obj.GetType();
-            strSql.Append($"insert into {type.Name}(");
-
+            strSql.AppendFormat("insert into {0}(", type.Name);
             var propertyInfoList = GetEntityProperties(type);
             var propertyNameList = new List<string>();
             var savedCount = 0;
@@ -640,9 +647,7 @@ namespace Wdxx.Database
                 savedCount++;
             }
 
-            strSql.Append($"{string.Join(",", propertyNameList.ToArray())})");
-            strSql.Append(
-                $" values ({string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray())})");
+            strSql.AppendFormat("{0}) values ({1})", string.Join(",", propertyNameList.ToArray()),string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray()));
             var parameters = new DbParameter[savedCount];
             var k = 0;
             for (var i = 0; i < propertyInfoList.Length && savedCount > 0; i++)
@@ -668,7 +673,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public int Delete<T>(string conditions)
         {
-            var st = new SqlTextHelper();
+            var st = new Sql();
             st.Add(conditions);
             var ret = Delete<T>(st);
             st.Clear();
@@ -679,16 +684,18 @@ namespace Wdxx.Database
         /// 根据条件删除
         /// </summary>
         /// <typeparam name="T">要删除的实体类型</typeparam>
-        /// <param name="sqlTextHelper">SqlTextHelper对象(从where后面开始组装)</param>
+        /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
-        public int Delete<T>(SqlTextHelper sqlTextHelper)
+        public int Delete<T>(Sql sql)
         {
-            GetSqlAndParms(sqlTextHelper, out var conditions, out var parameters);
+            string conditions;
+            DbParameter[] parameters;
+            GetSqlAndParms(sql, out conditions, out parameters);
             if (string.IsNullOrEmpty(conditions)) return 0;
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
-            sbSql.Append($"delete from {type.Name} where {conditions}");
+            sbSql.AppendFormat("delete from {0} where {1}", type.Name, conditions);
             return ExecuteSql(sbSql.ToString(), parameters);
         }
 
@@ -707,7 +714,7 @@ namespace Wdxx.Database
             var propertyInfoList = GetEntityProperties(type);
             if (propertyInfoList.Length == 0) return 0;
             var pk = propertyInfoList[0];
-            var conditions = $"{pk.Name}='{pk.GetValue(obj, null)}'";
+            var conditions = pk.Name + "='" + pk.GetValue(obj, null) + "'";
             return Update(obj, conditions);
         }
 
@@ -719,7 +726,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public int Update(object obj, string conditions)
         {
-            var st = new SqlTextHelper();
+            var st = new Sql();
             st.Add(conditions);
             var ret = Update(obj, st);
             st.Clear();
@@ -730,19 +737,19 @@ namespace Wdxx.Database
         /// 根据条件修改
         /// </summary>
         /// <param name="obj">要修改的实体</param>
-        /// <param name="sqlTextHelper">SqlTextHelper对象(从where后面开始组装)</param>
+        /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
-        public int Update(object obj, SqlTextHelper sqlTextHelper)
+        public int Update(object obj, Sql sql)
         {
             var strSql = new StringBuilder();
             var type = obj.GetType();
-            strSql.Append($"update {type.Name} ");
+            strSql.AppendFormat("update {0} ", type.Name);
             //获取要修改的字段数
             var propertyInfoList = GetEntityProperties(type);
             var savedCount = propertyInfoList.Select(propertyInfo => propertyInfo.GetValue(obj, null))
                 .Count(val => val != null);
             //这里定义参数化数组 长度加上where中的参数
-            var parameters = new DbParameter[savedCount + sqlTextHelper.ParamDict.Count];
+            var parameters = new DbParameter[savedCount + sql.ParamDict.Count];
             //开始拼接写入字段
             strSql.Append(" set ");
             //SQL参数下标
@@ -753,7 +760,7 @@ namespace Wdxx.Database
             {
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
-                if (string.IsNullOrEmpty(val?.ToString())) continue;
+                if (val == null || string.IsNullOrEmpty(val.ToString())) continue;
                 sbPros.Append(string.Format(" {0}={1}{0},", propertyInfo.Name, _mParameterMark));
                 var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
@@ -763,9 +770,9 @@ namespace Wdxx.Database
             {
                 strSql.Append(sbPros.ToString(0, sbPros.Length - 1));
             }
-            var conditions = sqlTextHelper.ToString();
+            var conditions = sql.ToString();
             //添加where中的参数
-            foreach (var p in sqlTextHelper.ParamDict)
+            foreach (var p in sql.ParamDict)
             {
                 //这里参数化为了匹配不同的数据库 在这里补充下参数化的参数前缀
                 var parmsKey = GetParameterMark() + p.Key;
@@ -773,7 +780,7 @@ namespace Wdxx.Database
                 parameters[k++] = GetDbParameter(GetParameterMark() + p.Key, p.Value);
             }
             //拼接上where语句
-            strSql.Append($" where {conditions}");
+            strSql.AppendFormat(" where {0}", conditions);
             //执行
             return savedCount > 0 ? ExecuteSql(strSql.ToString(), parameters) : 0;
         }
@@ -789,7 +796,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public T Select<T>(string conditions) where T : new()
         {
-            var st = new SqlTextHelper();
+            var st = new Sql();
             st.Add(conditions);
             var ret = Select<T>(st);
             st.Clear();
@@ -799,15 +806,17 @@ namespace Wdxx.Database
         /// <summary>
         /// 根据条件查询单条数据
         /// </summary>
-        /// <param name="sqlTextHelper">SqlTextHelper对象(从where后面开始组装)</param>
+        /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
-        public T Select<T>(SqlTextHelper sqlTextHelper) where T : new()
+        public T Select<T>(Sql sql) where T : new()
         {
-            GetSqlAndParms(sqlTextHelper, out var conditions, out var parameters);
+            string conditions;
+            DbParameter[] parameters;
+            GetSqlAndParms(sql, out conditions, out parameters);
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
-            sbSql.Append($"select * from {type.Name} where {conditions}");
+            sbSql.AppendFormat("select * from {0} where {1}", type.Name, conditions);
             return Find<T>(sbSql.ToString(), parameters);
         }
 
@@ -818,7 +827,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public List<T> SelectAll<T>(string conditions = "") where T : new()
         {
-            var st = new SqlTextHelper();
+            var st = new Sql();
             st.Add(conditions == "" ? "1=1" : conditions);
             var ret = SelectAll<T>(st);
             st.Clear();
@@ -828,16 +837,18 @@ namespace Wdxx.Database
         /// <summary>
         /// 根据条件查询列表
         /// </summary>
-        /// <param name="sqlTextHelper">SqlTextHelper对象(从where后面开始组装)</param>
+        /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
-        public List<T> SelectAll<T>(SqlTextHelper sqlTextHelper) where T : new()
+        public List<T> SelectAll<T>(Sql sql) where T : new()
         {
-            GetSqlAndParms(sqlTextHelper, out var conditions, out var parameters);
+            string conditions;
+            DbParameter[] parameters;
+            GetSqlAndParms(sql, out conditions, out parameters);
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
-            var where = conditions == "" ? "" : $" where {conditions}";
-            sbSql.Append($"select * from {type.Name}{where}");
+            var where = conditions == "" ? "" : " where " + conditions;
+            sbSql.AppendFormat("select * from {0} {1}", type.Name, where);
             return FindList<T>(sbSql.ToString(), parameters);
         }
 
@@ -884,7 +895,6 @@ namespace Wdxx.Database
             }
             catch (Exception ex)
             {
-                DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => $" {m.ParameterName}:{m.Value} ")));
                 DbLog.Error(ex);
             }
             finally
@@ -914,14 +924,14 @@ namespace Wdxx.Database
         /// 根据sql获取实体(参数化)
         /// </summary>
         /// <typeparam name="T">要查询的实体类型</typeparam>
-        /// <param name="sqlTextHelper">SqlTextHelper对象(全SQL)</param>
+        /// <param name="sql">sql对象(全SQL)</param>
         /// <returns></returns>
-        public T FindBySql<T>(SqlTextHelper sqlTextHelper) where T : new()
+        public T FindBySql<T>(Sql sql) where T : new()
         {
-            var conditions = sqlTextHelper.ToString();
-            var parameters = new DbParameter[sqlTextHelper.ParamDict.Count];
+            var conditions = sql.ToString();
+            var parameters = new DbParameter[sql.ParamDict.Count];
             var i = 0;
-            foreach (var p in sqlTextHelper.ParamDict)
+            foreach (var p in sql.ParamDict)
             {
                 parameters[i] = GetDbParameter(p.Key, p.Value);
                 i++;
@@ -991,7 +1001,6 @@ namespace Wdxx.Database
             }
             catch (Exception ex)
             {
-                DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => $" {m.ParameterName}:{m.Value} ")));
                 DbLog.Error(ex);
             }
             finally
@@ -1002,7 +1011,6 @@ namespace Wdxx.Database
                     rd.Dispose();
                 }
             }
-
             return list;
         }
 
@@ -1021,9 +1029,9 @@ namespace Wdxx.Database
         /// 根据sql获取实体
         /// </summary>
         /// <typeparam name="T">要查询的实体类型</typeparam>
-        /// <param name="sql">SqlTextHelper对象(全SQL)</param>
+        /// <param name="sql">sql对象(全SQL)</param>
         /// <returns></returns>
-        public List<T> FindListBySql<T>(SqlTextHelper sql) where T : new()
+        public List<T> FindListBySql<T>(Sql sql) where T : new()
         {
             var conditions = sql.ToString();
             var parameters = new DbParameter[sql.ParamDict.Count];
@@ -1053,7 +1061,7 @@ namespace Wdxx.Database
             using (var connection = GetConnection())
             {
                 connection.Open();
-                var commandText = $"select count(*) from ({sql}) T";
+                var commandText = "select count(*) from (" + sql + ") T";
                 IDbCommand cmd = GetCommand(commandText, connection);
                 rows = int.Parse(cmd.ExecuteScalar().ToString());
                 return FindList<T>(GetPageSql(sql, orderby, pageSize, currentPage), cmdParms);
@@ -1073,7 +1081,7 @@ namespace Wdxx.Database
             using (var connection = GetConnection())
             {
                 connection.Open();
-                var commandText = $"select count(*) from ({sql}) T";
+                var commandText = "select count(*) from (" + sql + ") T";
                 IDbCommand cmd = GetCommand(commandText, connection);
                 totalCount = int.Parse(cmd.ExecuteScalar().ToString());
                 ds = ExecuteSet(GetPageSql(sql, orderby, pageSize, currentPage), cmdParms);
@@ -1120,10 +1128,10 @@ namespace Wdxx.Database
                     startRow = pageSize * (currentPage - 1) + 1;
                     endRow = startRow + pageSize - 1;
 
-                    sb.Append(string.Format(@"
+                    sb.AppendFormat(@"
                             select * from 
                             (select ROW_NUMBER() over({1}) as rowNumber, t.* from ({0}) t) tempTable
-                            where rowNumber between {2} and {3} ", sql, orderby, startRow, endRow));
+                            where rowNumber between {2} and {3} ", sql, orderby, startRow, endRow);
 
                     #endregion
 

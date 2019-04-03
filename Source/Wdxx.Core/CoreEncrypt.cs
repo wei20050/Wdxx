@@ -9,7 +9,7 @@ namespace Wdxx.Core
     /// <summary>
     /// 加密核心
     /// </summary>
-    public class CoreEncrypt
+    public static class CoreEncrypt
     {
 
         #region 不可破解加密
@@ -50,7 +50,7 @@ namespace Wdxx.Core
             }
             catch
             {
-                return "";
+                return string.Empty;
             }
         }
 
@@ -160,7 +160,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                Console.Write(ex);
+                throw new Exception("DES解密文件发生异常:" + ex);
             }
         }
 
@@ -400,11 +400,8 @@ namespace Wdxx.Core
                 {
                     return string.Empty;
                 }
-                else
-                {
-                    return sourceString.Substring(startIndex,
-                                                   ((length + startIndex) > sourceString.Length) ? (sourceString.Length - startIndex) : length);
-                }
+                return sourceString.Substring(startIndex,
+                    length + startIndex > sourceString.Length ? sourceString.Length - startIndex : length);
             }
 
             //中文字符，如"中国人民abcd123"
@@ -450,7 +447,7 @@ namespace Wdxx.Core
                     anResultFlag[i] = nFlag;
                 }
                 //最后一个字节为双字节字符的一半
-                if ((bytesSource[endIndex - 1] > 127) && (anResultFlag[length - 1] == 1))
+                if (bytesSource[endIndex - 1] > 127 && anResultFlag[length - 1] == 1)
                 {
                     length = length + 1;
                 }
@@ -532,8 +529,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                CoreLog.Error("文件异常:" + ex);
-                return false;
+                throw new Exception("文件异常:" + ex);
             }
             return true;
         }
@@ -567,8 +563,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                CoreLog.Error("文件异常:" + ex);
-                return false;
+                throw new Exception("文件异常:" + ex);
             }
             return true;
         }
@@ -598,8 +593,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                CoreLog.Error("字符串异常:" + ex);
-                return null;
+                throw new Exception("字符串异常:" + ex);
             }
 
         }
@@ -626,8 +620,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                CoreLog.Error("字符串异常:" + ex);
-                return null;
+                throw new Exception("字符串异常:" + ex);
             }
 
         }

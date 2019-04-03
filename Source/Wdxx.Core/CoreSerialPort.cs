@@ -16,6 +16,7 @@ namespace Wdxx.Core
         /// </summary>
         public CoreSerialPort()
         {
+            DataReceivedDelay = 66;
             DataReceived += CallDataReceived;
             _t.Interval = 1;
             _t.Elapsed += (o,e) =>
@@ -39,7 +40,7 @@ namespace Wdxx.Core
         /// <summary>
         /// 数据返回间隔 单位毫秒 若多次传输间隔少于这个事件不触发新的数据返回事件
         /// </summary>
-        public int DataReceivedDelay { get; set; } = 66;
+        public int DataReceivedDelay { get; set; }
         private readonly Timer _t = new Timer();
         private int _i;
         private byte[] _bytes;
@@ -53,7 +54,7 @@ namespace Wdxx.Core
             _i = 0;
             var data = new byte[BytesToRead];
             Read(data, 0, data.Length);
-            _bytes = _bytes?.Concat(data).ToArray() ?? data;
+            _bytes = _bytes.Concat(data).ToArray();
             _t.Start();
         }
         /// <summary>
@@ -62,7 +63,7 @@ namespace Wdxx.Core
         /// <param name="b"></param>
         protected virtual void OnDataReceivedEx(byte[] b)
         {
-            DataReceivedEx?.Invoke(b);
+            if (DataReceivedEx != null) DataReceivedEx.Invoke(b);
         }
     }
 }

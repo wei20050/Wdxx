@@ -5,16 +5,16 @@ using System.Threading;
 namespace Wdxx.Database
 {
     /// <summary>
-    /// 日志核心
+    /// 数据库日志 (路径 exe根目录 logs文件夹)
     /// </summary>
-    public class DbLog
+    public static class DbLog
     {
         //多线程锁防止写文件或者创建目录与文件冲突
         private static readonly object Lock = new object();
         //日志文件夹默认根目录logs文件夹
-        private static readonly string FilePath = $@"{AppDomain.CurrentDomain.BaseDirectory}logs\";
-        //日志分隔文件大小 6M
-        private const int FileSize = 6 * 1024 * 1024; 
+        private static readonly string FilePath = AppDomain.CurrentDomain.BaseDirectory + "logs\\";
+        //日志分隔文件大小 100M
+        private const int FileSize = 100 * 1024 * 1024; 
 
         /// <summary>
         /// 写错误日志
@@ -25,7 +25,7 @@ namespace Wdxx.Database
             {
                 lock (Lock)
                 {
-                    WriteFile($@"[Error] {log}", CreateLogPath());
+                    WriteFile("[Error] " + log, CreateLogPath());
                 }
             }).Start();
         }
@@ -39,7 +39,7 @@ namespace Wdxx.Database
             {
                 lock (Lock)
                 {
-                    WriteFile($@"[Info] {log}", CreateLogPath());
+                    WriteFile("[Info] " + log, CreateLogPath());
                 }
             }).Start();
         }
@@ -55,7 +55,7 @@ namespace Wdxx.Database
             do
             {
                 index++;
-                logPath = $@"{FilePath}DB_{DateTime.Now:yyyy-MM-dd}_{index}.log";
+                logPath = FilePath + "DB_" + DateTime.Now.ToString("yyyyMMdd") + "_" + index + ".log";
                 if (File.Exists(logPath))
                 {
                     var fileInfo = new FileInfo(logPath);
@@ -77,14 +77,10 @@ namespace Wdxx.Database
         /// </summary>
         private static void WriteFile(string txt, string logPath)
         {
-            lock (Lock)
+            if (!Directory.Exists(FilePath))
             {
-                if (!Directory.Exists(Path.GetDirectoryName(FilePath)))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(FilePath) ?? throw new InvalidOperationException());
-                }
+                Directory.CreateDirectory(FilePath);
             }
-
             if (!File.Exists(logPath))
             {
                 using (var fs = new FileStream(logPath, FileMode.Create))
@@ -92,14 +88,13 @@ namespace Wdxx.Database
                     fs.Close();
                 }
             }
-
             using (var fs = new FileStream(logPath, FileMode.Append, FileAccess.Write))
             {
                 using (var sw = new StreamWriter(fs))
                 {
                     #region 日志内容
 
-                    var value = $@"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {txt}";
+                    var value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff ") + txt;
 
                     #endregion
 

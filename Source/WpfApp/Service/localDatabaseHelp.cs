@@ -6,7 +6,7 @@ using Wdxx.Core;
 
 namespace Client.Service
 {
-    public class LocalDatabaseHelp
+    public static class LocalDatabaseHelp
     {
         /// <summary>
         /// 设置数据库
@@ -16,11 +16,11 @@ namespace Client.Service
             //开始创建离线库文件 不存在库的情况
             if (!File.Exists(GlobalVar.AppDbName))
             {
-                if (!Directory.Exists(GlobalVar.ResPath + "Data"))
+                if (!Directory.Exists(GlobalVar.AppDbDirectory))
                 {
-                    Directory.CreateDirectory(GlobalVar.ResPath + "Data");
+                    Directory.CreateDirectory(GlobalVar.AppDbDirectory);
                 }
-                CoreLog.Info($"复制离线数据库从{GlobalVar.DbName} => {GlobalVar.AppDbName}");
+                CoreLog.Info("复制离线数据库从{" + GlobalVar.DbName + "} => {" + GlobalVar.AppDbName + "}");
                 File.Copy(GlobalVar.DbName, GlobalVar.AppDbName);
                 File.Copy(GlobalVar.DbVer, GlobalVar.AppDbVer);
             }
@@ -35,7 +35,7 @@ namespace Client.Service
                 //更新数据库
                 File.Copy(GlobalVar.DbName, GlobalVar.AppDbName, true);
                 //获取数据库文件夹中的文件集合
-                var files = Directory.GetFiles(GlobalVar.ResPath + "Data").ToList();
+                var files = Directory.GetFiles(GlobalVar.AppDbDirectory).ToList();
                 //对获取到的文件名进行排序按照名称排序后 创建时间早的数据库排在前面
                 files.Sort();
                 //集合中排除版本文件

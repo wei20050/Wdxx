@@ -11,19 +11,20 @@ namespace Wdxx.Core
     /// INI文件操作核心
     /// 配置默认路径 C:\Users\{用户名}\AppData\Local\{程序集名}\Config.ini
     /// </summary>
-    public class CoreIni
+    public static class CoreIni
     {
         #region INI读写底层
 
         /// <summary>
         /// ini文件路径
         /// </summary>
-        private static readonly string ConfigPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{Assembly.GetEntryAssembly().GetName().Name}\\Config.ini";
+        private static readonly string ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                                                        Assembly.GetEntryAssembly().GetName().Name) + "\\Config.ini";
 
         /// <summary>
         /// ini配置节大小
         /// </summary>
-        private const int IniSize = 524288;
+        public static uint IniSize = 524288;
 
         /// <summary>
         /// 默认路径
@@ -55,7 +56,7 @@ namespace Wdxx.Core
         private static string ReadIniData(string section, string key, string noText, string iniFilePath)
         {
             if (!File.Exists(iniFilePath)) return string.Empty;
-            var temp = new StringBuilder(IniSize);
+            var temp = new StringBuilder((int)IniSize);
             GetPrivateProfileString(section, key, noText, temp, IniSize, iniFilePath);
             return temp.ToString();
         }
@@ -75,7 +76,8 @@ namespace Wdxx.Core
             }
             if (WritePrivateProfileString(section, key, value, iniFilePath)) return true;
             var errorCode = Marshal.GetLastWin32Error();
-            throw new Exception($"ini写入 section:{section} key:{key} value:{value} iniFilePath:{iniFilePath} 失败,错误代码:{errorCode}!");
+            throw new Exception("ini写入 section:" + section + " key:" + key + " value:" + value + " iniFilePath:" +
+                                iniFilePath + " 失败,错误:" + errorCode);
         }
         #endregion
 

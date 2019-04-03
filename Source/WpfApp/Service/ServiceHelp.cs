@@ -6,7 +6,7 @@ using Wdxx.Core;
 
 namespace Client.Service
 {
-    public class ServiceHelp
+    public static class ServiceHelp
     {
         /// <summary>
         /// 是否在线

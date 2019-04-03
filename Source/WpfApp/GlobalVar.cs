@@ -1,27 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.IO;
 using Client.WcfServiceReference;
+using Wdxx.Core;
 
 namespace Client
 {
     public static class GlobalVar
     {
-
-        /// <summary>
-        /// 系统资源路径
-        /// </summary>
-        public static string ResPath =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                $"{Assembly.GetExecutingAssembly().GetName().Name}\\F213BCE5-9EC2-4C29-945B-F62C3EC00161\\");
         
-
         /// <summary>
         /// 服务对象
         /// </summary>
         public static ServiceClient Service;
-
-      
+        
+        /// <summary>
+        /// 离线应用文件夹路径
+        /// </summary>
+        public static string AppDbDirectory = Path.Combine(CorePublic.AppPath, "Data\\");
 
         /// <summary>
         /// 离线数据库文件路径(生成的源文件)
@@ -36,17 +30,17 @@ namespace Client
         /// <summary>
         /// 离线应用数据库文件路径(使用的文件)
         /// </summary>
-        public static string AppDbName = Path.Combine(ResPath, DbName);
+        public static string AppDbName = Path.Combine(CorePublic.AppPath, DbName);
 
         /// <summary>
         /// 离线应用数据库版本文件路径(使用的文件)
         /// </summary>
-        public static string AppDbVer = Path.Combine(ResPath, DbVer);
+        public static string AppDbVer = Path.Combine(CorePublic.AppPath, DbVer);
 
         /// <summary>
         /// 离线应用数据库连接字符串
         /// </summary>
-        public static string DbContext = $"data source={AppDbName}";
+        public static string DbContext = "data source=" + AppDbName;
 
     }
 }
