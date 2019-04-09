@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "串口测试工具", "串口测试工具\串口测试工具.csproj", "{E8BAE00D-8B13-44E9-AF4C-E1E2F7873C95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortsEx", "PortsEx\PortsEx.csproj", "{B683B80E-B6C4-40EF-9BD3-EEC93266450C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8BAE00D-8B13-44E9-AF4C-E1E2F7873C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8BAE00D-8B13-44E9-AF4C-E1E2F7873C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8BAE00D-8B13-44E9-AF4C-E1E2F7873C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8BAE00D-8B13-44E9-AF4C-E1E2F7873C95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B683B80E-B6C4-40EF-9BD3-EEC93266450C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B683B80E-B6C4-40EF-9BD3-EEC93266450C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B683B80E-B6C4-40EF-9BD3-EEC93266450C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B683B80E-B6C4-40EF-9BD3-EEC93266450C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C3A7877-F55E-4E23-BE1E-0B61B918BA71}
+	EndGlobalSection
+EndGlobal

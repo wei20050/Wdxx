@@ -1,0 +1,4 @@
+ClickOnceHelp  用于clickonce写入安装地址
+Model生成器 用于生成数据库models
+SqliteChangePwd 用于修改sqlite密码
+串口测试工具 用于连接串口设备的测试代码生成和监控串口数据
