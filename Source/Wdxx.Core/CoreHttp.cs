@@ -186,6 +186,7 @@ namespace Wdxx.Core
         /// <returns>转换后的对象</returns>
         private static T JsonToObj<T>(string jsonStr)
         {
+            //时间类型直接转换
             if (typeof(T) == typeof(DateTime))
             {
                 return (T)(object)Convert.ToDateTime(jsonStr);

@@ -37,6 +37,7 @@ namespace Wdxx.Core
         private const string DefaultEndpoint = "Default";
 
         #region API函数声明
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool WritePrivateProfileString(string lpAppName,
@@ -50,9 +51,11 @@ namespace Wdxx.Core
             StringBuilder lpReturnedString,
             uint nSize,
             string lpFileName);
+
         #endregion
 
         #region 读Ini文件
+
         private static string ReadIniData(string section, string key, string noText, string iniFilePath)
         {
             if (!File.Exists(iniFilePath)) return string.Empty;
@@ -60,9 +63,11 @@ namespace Wdxx.Core
             GetPrivateProfileString(section, key, noText, temp, IniSize, iniFilePath);
             return temp.ToString();
         }
+
         #endregion
 
         #region 写Ini文件
+
         private static bool WriteIniData(string section, string key, string value, string iniFilePath)
         {
             var dir = Path.GetDirectoryName(iniFilePath);
@@ -79,6 +84,7 @@ namespace Wdxx.Core
             throw new Exception("ini写入 section:" + section + " key:" + key + " value:" + value + " iniFilePath:" +
                                 iniFilePath + " 失败,错误:" + errorCode);
         }
+
         #endregion
 
         #endregion
@@ -143,6 +149,7 @@ namespace Wdxx.Core
         /// <returns>转换后的对象</returns>
         private static T JsonToObj<T>(string jsonStr)
         {
+            //时间类型直接转换
             if (typeof(T) == typeof(DateTime))
             {
                 return (T)(object)Convert.ToDateTime(jsonStr);

@@ -4,19 +4,22 @@ using System.Timers;
 
 namespace Wdxx.Core
 {
+
     /// <inheritdoc />
     /// <summary>
     /// 串口核心
     /// </summary>
     public class CoreSerialPort : SerialPort
     {
+
         /// <inheritdoc />
         /// <summary>
         /// 串口核心封装类实现了定时获取串口数据
         /// </summary>
         public CoreSerialPort()
         {
-            DataReceivedDelay = 66;
+            //默认的多次触发时间 若串口数据过大 每次传输数据量耗时长 需要修改此时间
+            DataReceivedDelay = 168;
             DataReceived += CallDataReceived;
             _t.Interval = 1;
             _t.Elapsed += (o,e) =>
@@ -28,22 +31,38 @@ namespace Wdxx.Core
                 _bytes = null;
             };
         }
+
         /// <summary>
         /// 封装的委托
         /// </summary>
         /// <param name="b"></param>
         public delegate void DeleDataReceived(byte[] b);
+
         /// <summary>
         /// 新的的数据返回事件
         /// </summary>
         public event DeleDataReceived DataReceivedEx;
+
         /// <summary>
         /// 数据返回间隔 单位毫秒 若多次传输间隔少于这个事件不触发新的数据返回事件
         /// </summary>
         public int DataReceivedDelay { get; set; }
+
+        /// <summary>
+        /// 封装返回的定时器
+        /// </summary>
         private readonly Timer _t = new Timer();
+
+        /// <summary>
+        /// 封装返回定时器计数
+        /// </summary>
         private int _i;
+
+        /// <summary>
+        /// 封装后返回的数据
+        /// </summary>
         private byte[] _bytes;
+
         /// <summary>
         /// 封装前的事件触发
         /// </summary>
@@ -57,6 +76,7 @@ namespace Wdxx.Core
             _bytes = _bytes.Concat(data).ToArray();
             _t.Start();
         }
+
         /// <summary>
         /// 封装后的事件触发
         /// </summary>
@@ -65,5 +85,6 @@ namespace Wdxx.Core
         {
             if (DataReceivedEx != null) DataReceivedEx.Invoke(b);
         }
+
     }
 }

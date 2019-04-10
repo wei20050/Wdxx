@@ -7,7 +7,7 @@ using System.Data.Common;
 using System.Data.Objects.DataClasses;
 using System.Data.OracleClient;
 using System.Data.SqlClient;
-using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -51,7 +51,16 @@ namespace Wdxx.Database
             var pn = cm.ProviderName;
             if (pn.Contains("System.Data.SQLite"))
             {
-                MDbType = DbTypeEnum.Sqlite;
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll"))
+                {
+                    _sqliteAss = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll");
+                    MDbType = DbTypeEnum.Sqlite;
+                }
+                else
+                {
+                    LogErr("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
+                    MDbType = DbTypeEnum.None;
+                }
             }
             else if (pn.Contains("MySql.Data.MySqlClient"))
             {
@@ -67,7 +76,8 @@ namespace Wdxx.Database
             }
             else
             {
-                MDbType = DbTypeEnum.Sqlite;
+                MDbType = DbTypeEnum.None;
+                LogErr("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
             }
             _mConnectionString = cm.ToString();
             _mParameterMark = GetParameterMark();
@@ -97,12 +107,20 @@ namespace Wdxx.Database
             /// <summary>
             /// Oracle数据库
             /// </summary>
-            Oracle = 3
+            Oracle = 3,
+            /// <summary>
+            /// 未知数据库类型
+            /// </summary>
+            None = 4
         }
 
         #endregion
 
         #region 变量
+        /// <summary>
+        /// Sqlite程序集
+        /// </summary>
+        private readonly Assembly _sqliteAss;
 
         /// <summary>
         /// 数据库类型
@@ -145,7 +163,8 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    command = new SQLiteCommand();
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand");
+                    command = (DbCommand)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     command = new MySqlCommand();
@@ -156,8 +175,11 @@ namespace Wdxx.Database
                 case DbTypeEnum.Oracle:
                     command = new OracleCommand();
                     break;
+                case DbTypeEnum.None:
+                    command = null;
+                    break;
                 default:
-                    command = new SQLiteCommand();
+                    command = null;
                     break;
             }
             return command;
@@ -172,7 +194,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    command = new SQLiteCommand(sql);
+                    var parameters = new object[1];
+                    parameters[0] = sql;
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand", true, BindingFlags.Default, null, parameters, null, null);
+                    command = (DbCommand)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     command = new MySqlCommand(sql);
@@ -183,10 +208,12 @@ namespace Wdxx.Database
                 case DbTypeEnum.Oracle:
                     command = new OracleCommand(sql);
                     break;
+                case DbTypeEnum.None:
+                    return null;
                 default:
-                    command = new SQLiteCommand(sql);
-                    break;
+                    return null;
             }
+            if (command == null) return null;
             command.Connection = conn;
             return command;
         }
@@ -204,7 +231,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    conn = new SQLiteConnection(_mConnectionString);
+                    var parameters = new object[1];
+                    parameters[0] = _mConnectionString;
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteConnection", true, BindingFlags.Default, null, parameters, null, null);
+                    conn = (DbConnection)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     conn = new MySqlConnection(_mConnectionString);
@@ -215,8 +245,11 @@ namespace Wdxx.Database
                 case DbTypeEnum.Oracle:
                     conn = new OracleConnection(_mConnectionString);
                     break;
+                case DbTypeEnum.None:
+                    conn = null;
+                    break;
                 default:
-                    conn = new SQLiteConnection(_mConnectionString);
+                    conn = null;
                     break;
             }
             return conn;
@@ -236,7 +269,8 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    dataAdapter = new SQLiteDataAdapter();
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteDataAdapter");
+                    dataAdapter = (DbDataAdapter) obj;
                     break;
                 case DbTypeEnum.Mysql:
                     dataAdapter = new MySqlDataAdapter();
@@ -247,20 +281,22 @@ namespace Wdxx.Database
                 case DbTypeEnum.Oracle:
                     dataAdapter = new OracleDataAdapter();
                     break;
+                case DbTypeEnum.None:
+                    return null;
                 default:
-                    dataAdapter = new SQLiteDataAdapter();
-                    break;
+                    return null;
             }
+            if (dataAdapter == null) return null;
             dataAdapter.SelectCommand = cmd;
             return dataAdapter;
         }
 
         #endregion
 
-        #region 生成 ParameterMark
+        #region 获取 ParameterMark
 
         /// <summary>
-        /// 生成 ParameterMark(参数化查询前面的标识符)
+        /// 获取 ParameterMark(参数化查询前面的标识符)
         /// </summary>
         private string GetParameterMark()
         {
@@ -273,6 +309,8 @@ namespace Wdxx.Database
                 case DbTypeEnum.Mysql:
                     return "@";
                 case DbTypeEnum.Sqlite:
+                    return ":";
+                case DbTypeEnum.None:
                     return ":";
                 default:
                     return ":";
@@ -305,10 +343,19 @@ namespace Wdxx.Database
                     dbParameter = new MySqlParameter(name, vallue);
                     break;
                 case DbTypeEnum.Sqlite:
-                    dbParameter = new SQLiteParameter(name, vallue);
+                    var parameters = new object[2];
+                    parameters[0] = name;
+                    parameters[1] = vallue;
+                    // 创建类的实例 
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteParameter", true, BindingFlags.Default, null, parameters, null, null);
+                    dbParameter = (DbParameter)obj;
+                    //dbParameter = new System.Data.SQLite.SQLiteParameter(name, vallue);
+                    break;
+                case DbTypeEnum.None:
+                    dbParameter = null;
                     break;
                 default:
-                    dbParameter = new SQLiteParameter(name, vallue);
+                    dbParameter = null;
                     break;
             }
             return dbParameter;
@@ -647,7 +694,7 @@ namespace Wdxx.Database
                 savedCount++;
             }
 
-            strSql.AppendFormat("{0}) values ({1})", string.Join(",", propertyNameList.ToArray()),string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray()));
+            strSql.AppendFormat("{0}) values ({1})", string.Join(",", propertyNameList.ToArray()), string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray()));
             var parameters = new DbParameter[savedCount];
             var k = 0;
             for (var i = 0; i < propertyInfoList.Length && savedCount > 0; i++)
