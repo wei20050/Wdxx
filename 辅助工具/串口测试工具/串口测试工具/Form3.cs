@@ -22,13 +22,14 @@ namespace 串口测试工具
                 MessageBox.Show(@"请输入发送内容!");
                 return;
             }
-            if (Properties.Settings.Default.zdy.Count == 60)
+            if (GlobalVar.Zdy.Count == 60)
             {
                 MessageBox.Show(@"自定义发送按钮已到上限,无法添加!");
                 return;
             }
-            Properties.Settings.Default.zdy.Add($"{textBox1.Text}|{richTextBox1.Text}");
-            Properties.Settings.Default.Save();
+            var zdy = GlobalVar.Zdy;
+            zdy.Add(textBox1.Text + "|" + richTextBox1.Text);
+            GlobalVar.Zdy = zdy;
             DialogResult = DialogResult.OK;
         }
 

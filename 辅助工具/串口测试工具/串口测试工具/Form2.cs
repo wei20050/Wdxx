@@ -29,9 +29,8 @@ namespace 串口测试工具
                 MessageBox.Show(@"请输入发送内容!");
                 return;
             }
-            Properties.Settings.Default.zdy[index] = $"{textBox1.Text}|{richTextBox1.Text}";
-            Properties.Settings.Default.Save();
-            MessageBox.Show($@"按钮:{textBox1.Text} 保存成功!");
+            GlobalVar.Zdy[index] = textBox1.Text + "|" + richTextBox1.Text;
+            MessageBox.Show(@"按钮:" + textBox1.Text + @" 保存成功!");
         }
         //退出按钮
         private void button2_Click(object sender, EventArgs e)
@@ -43,7 +42,7 @@ namespace 串口测试工具
         {
             var index = checkedListBox1.SelectedIndex;
             if (index < 0) return;
-            var tmp = Properties.Settings.Default.zdy[index].Split('|');
+            var tmp = GlobalVar.Zdy[index].Split('|');
             textBox1.Text = tmp[0];
             richTextBox1.Text = tmp[1];
         }
@@ -53,15 +52,16 @@ namespace 串口测试工具
             for (var i = checkedListBox1.CheckedIndices.Count - 1; i >=0 ; i--)
             {
                 var v = checkedListBox1.CheckedIndices[i];
-                Properties.Settings.Default.zdy.RemoveAt(v);
+                var zdy = GlobalVar.Zdy;
+                zdy.RemoveAt(v);
+                GlobalVar.Zdy = zdy;
             }
-            Properties.Settings.Default.Save();
             Close();
         }
         //界面初始化
         private void Form2_Load(object sender, EventArgs e)
         {
-            foreach (var v in Properties.Settings.Default.zdy)
+            foreach (var v in GlobalVar.Zdy)
             {
                 var tmp = v.Split('|');
                 checkedListBox1.Items.Add(tmp[0], false);
