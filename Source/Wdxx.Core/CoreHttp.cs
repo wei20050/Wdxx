@@ -14,12 +14,12 @@ namespace Wdxx.Core
     {
 
         /// <summary>
-        /// Http Get请求(字符串入 参返回泛型)
+        /// Http Get请求(字符串入参 返回泛型)
         /// </summary>
         /// <param name="httpUri">请求地址</param>
         /// <param name="getData">请求参数 例:id=1</param>
         /// <returns></returns>
-        public static T HttpGet<T>(string httpUri, string getData)
+        public static T HttpGet<T>(string httpUri, string getData = "")
         {
             string ret;
             if (HttpGet(httpUri, getData, out ret))
@@ -35,7 +35,7 @@ namespace Wdxx.Core
         /// <param name="httpUri">请求地址</param>
         /// <param name="getData">请求参数 例:id=1</param>
         /// <returns></returns>
-        public static string HttpGet(string httpUri, string getData)
+        public static string HttpGet(string httpUri, string getData = "")
         {
             return HttpGet<string>(httpUri, getData);
         }
