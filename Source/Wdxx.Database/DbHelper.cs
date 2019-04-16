@@ -694,7 +694,7 @@ namespace Wdxx.Database
                 savedCount++;
             }
 
-            strSql.AppendFormat("{0}) values ({1})", string.Join(",", propertyNameList.ToArray()), string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray()));
+            strSql.AppendFormat("{0}) values ({1})", string.Join(",", propertyNameList.ConvertAll(a => "`" + a + "`").ToArray()), string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray()));
             var parameters = new DbParameter[savedCount];
             var k = 0;
             for (var i = 0; i < propertyInfoList.Length && savedCount > 0; i++)
@@ -808,7 +808,7 @@ namespace Wdxx.Database
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
                 if (val == null || string.IsNullOrEmpty(val.ToString())) continue;
-                sbPros.Append(string.Format(" {0}={1}{0},", propertyInfo.Name, _mParameterMark));
+                sbPros.Append(string.Format(" `{0}`={1}{0},", propertyInfo.Name, _mParameterMark));
                 var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
             }
