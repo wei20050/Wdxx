@@ -22,7 +22,7 @@ namespace Wdxx.Core
         /// </summary>
         public static void Error(object log)
         {
-            WriteFile("[Error] " + log, CreateLogPath());
+            WriteFile("[Error] " + log, CreateLogPath(string.Empty));
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Wdxx.Core
         /// </summary>
         public static void Info(object log)
         {
-            WriteFile("[Info] " + log, CreateLogPath());
+            WriteFile("[Info] " + log, CreateLogPath(string.Empty));
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Wdxx.Core
         /// </summary>
         /// <param name="prefix">前缀</param>
         /// <returns></returns>
-        private static string CreateLogPath(string prefix = "")
+        private static string CreateLogPath(string prefix)
         {
             var index = 0;
             string logPath;
@@ -85,6 +85,14 @@ namespace Wdxx.Core
         #region 进程与线程保证同步
 
         /// <summary>
+        /// 多线程与多进程间同步操作文件 默认不是递归
+        /// </summary>
+        private static void MutexExec(string filePath, Action action)
+        {
+            MutexExec(filePath, action, false);
+        }
+
+        /// <summary>
         /// 多线程与多进程间同步操作文件
         /// </summary>
         /// <param name="filePath">文件路径
@@ -94,7 +102,7 @@ namespace Wdxx.Core
         /// 如果创建已命名 mutex 时不指定前缀，则它将采用前缀“Local\”。)</param>
         /// <param name="action">同步处理操作</param>
         /// <param name="recursive">指示当前调用是否为递归处理，递归处理时检测到异常则抛出异常，避免进入无限递归</param>
-        private static void MutexExec(string filePath, Action action, bool recursive = false)
+        private static void MutexExec(string filePath, Action action, bool recursive)
         {
             //生成文件对应的同步键，可自定义格式（互斥体名称对特殊字符支持不友好，遂转换为BASE64格式字符串）
             var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes(string.Format(@"FILE\{0}", filePath)));

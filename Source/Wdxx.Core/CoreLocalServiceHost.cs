@@ -35,7 +35,7 @@ namespace Wdxx.Core
         /// 离线服务名称
         /// </summary>
         protected static string LocalService { get; set; }
-        
+
 
         /// <summary>
         /// 离线服务端IP
@@ -155,13 +155,23 @@ namespace Wdxx.Core
         /// 根据Wcf服务类开启离线服务 返回开启离线服务地址  http请求模式地址后面加  Api/
         /// </summary>
         /// <param name="t">挂载的服务类</param>
+        /// <returns>返回服务url</returns>
+        public static string OpenHost(Type t)
+        {
+            return OpenHost(t, "localhost");
+        }
+
+        /// <summary>
+        /// 根据Wcf服务类开启离线服务 返回开启离线服务地址  http请求模式地址后面加  Api/
+        /// </summary>
+        /// <param name="t">挂载的服务类</param>
         /// <param name="ip">指定的本地服务ip</param>
         /// <returns>返回服务url</returns>
-        public static string OpenHost(Type t,string ip = "")
+        public static string OpenHost(Type t, string ip)
         {
-            ServiceIp = string.IsNullOrEmpty(ip) ? "localhost" : ip;
+            ServiceIp = ip;
             LocalService = t.Name;
-            LocalNamespace = t.Assembly.ManifestModule.Name.Replace(".dll",string.Empty);
+            LocalNamespace = t.Assembly.ManifestModule.Name.Replace(".dll", string.Empty);
             var serviceHost = new CoreLocalServiceHost(t);
             Action open = () =>
             {

@@ -19,7 +19,7 @@ namespace WcfService
         private readonly DbHelper _db = new DbHelper();
         public string Get(int id, string name)
         {
-            return "id:" + id + " name:" + name;
+            return "{id:" + id + " name:" + name + "}";
         }
 
         public user GetUser(int id, string name)

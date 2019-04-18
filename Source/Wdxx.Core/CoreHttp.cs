@@ -14,19 +14,34 @@ namespace Wdxx.Core
     {
 
         /// <summary>
+        /// Http Get请求(返回泛型)
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <returns></returns>
+        public static T HttpGet<T>(string httpUri)
+        {
+           return HttpGet<T>(httpUri, string.Empty);
+        }
+        
+        /// <summary>
         /// Http Get请求(字符串入参 返回泛型)
         /// </summary>
         /// <param name="httpUri">请求地址</param>
         /// <param name="getData">请求参数 例:id=1</param>
         /// <returns></returns>
-        public static T HttpGet<T>(string httpUri, string getData = "")
+        public static T HttpGet<T>(string httpUri, string getData)
         {
-            string ret;
-            if (HttpGet(httpUri, getData, out ret))
-            {
-                return JsonToObj<T>(ret);
-            }
-            throw new Exception("Http Get请求 发生异常:" + ret);
+            return JsonToObj<T>(HttpGet(httpUri, getData));
+        }
+        
+        /// <summary>
+        /// Http Get请求(返回字符串)
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <returns></returns>
+        public static string HttpGet(string httpUri)
+        {
+            return HttpGet(httpUri, string.Empty);
         }
 
         /// <summary>
@@ -35,9 +50,14 @@ namespace Wdxx.Core
         /// <param name="httpUri">请求地址</param>
         /// <param name="getData">请求参数 例:id=1</param>
         /// <returns></returns>
-        public static string HttpGet(string httpUri, string getData = "")
+        public static string HttpGet(string httpUri, string getData)
         {
-            return HttpGet<string>(httpUri, getData);
+            string ret;
+            if (HttpGet(httpUri, getData, out ret))
+            {
+                return ret;
+            }
+            throw new Exception("Http Get请求 发生异常:" + ret);
         }
 
         /// <summary>
@@ -48,13 +68,8 @@ namespace Wdxx.Core
         /// <returns>调用是否成功</returns>
         public static T HttpPost<T>(string httpUri, object postData)
         {
-            string ret;
             var data = ObjToJson(postData);
-            if (HttpPost(httpUri, data, out ret))
-            {
-                return JsonToObj<T>(ret);
-            }
-            throw new Exception("Http Post请求 发生异常:" + ret);
+            return JsonToObj<T>(HttpPost(httpUri, data));
         }
 
         /// <summary>
@@ -65,7 +80,8 @@ namespace Wdxx.Core
         /// <returns>调用是否成功</returns>
         public static string HttpPost(string httpUri, object postData)
         {
-            return HttpPost<string>(httpUri, postData);
+            var data = ObjToJson(postData);
+            return HttpPost(httpUri, data);
         }
 
         /// <summary>
@@ -76,12 +92,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T HttpPost<T>(string httpUri, string postData)
         {
-            string ret;
-            if (HttpPost(httpUri, postData, out ret))
-            {
-                return JsonToObj<T>(ret);
-            }
-            throw new Exception("Http Post请求 发生异常:" + ret);
+            return JsonToObj<T>(HttpPost(httpUri, postData));
         }
 
         /// <summary>
@@ -92,7 +103,12 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string HttpPost(string httpUri, string postData)
         {
-            return HttpPost<string>(httpUri, postData);
+            string ret;
+            if (HttpPost(httpUri, postData, out ret))
+            {
+                return ret;
+            }
+            throw new Exception("Http Post请求 发生异常:" + ret);
         }
 
         /// <summary>

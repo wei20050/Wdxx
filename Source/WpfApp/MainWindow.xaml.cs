@@ -59,7 +59,7 @@ namespace Client
         /// <param name="e"></param>
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            var data = new {id = 3, name = "王五"};
+            var data = new { id = 3, name = "王五" };
             MessageBox.Show(CoreHttp.HttpPost<string>(ServiceHelp.HttpUrl + "post", data));
         }
 
@@ -70,9 +70,9 @@ namespace Client
         /// <param name="e"></param>
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            var user = new {id = 4,name = "六麻子"};
+            var user = new { id = 4, name = "六麻子" };
             var u = CoreHttp.HttpPost<user>(ServiceHelp.HttpUrl + "postuser", user);
-                MessageBox.Show(u.id + u.name);
+            MessageBox.Show(u.id + u.name);
         }
 
         /// <summary>
@@ -93,8 +93,8 @@ namespace Client
         /// <param name="e"></param>
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            var user = new user{ id = 1, name = "六麻子111" };
-            var data = new {u = user};
+            var user = new user { id = 1, name = "六麻子111" };
+            var data = new { u = user };
             MessageBox.Show(CoreHttp.HttpPost<int>(ServiceHelp.HttpUrl + "insert", data).ToString());
         }
 
@@ -129,8 +129,8 @@ namespace Client
         private void Button_Click_8(object sender, RoutedEventArgs e)
         {
             //CoreHttp.HttpGet(GlobalVar.HttpUrl + "select", "id=4", out user u);
-            var u = GlobalVar.Service.Select(4,"啊啊啊");
-            DataGrid1.ItemsSource = new  List<user>{u};
+            var u = GlobalVar.Service.Select(4, "啊啊啊");
+            DataGrid1.ItemsSource = new List<user> { u };
         }
 
         /// <summary>
@@ -157,14 +157,33 @@ namespace Client
             GlobalVar.Service = ServiceHelp.CreateServiceClient();
         }
 
+        private struct Tmxx
+        {
+            public string Dyjg;
+            public string Xm;
+            public string Ycxx;
+        }
+
         private void ButtonBase_OnClick1(object sender, RoutedEventArgs e)
         {
-            CorePublic.Restart();
+            var tm = CoreEncrypt.AesEncrypt("123456789012", "wondersgroupjztm");
+            var tmEncode = System.Web.HttpUtility.UrlEncode(tm, System.Text.Encoding.UTF8);
+            var url = "http://10.1.93.110/ipms/api/getPdjhszzjbxxByQuery?szztm=" + tmEncode;
+            var tmxx = CoreHttp.HttpPost<Tmxx>(url, null);
+            if (tmxx.Dyjg == "0")
+            {
+                MessageBox.Show("成功获取到姓名:" + System.Web.HttpUtility.UrlDecode(tmxx.Xm, System.Text.Encoding.UTF8) );
+            }
+            else
+            {
+                MessageBox.Show("错误:" + System.Web.HttpUtility.UrlDecode(tmxx.Ycxx, System.Text.Encoding.UTF8) );
+            }
         }
+
         private void ButtonBase_OnClick2(object sender, RoutedEventArgs e)
         {
-            var aa =  CoreIni.Rini<string[]>("ca1");
-            MessageBox.Show(aa.ToString());
+            var tm = CoreEncrypt.Core("123451");
+            MessageBox.Show(tm);
         }
     }
 }

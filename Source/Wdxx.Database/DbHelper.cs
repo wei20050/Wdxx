@@ -872,13 +872,25 @@ namespace Wdxx.Database
         /// </summary>
         /// <param name="conditions">修改的条件(从where后面开始组装)</param>
         /// <returns></returns>
-        public List<T> SelectAll<T>(string conditions = "") where T : new()
+        public List<T> SelectAll<T>(string conditions) where T : new()
         {
             var st = new Sql();
             st.Add(conditions == "" ? "1=1" : conditions);
             var ret = SelectAll<T>(st);
             st.Clear();
             return ret;
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <returns></returns>
+        public List<T> SelectAll<T>() where T : new()
+        {
+            var type = typeof(T);
+            var sbSql = new StringBuilder();
+            sbSql.AppendFormat("select * from {0}", type.Name);
+            return FindList<T>(sbSql.ToString());
         }
 
         /// <summary>

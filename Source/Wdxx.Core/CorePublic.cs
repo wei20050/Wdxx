@@ -142,10 +142,18 @@ namespace Wdxx.Core
         #region 注册表添加与删除开机启动
 
         /// <summary>
-        /// 设置注册表实现 开机自动启动(appPath不填,默认设置当前程序开机自启)
+        /// 设置当前程序开机自启
+        /// </summary>
+        public static void AutoStart()
+        {
+            AutoStart(AppDomain.CurrentDomain.BaseDirectory + Assembly.GetEntryAssembly().GetName().Name + ".exe");
+        }
+
+        /// <summary>
+        /// 设置注册表实现 开机自动启动
         /// </summary>
         /// <param name="appPath">程序路径</param>
-        public static void AutoStart(string appPath = "")
+        public static void AutoStart(string appPath)
         {
             try
             {
@@ -154,14 +162,8 @@ namespace Wdxx.Core
                 {
                     throw new Exception(@"添加开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
                 }
-                if (string.IsNullOrEmpty(appPath))
-                {
-                    rKey.SetValue(Assembly.GetEntryAssembly().GetName().Name, "\"" + AppDomain.CurrentDomain.BaseDirectory + Assembly.GetEntryAssembly().GetName().Name + ".exe\"");
-                }
-                else
-                {
-                    rKey.SetValue(Path.GetFileNameWithoutExtension(appPath), "\"" + appPath + "\"");
-                }
+                rKey.SetValue(Path.GetFileNameWithoutExtension(appPath), "\"" + appPath + "\"");
+
             }
             catch (Exception e)
             {
@@ -170,10 +172,18 @@ namespace Wdxx.Core
         }
 
         /// <summary>
-        /// 删除注册表实现 解除开机自动启动(appName不填,默认删除当前程序开机自启)
+        /// 删除当前程序开机自启
+        /// </summary>
+        public static void UnAutoStart()
+        {
+            UnAutoStart(Assembly.GetEntryAssembly().GetName().Name);
+        }
+
+        /// <summary>
+        /// 删除注册表实现 解除开机自动启动
         /// </summary>
         /// <param name="appName">程序名称(不带后缀)</param>
-        public static void UnAutoStart(string appName = "")
+        public static void UnAutoStart(string appName)
         {
             try
             {
@@ -182,8 +192,7 @@ namespace Wdxx.Core
                 {
                     throw new Exception(@"删除开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
                 }
-                rKey.DeleteValue(string.IsNullOrEmpty(appName) ? Assembly.GetEntryAssembly().GetName().Name : appName,
-                    false);
+                rKey.DeleteValue(appName, false);
             }
             catch (Exception e)
             {
@@ -277,11 +286,20 @@ namespace Wdxx.Core
         }
 
         /// <summary>
+        /// 运行外部应用等待退出(一直等待)
+        /// </summary>
+        /// <param name="filePath">外部程序文件路径</param>
+        public static void RunAppWaitForExit(string filePath)
+        {
+            RunAppWaitForExit(filePath, 0);
+        }
+
+        /// <summary>
         /// 运行外部应用等待退出
         /// </summary>
         /// <param name="filePath">外部程序文件路径</param>
-        /// <param name="s">等待毫秒数</param>
-        public static void RunAppWaitForExit(string filePath,int s = 0)
+        /// <param name="s">等待毫秒数(小于等于0一直等待)</param>
+        public static void RunAppWaitForExit(string filePath, int s)
         {
             var oldWow64State = new IntPtr();
             try
@@ -294,7 +312,7 @@ namespace Wdxx.Core
                 var proc = Process.Start(filePath);
                 Wow64RevertWow64FsRedirection(oldWow64State);
                 if (proc == null) return;
-                if (s == 0)
+                if (s <= 0)
                 {
                     proc.WaitForExit();
                 }
