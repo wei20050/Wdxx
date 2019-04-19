@@ -124,11 +124,7 @@ namespace Wdxx.Core
         /// <returns>配置值</returns>
         public static T Rini<T>(string key, string configPath , string endpoint)
         {
-            if (configPath == DefaultPath)
-            {
-                configPath = ConfigPath;
-            }
-            return JsonToObj<T>(ReadIniData(endpoint, key, string.Empty, configPath));
+            return JsonToObj<T>(Rini(endpoint, key, configPath));
         }
 
         /// <summary>
@@ -165,7 +161,7 @@ namespace Wdxx.Core
             {
                 configPath = ConfigPath;
             }
-            return JsonToObj<string>(ReadIniData(endpoint, key, string.Empty, configPath));
+            return ReadIniData(endpoint, key, string.Empty, configPath);
         }
 
         /// <summary>
@@ -205,7 +201,48 @@ namespace Wdxx.Core
             {
                 configPath = ConfigPath;
             }
-            return WriteIniData(endpoint, key, ObjToJson(value), configPath);
+            return Wini(endpoint, key, ObjToJson(value), configPath);
+        }
+
+
+        /// <summary>
+        /// 写入字符串类型
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <returns></returns>
+        public static bool Wini(string key, string value)
+        {
+            return Wini(key, value, DefaultPath, DefaultEndpoint);
+        }
+
+        /// <summary>
+        /// 写入字符串类型
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <param name="configPath">配置文件路径</param>
+        /// <returns></returns>
+        public static bool Wini(string key, string value, string configPath)
+        {
+            return Wini(key, value, configPath, DefaultEndpoint);
+        }
+
+        /// <summary>
+        /// 写入字符串类型
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <param name="configPath">配置文件路径</param>
+        /// <param name="endpoint">终结点(默认root)</param>
+        /// <returns></returns>
+        public static bool Wini(string key, string value, string configPath, string endpoint)
+        {
+            if (configPath == DefaultPath)
+            {
+                configPath = ConfigPath;
+            }
+            return WriteIniData(endpoint, key, value, configPath);
         }
 
         /// <summary>
