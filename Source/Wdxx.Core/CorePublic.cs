@@ -335,5 +335,39 @@ namespace Wdxx.Core
 
         #endregion
 
+        #region 绝对随机
+
+        /// <summary>
+        /// 返回double随机数0-1不包括1
+        /// </summary>
+        /// <returns></returns>
+        public static double Random()
+        {
+            var rd = new Random(GenerateId());
+            return rd.NextDouble();
+        }
+
+        /// <summary>
+        /// 返回在指定范围内的任意整数
+        /// </summary>
+        /// <returns></returns>
+        public static double Random(int minValue,int maxValue)
+        {
+            var rd = new Random(GenerateId());
+            return rd.Next(minValue, maxValue);
+        }
+
+        /// <summary>
+        /// 获取9位随机正整数(作为Random的种子 或其他用途)
+        /// </summary>
+        /// <returns></returns>
+        public static int GenerateId()
+        {
+            var buffer = Guid.NewGuid().ToByteArray();
+            return (int) (BitConverter.ToInt64(buffer, 0) / 999999999);
+        }
+
+        #endregion
+
     }
 }

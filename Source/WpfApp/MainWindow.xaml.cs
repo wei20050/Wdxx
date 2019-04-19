@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using Client.WcfServiceReference;
 using Client.Service;
@@ -166,9 +168,8 @@ namespace Client
 
         private void ButtonBase_OnClick1(object sender, RoutedEventArgs e)
         {
-            var tm = CoreEncrypt.AesEncrypt("123456789012", "wondersgroupjztm");
-            var tmEncode = System.Web.HttpUtility.UrlEncode(tm, System.Text.Encoding.UTF8);
-            var url = "http://10.1.93.110/ipms/api/getPdjhszzjbxxByQuery?szztm=" + tmEncode;
+            var tm = CoreEncrypt.AesEncrypt("123456789011", "wondersgroupjztm");
+            var url = "http://10.1.93.110/ipms/api/getPdjhszzjbxxByQuery?szztm=" + tm;
             var tmxx = CoreHttp.HttpPost<Tmxx>(url, null);
             if (tmxx.Dyjg == "0")
             {
@@ -182,8 +183,7 @@ namespace Client
 
         private void ButtonBase_OnClick2(object sender, RoutedEventArgs e)
         {
-            var tm = CoreEncrypt.Core("123451");
-            MessageBox.Show(tm);
+            MessageBox.Show(CorePublic.GenerateId().ToString(CultureInfo.InvariantCulture));
         }
     }
 }
