@@ -8,7 +8,7 @@ namespace Wdxx.Database
     /// <summary>
     /// 数据库日志 (路径 操作数据库的应用或服务根目录 logs文件夹)
     /// </summary>
-    public static class DbLog
+    internal static class DbLog
     {
 
         //日志文件夹默认根目录logs文件夹

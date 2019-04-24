@@ -58,6 +58,11 @@
     <Compile Include="DbHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sql.cs" />
+    <Compile Include="SqlFunction\SqlFunBase.cs" />
+    <Compile Include="SqlFunction\MsSqlFunction.cs" />
+    <Compile Include="SqlFunction\OracleFunction.cs" />
+    <Compile Include="SqlFun.cs" />
+    <Compile Include="SqlFunction\SqLiteFunction.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
