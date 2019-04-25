@@ -11,6 +11,18 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
+  <xs:element name="TestStr">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TestStrResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="TestStrResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Get">
     <xs:complexType>
       <xs:sequence>

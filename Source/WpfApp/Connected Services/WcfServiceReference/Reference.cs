@@ -81,6 +81,9 @@ namespace Client.WcfServiceReference {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/Test", ReplyAction="http://tempuri.org/IService/TestResponse")]
         void Test();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/TestStr", ReplyAction="http://tempuri.org/IService/TestStrResponse")]
+        string TestStr();
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/Get", ReplyAction="http://tempuri.org/IService/GetResponse")]
         string Get(int id, string name);
         
@@ -138,6 +141,10 @@ namespace Client.WcfServiceReference {
         
         public void Test() {
             base.Channel.Test();
+        }
+        
+        public string TestStr() {
+            return base.Channel.TestStr();
         }
         
         public string Get(int id, string name) {

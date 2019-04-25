@@ -17,7 +17,7 @@
         <Button Content="httpselect" HorizontalAlignment="Left" Height="53" Margin="465,117,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_8"/>
         <Button Content="httpselectall" HorizontalAlignment="Left" Height="53" Margin="608,117,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_9"/>
         <TextBox Name="TextBoxUrl" HorizontalAlignment="Left" Height="23" Margin="59,207,0,0" TextWrapping="Wrap" Text="http://localhost:56000/Service.svc" VerticalAlignment="Top" Width="546"/>
-        <Button Content="连接服务" HorizontalAlignment="Left" Margin="638,211,0,0" VerticalAlignment="Top" Width="75" Click="ButtonBase_OnClick"/>
+        <Button Content="连接服务" HorizontalAlignment="Left" Margin="638,207,0,0" VerticalAlignment="Top" Width="75" Click="ButtonBase_OnClick" Height="23"/>
         <DataGrid Name="DataGrid1" HorizontalAlignment="Left" Height="174" Margin="59,235,0,0" VerticalAlignment="Top" Width="355"/>
         <Button Content="测试" HorizontalAlignment="Left" Margin="465,326,0,0" VerticalAlignment="Top" Width="75" Click="ButtonBase_OnClick1" Height="72"/>
         <Button Content="测试" HorizontalAlignment="Left" Margin="565,326,0,0" VerticalAlignment="Top" Width="75" Click="ButtonBase_OnClick2" Height="72"/>

@@ -13,6 +13,9 @@ namespace WcfService
         void Test();
 
         [OperationContract]
+        string TestStr();
+
+        [OperationContract]
         [WebInvoke(Method = "GET", BodyStyle = WebMessageBodyStyle.WrappedRequest,
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json)]

@@ -5,7 +5,7 @@
         
         internal new string Now()
         {
-            return "date('now') || ' ' || time('now', 'localtime')";
+            return "DATE('NOW') || ' ' || TIME('NOW', 'LOCALTIME')";
         }
 
     }

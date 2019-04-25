@@ -38,9 +38,9 @@ namespace Wdxx.Database
         #region 字段
         
         /// <summary>
-        /// 上个参数的位置
+        /// 上个参数的位置(默认0)
         /// </summary>
-        private int _lastParamIndex = -1;
+        private int _lastParamIndex;
 
         #endregion
 
@@ -67,8 +67,8 @@ namespace Wdxx.Database
         /// <returns>返回参数名</returns>
         private string AddParam(object v)
         {
-            _lastParamIndex++;
-            var paramName = "SqlP_" + _lastParamIndex;
+            //这里用完 _lastParamIndex 立即加一 防止下个参数错误
+            var paramName = "SQL_P_" + _lastParamIndex++;
             ParamDict.Add(paramName, v);
             return paramName;
         }
@@ -96,11 +96,20 @@ namespace Wdxx.Database
         }
 
         /// <summary>
+        /// 当前Sql文本增加字段, `{0}`
+        /// </summary>
+        public virtual Sql AddField(string str)
+        {
+            SqlText.AppendFormat(" `{0}` ", str);
+            return this;
+        }
+
+        /// <summary>
         /// 增加一个select,等于 "select"
         /// </summary>
         public virtual Sql Select()
         {
-            SqlText.AppendFormat(" select ");
+            SqlText.AppendFormat(" SELECT ");
             return this;
         }
 
@@ -118,7 +127,16 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql From()
         {
-            SqlText.AppendFormat(" from ");
+            SqlText.AppendFormat(" FROM ");
+            return this;
+        }
+
+        /// <summary>
+        /// 增加一个join,等于 "join"
+        /// </summary>
+        public virtual Sql Join()
+        {
+            SqlText.AppendFormat(" JOIN ");
             return this;
         }
 
@@ -127,7 +145,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql InnerJoin()
         {
-            SqlText.AppendFormat(" inner join ");
+            SqlText.AppendFormat(" INNER JOIN ");
             return this;
         }
 
@@ -136,7 +154,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql LeftJoin()
         {
-            SqlText.AppendFormat(" left join ");
+            SqlText.AppendFormat(" LEFT JOIN ");
             return this;
         }
 
@@ -145,7 +163,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql RightJoin()
         {
-            SqlText.AppendFormat(" right join ");
+            SqlText.AppendFormat(" RIGHT JOIN ");
             return this;
         }
 
@@ -154,7 +172,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql On()
         {
-            SqlText.AppendFormat(" on ");
+            SqlText.AppendFormat(" ON ");
             return this;
         }
 
@@ -163,7 +181,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql Where()
         {
-            SqlText.AppendFormat(" where ");
+            SqlText.AppendFormat(" WHERE ");
             return this;
         }
 
@@ -226,7 +244,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql In(params object[] inArgs)
         {
-            SqlText.Append(" in (");
+            SqlText.Append(" IN (");
             for (var i = 0; i < inArgs.Length; i++)
             {
                 SqlText.Append(AddParam(inArgs[i]));
@@ -244,7 +262,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql NotIn(params object[] inArgs)
         {
-            SqlText.Append(" not in (");
+            SqlText.Append(" NOT IN (");
             for (var i = 0; i < inArgs.Length; i++)
             {
                 SqlText.Append(AddParam(inArgs[i]));
@@ -263,7 +281,7 @@ namespace Wdxx.Database
         public virtual Sql LikeLeft(string v)
         {
             var addParam = AddParam("%" + v);
-            SqlText.AppendFormat(" like {0}", addParam);
+            SqlText.AppendFormat(" LIKE {0}", addParam);
             return this;
         }
 
@@ -273,7 +291,7 @@ namespace Wdxx.Database
         public virtual Sql LikeRight(string v)
         {
             var addParam = AddParam(v + "%");
-            SqlText.AppendFormat(" like {0}", addParam);
+            SqlText.AppendFormat(" LIKE {0}", addParam);
             return this;
         }
 
@@ -283,7 +301,7 @@ namespace Wdxx.Database
         public virtual Sql Like(string v)
         {
             var addParam = AddParam("%" + v + "%");
-            SqlText.AppendFormat(" like {0}", addParam);
+            SqlText.AppendFormat(" LIKE {0}", addParam);
             return this;
         }
 
@@ -297,12 +315,11 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 增加一个左括号"(",再加一个字符串(通常是一个字段)
+        /// 增加一个左括号"(",再加一个字段)
         /// </summary>
         public virtual Sql BracketLeft(string str)
         {
-            SqlText.AppendFormat("(");
-            SqlText.AppendFormat(str);
+            SqlText.AppendFormat("(`{0}`", str);
             return this;
         }
 
@@ -325,15 +342,18 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 增加连接符 "and",再加一个字符串(通常是一个字段)
+        /// 增加连接符 "and",再加一个字段
         /// </summary>
         public virtual Sql And(string str)
         {
             if (SqlText.Length > 0)
             {
-                SqlText.Append(" and ");
+                SqlText.Append(" AND ");
             }
-            SqlText.Append(str);
+            if (!string.IsNullOrEmpty(str))
+            {
+                SqlText.AppendFormat("`{0}`", str);
+            }
             return this;
         }
 
@@ -347,15 +367,18 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 增加连接符"or",再加一个字符串(通常是一个字段)
+        /// 增加连接符"or",再加一个字段
         /// </summary>
         public virtual Sql Or(string str)
         {
             if (SqlText.Length > 0)
             {
-                SqlText.Append(" or ");
+                SqlText.Append(" OR ");
             }
-            SqlText.Append(str);
+            if (!string.IsNullOrEmpty(str))
+            {
+                SqlText.AppendFormat("`{0}`", str);
+            }
             return this;
         }
 
@@ -368,7 +391,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql Asc(string str)
         {
-            SqlText.AppendFormat(" order by {0} asc ", str);
+            SqlText.AppendFormat(" ORDER BY `{0}` ASC ", str);
             return this;
         }
 
@@ -377,7 +400,7 @@ namespace Wdxx.Database
         /// </summary>
         public virtual Sql Desc(string str)
         {
-            SqlText.AppendFormat(" order by {0} desc ", str);
+            SqlText.AppendFormat(" ORDER BY `{0}` DESC ", str);
             return this;
         }
 
@@ -389,11 +412,11 @@ namespace Wdxx.Database
             var str = new StringBuilder();
             foreach (var v in strDic)
             {
-                var sort= v.Value ? " asc" :" desc";
-                str.AppendFormat("{0}{1},", v.Key, sort);
+                var sort= v.Value ? " ASC" :" DESC";
+                str.AppendFormat("`{0}` {1},", v.Key, sort);
             }
             str.Remove(str.Length - 1, 1);
-            SqlText.AppendFormat(" order by {0}", str);
+            SqlText.AppendFormat(" ORDER BY `{0}`", str);
             return this;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using MydbEntity;
+using Wdxx.Core;
 using Wdxx.Database;
 
 namespace WcfService
@@ -9,6 +10,11 @@ namespace WcfService
         public void Test()
         {
 
+        }
+        public string TestStr()
+        {
+            var ret = _db.Select<user>(new Sql().AddField("id").Equal(1).Or("name").Equal("张三"));
+            return CoreConvert.ObjToJson(ret);
         }
 
         public Service()
@@ -44,7 +50,7 @@ namespace WcfService
 
         public int Delete(int id)
         {
-            return _db.Delete<user>(new Sql().Add("id").Equal(id));
+            return _db.Delete<user>(new Sql().AddField("id").Equal(id));
         }
 
         public int Update(user u)
@@ -54,7 +60,7 @@ namespace WcfService
 
         public user Select(int id,string name)
         {
-            return _db.Select<user>(new Sql().Add("id").Equal(id).Or("name").Equal(name));
+            return _db.Select<user>(new Sql().AddField("id").Equal(id).Or("name").Equal(name));
         }
 
         public List<user> SelectAll()

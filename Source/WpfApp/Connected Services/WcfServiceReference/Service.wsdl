@@ -13,6 +13,12 @@
   <wsdl:message name="IService_Test_OutputMessage">
     <wsdl:part name="parameters" element="tns:TestResponse" />
   </wsdl:message>
+  <wsdl:message name="IService_TestStr_InputMessage">
+    <wsdl:part name="parameters" element="tns:TestStr" />
+  </wsdl:message>
+  <wsdl:message name="IService_TestStr_OutputMessage">
+    <wsdl:part name="parameters" element="tns:TestStrResponse" />
+  </wsdl:message>
   <wsdl:message name="IService_Get_InputMessage">
     <wsdl:part name="parameters" element="tns:Get" />
   </wsdl:message>
@@ -72,6 +78,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IService/Test" message="tns:IService_Test_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService/TestResponse" message="tns:IService_Test_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="TestStr">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/TestStr" message="tns:IService_TestStr_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/TestStrResponse" message="tns:IService_TestStr_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="Get">
       <wsdl:input wsaw:Action="http://tempuri.org/IService/Get" message="tns:IService_Get_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService/GetResponse" message="tns:IService_Get_OutputMessage" />
@@ -113,6 +123,15 @@
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="Test">
       <soap:operation soapAction="http://tempuri.org/IService/Test" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestStr">
+      <soap:operation soapAction="http://tempuri.org/IService/TestStr" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
