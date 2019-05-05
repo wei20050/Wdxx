@@ -38,7 +38,7 @@ namespace Wdxx.Core
             {
                 return jsonObject.ToString();
             }
-            return new JavaScriptSerializer().Serialize(jsonObject);
+            return new JavaScriptSerializer().Serialize(jsonObject).Replace("\"ExtensionData\":{},", string.Empty);
         }
         
         /// <summary>
