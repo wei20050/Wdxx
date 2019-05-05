@@ -124,7 +124,7 @@ namespace Wdxx.Core
         /// <returns>配置值</returns>
         public static T Rini<T>(string key, string configPath , string endpoint)
         {
-            return JsonToObj<T>(Rini(endpoint, key, configPath));
+            return JsonToObj<T>(Rini(key, configPath, endpoint));
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Wdxx.Core
             {
                 configPath = ConfigPath;
             }
-            return Wini(endpoint, key, ObjToJson(value), configPath);
+            return Wini(key, ObjToJson(value), configPath, endpoint);
         }
 
 

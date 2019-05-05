@@ -64,10 +64,14 @@ namespace Wdxx.Core
         /// </summary>
         public static void IsStart()
         {
-            //获取指定的进程名
-            var myProcesses = Process.GetProcessesByName(Assembly.GetEntryAssembly().GetName().Name);
-            //如果可以获取到知道的进程名则说明已经启动
-            if (myProcesses.Length <= 1) return;
+            for (var i = 0; i < 8; i++)
+            {
+                //获取指定的进程名
+                var myProcesses = Process.GetProcessesByName(Assembly.GetEntryAssembly().GetName().Name);
+                //如果可以获取到知道的进程名则说明已经启动
+                if (myProcesses.Length <= 1) return;
+                System.Threading.Thread.Sleep(168);
+            }
             MessageBox.Show("程序已启动！");
             //关闭系统
             Environment.Exit(0);

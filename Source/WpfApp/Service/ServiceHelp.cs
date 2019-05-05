@@ -50,8 +50,8 @@ namespace Client.Service
                 if (MessageBoxResult.Yes != MessageBox.Show("离线中！是否还要继续？", "提示", MessageBoxButton.YesNo,
                         MessageBoxImage.Warning)) return false;
                 IsOnLine = false;
-                OfflineServiceUrl = CoreLocalServiceHost.OpenHost(typeof(WcfService.Service));
-                HttpUrl = OfflineServiceUrl + "api/";
+                OfflineServiceUrl = CoreHost.OpenHost(typeof(WcfService.IService),typeof(WcfService.Service),"http://localhost:88/a/");
+                HttpUrl = OfflineServiceUrl + "/api/";
                 //设置本地数据库
                 LocalDatabaseHelp.SetDatabase();
             }
