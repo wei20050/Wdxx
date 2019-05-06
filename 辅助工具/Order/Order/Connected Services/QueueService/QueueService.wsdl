@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="QueueService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:56239/QueueService.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:56239/QueueService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:56239/QueueService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IQueueService_Test_InputMessage">
+    <wsdl:part name="parameters" element="tns:Test" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_Test_OutputMessage">
+    <wsdl:part name="parameters" element="tns:TestResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_TakenoApi_InputMessage">
+    <wsdl:part name="parameters" element="tns:TakenoApi" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_TakenoApi_OutputMessage">
+    <wsdl:part name="parameters" element="tns:TakenoApiResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueClinicTypeList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueClinicTypeList" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueClinicTypeList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueClinicTypeListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetClinicTypeName_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetClinicTypeName" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetClinicTypeName_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetClinicTypeNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueConfigSysList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueConfigSysList" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueConfigSysList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueConfigSysListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_SetQueueConfigSys_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetQueueConfigSys" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_SetQueueConfigSys_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetQueueConfigSysResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_PullOrderService_InputMessage">
+    <wsdl:part name="parameters" element="tns:PullOrderService" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_PullOrderService_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PullOrderServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueOrderInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueOrderInfo" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueOrderInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueOrderInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_SetQueueOrderInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetQueueOrderInfo" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_SetQueueOrderInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetQueueOrderInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetName_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetName" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetName_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetDateTime_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDateTime" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetDateTime_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDateTimeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_TakeNo_InputMessage">
+    <wsdl:part name="parameters" element="tns:TakeNo" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_TakeNo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:TakeNoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_CallNo_InputMessage">
+    <wsdl:part name="parameters" element="tns:CallNo" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_CallNo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CallNoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_OverNo_InputMessage">
+    <wsdl:part name="parameters" element="tns:OverNo" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_OverNo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OverNoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_ResNo_InputMessage">
+    <wsdl:part name="parameters" element="tns:ResNo" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_ResNo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ResNoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueTakeno_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueTakeno" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueTakeno_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueTakenoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueTakenoList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueTakenoList" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueTakenoList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueTakenoListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueTakenoMiddle_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueTakenoMiddle" />
+  </wsdl:message>
+  <wsdl:message name="IQueueService_GetQueueTakenoMiddle_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueTakenoMiddleResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IQueueService">
+    <wsdl:operation name="Test">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/Test" message="tns:IQueueService_Test_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/TestResponse" message="tns:IQueueService_Test_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="TakenoApi">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/TakenoApi" message="tns:IQueueService_TakenoApi_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/TakenoApiResponse" message="tns:IQueueService_TakenoApi_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueClinicTypeList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetQueueClinicTypeList" message="tns:IQueueService_GetQueueClinicTypeList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetQueueClinicTypeListResponse" message="tns:IQueueService_GetQueueClinicTypeList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetClinicTypeName">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetClinicTypeName" message="tns:IQueueService_GetClinicTypeName_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetClinicTypeNameResponse" message="tns:IQueueService_GetClinicTypeName_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueConfigSysList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetQueueConfigSysList" message="tns:IQueueService_GetQueueConfigSysList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetQueueConfigSysListResponse" message="tns:IQueueService_GetQueueConfigSysList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetQueueConfigSys">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/SetQueueConfigSys" message="tns:IQueueService_SetQueueConfigSys_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/SetQueueConfigSysResponse" message="tns:IQueueService_SetQueueConfigSys_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PullOrderService">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/PullOrderService" message="tns:IQueueService_PullOrderService_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/PullOrderServiceResponse" message="tns:IQueueService_PullOrderService_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueOrderInfo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetQueueOrderInfo" message="tns:IQueueService_GetQueueOrderInfo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetQueueOrderInfoResponse" message="tns:IQueueService_GetQueueOrderInfo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetQueueOrderInfo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/SetQueueOrderInfo" message="tns:IQueueService_SetQueueOrderInfo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/SetQueueOrderInfoResponse" message="tns:IQueueService_SetQueueOrderInfo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetName">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetName" message="tns:IQueueService_GetName_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetNameResponse" message="tns:IQueueService_GetName_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDateTime">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetDateTime" message="tns:IQueueService_GetDateTime_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetDateTimeResponse" message="tns:IQueueService_GetDateTime_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="TakeNo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/TakeNo" message="tns:IQueueService_TakeNo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/TakeNoResponse" message="tns:IQueueService_TakeNo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CallNo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/CallNo" message="tns:IQueueService_CallNo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/CallNoResponse" message="tns:IQueueService_CallNo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OverNo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/OverNo" message="tns:IQueueService_OverNo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/OverNoResponse" message="tns:IQueueService_OverNo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ResNo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/ResNo" message="tns:IQueueService_ResNo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/ResNoResponse" message="tns:IQueueService_ResNo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueTakeno">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetQueueTakeno" message="tns:IQueueService_GetQueueTakeno_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetQueueTakenoResponse" message="tns:IQueueService_GetQueueTakeno_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueTakenoList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetQueueTakenoList" message="tns:IQueueService_GetQueueTakenoList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetQueueTakenoListResponse" message="tns:IQueueService_GetQueueTakenoList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueTakenoMiddle">
+      <wsdl:input wsaw:Action="http://tempuri.org/IQueueService/GetQueueTakenoMiddle" message="tns:IQueueService_GetQueueTakenoMiddle_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IQueueService/GetQueueTakenoMiddleResponse" message="tns:IQueueService_GetQueueTakenoMiddle_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IQueueService" type="tns:IQueueService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Test">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/Test" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TakenoApi">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/TakenoApi" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueClinicTypeList">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetQueueClinicTypeList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetClinicTypeName">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetClinicTypeName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueConfigSysList">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetQueueConfigSysList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetQueueConfigSys">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/SetQueueConfigSys" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PullOrderService">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/PullOrderService" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueOrderInfo">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetQueueOrderInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetQueueOrderInfo">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/SetQueueOrderInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetName">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDateTime">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetDateTime" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TakeNo">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/TakeNo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CallNo">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/CallNo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OverNo">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/OverNo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResNo">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/ResNo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueTakeno">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetQueueTakeno" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueTakenoList">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetQueueTakenoList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueTakenoMiddle">
+      <soap:operation soapAction="http://tempuri.org/IQueueService/GetQueueTakenoMiddle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="QueueService">
+    <wsdl:port name="BasicHttpBinding_IQueueService" binding="tns:BasicHttpBinding_IQueueService">
+      <soap:address location="http://localhost:56239/QueueService.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:56239/QueueService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" />
+  <xs:element name="Test">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TestResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TakenoApi">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="takenoType" type="xs:int" />
+        <xs:element minOccurs="0" name="barCode" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="takenoCode" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="callName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TakenoApiResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="TakenoApiResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueClinicTypeList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueClinicTypeListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="GetQueueClinicTypeListResult" nillable="true" type="q1:ArrayOfqueue_clinictype" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetClinicTypeName">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="clinicTypeKey" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetClinicTypeNameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetClinicTypeNameResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueConfigSysList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueConfigSysListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="GetQueueConfigSysListResult" nillable="true" type="q2:ArrayOfqueue_config_sys" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetQueueConfigSys">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="qcs" nillable="true" type="q3:queue_config_sys" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetQueueConfigSysResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="SetQueueConfigSysResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PullOrderService">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="time" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PullOrderServiceResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="PullOrderServiceResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueOrderInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="userCardId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueOrderInfoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="GetQueueOrderInfoResult" nillable="true" type="q4:queue_order_info" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetQueueOrderInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="queueOrderInfo" nillable="true" type="q5:queue_order_info" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetQueueOrderInfoResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetName">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="barCode" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetNameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetNameResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDateTime">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDateTimeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetDateTimeResult" type="xs:dateTime" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TakeNo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="queueTakeno" nillable="true" type="q6:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TakeNoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="TakeNoResult" nillable="true" type="q7:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CallNo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="queueTakeno" nillable="true" type="q8:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CallNoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="CallNoResult" nillable="true" type="q9:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OverNo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OverNoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="OverNoResult" nillable="true" type="q10:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ResNo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="id" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ResNoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="ResNoResult" nillable="true" type="q11:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueTakeno">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="queueTakeno" nillable="true" type="q12:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueTakenoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="GetQueueTakenoResult" nillable="true" type="q13:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueTakenoList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="queueTakeno" nillable="true" type="q14:queue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueTakenoListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="GetQueueTakenoListResult" nillable="true" type="q15:ArrayOfqueue_takeno" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueTakenoMiddle">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="queueTakenoMiddle" nillable="true" type="q16:queue_takeno_middle" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetQueueTakenoMiddleResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/Queue.Service.Entity" minOccurs="0" name="GetQueueTakenoMiddleResult" nillable="true" type="q17:queue_takeno_middle" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,23 @@
+﻿<Window x:Class="Order.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="预约数据下拉" Height="500" Width="500" Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed">
+    <Grid>
+        <StackPanel>
+            <TextBox Name="TxtContent" Padding="6" TextWrapping="Wrap" FontSize="20" Height="300" Margin="6,3,6,3"/>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,3">
+                <Label Content="预约日期:" FontSize="30"/>
+                <DatePicker Name="DpYy" FontSize="30" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,6" HorizontalAlignment="Center">
+                <Button Name="BtnPull" Content="根据预约日期手动拉取预约数据" FontSize="30" Click="BtnPull_Click" Width="460" Padding="6" Margin="6,0,6,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6" HorizontalAlignment="Right">
+                <CheckBox Name="CbAutoStart" Content="开机自启" FontSize="20" Margin="0,0,6,0" Click="CbAutoStart_Click" Background="#FF8891C9" Foreground="#FF720707"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

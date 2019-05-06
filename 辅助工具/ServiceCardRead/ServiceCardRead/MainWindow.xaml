@@ -1,0 +1,29 @@
+﻿<Window x:Class="ServiceCardRead.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="读卡服务端" Height="520" Width="500" Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed">
+    <Grid>
+        <StackPanel>
+            <TextBox Name="TxtContent" Padding="6" TextWrapping="Wrap" FontSize="20" Height="300" Margin="6,3,6,3"/>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,3"  HorizontalAlignment="Center">
+                <Label Content="本机IP:" FontSize="20"/>
+                <ComboBox Name="CbIp" HorizontalAlignment="Center" FontSize="20" VerticalAlignment="Top" Width="200"/>
+                <Label FontSize="20" Content="端口:" />
+                <TextBox Name="TxtPort" FontSize="20" Margin="0,0,10,0" Text="9876" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,6" HorizontalAlignment="Center">
+                <Button Name="BtnIdCardRead" Content="读身份证测试" FontSize="30" Click="BtnIdCardRead_Click" Width="220" Padding="6" Margin="6,0,6,0"/>
+                <Button Name="BtnSsCardRead" Visibility="Collapsed" Content="读社保卡" FontSize="30" Click="BtnSsCardRead_Click" Width="140" Padding="6" Margin="6,0,6,0"/>
+                <Button Name="BtnSave" Content="保存配置" FontSize="30" Click="BtnSave_Click" Width="140" Padding="6" Margin="6,0,6,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6" HorizontalAlignment="Right">
+               
+                <Button Name="BtnSetting" Content="读卡器设置" FontSize="30" Click="BtnSetting_Click" Width="180" Margin="6,0,6,0"/>
+                <CheckBox Name="CbAutoStart" Content="开机自启" FontSize="20" Margin="66,0,6,0" Click="CbAutoStart_Click" Background="White" Foreground="#FF720707"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
