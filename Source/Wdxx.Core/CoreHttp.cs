@@ -126,7 +126,7 @@ namespace Wdxx.Core
                     (HttpWebRequest) WebRequest.Create(
                         httpUri + (getData == string.Empty ? string.Empty : "?" + getData));
                 httpWebRequest.Method = "GET";
-                httpWebRequest.ContentType = "text/html;charset=UTF-8";
+                httpWebRequest.ContentType = "application/json";
                 var webResponse = httpWebRequest.GetResponse();
                 var httpWebResponse = (HttpWebResponse)webResponse;
                 var stream = httpWebResponse.GetResponseStream();
