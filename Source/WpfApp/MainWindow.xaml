@@ -10,7 +10,7 @@
         <Button Content="httpgetuser" HorizontalAlignment="Left" Height="53" Margin="194,22,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_1"/>
         <Button Content="httppost" HorizontalAlignment="Left" Height="53" Margin="328,22,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_2"/>
         <Button Content="httppostuser" HorizontalAlignment="Left" Height="53" Margin="465,22,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_3"/>
-        <Button Content="WCFGet" HorizontalAlignment="Left" Height="53" Margin="608,22,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_4"/>
+        <Button Content="测试保留" HorizontalAlignment="Left" Height="53" Margin="608,22,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_4"/>
         <Button Content="httpinsert" HorizontalAlignment="Left" Height="53" Margin="59,117,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_5"/>
         <Button Content="httpdelete" HorizontalAlignment="Left" Height="53" Margin="194,117,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_6"/>
         <Button Content="httpupdate" HorizontalAlignment="Left" Height="53" Margin="328,117,0,0" VerticalAlignment="Top" Width="105" Click="Button_Click_7"/>

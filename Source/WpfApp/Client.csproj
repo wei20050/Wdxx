@@ -32,7 +32,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -103,11 +103,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Connected Services\WcfServiceReference\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -132,19 +127,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="Connected Services\WcfServiceReference\Client.WcfServiceReference.user.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\WcfServiceReference\Service.wsdl" />
-    <None Include="Connected Services\WcfServiceReference\Service.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\WcfServiceReference\Service1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\WcfServiceReference\Service2.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Data\mydb.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -155,6 +137,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MydbEntity\MydbEntity.csproj">
+      <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
+      <Name>MydbEntity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WcfService\WcfService.csproj">
       <Project>{97e37456-995d-4f61-8612-210fe8d5f1e6}</Project>
       <Name>WcfService</Name>
@@ -163,27 +149,6 @@
       <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>
       <Name>Wdxx.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Connected Services\WcfServiceReference\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\WcfServiceReference\Service.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\WcfServiceReference\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\WcfServiceReference\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\WcfServiceReference\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\dbver.txt">

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
-using Client.WcfServiceReference;
 using Client.Service;
+using MydbEntity;
 using Wdxx.Core;
 
 namespace Client
@@ -76,14 +77,13 @@ namespace Client
         }
 
         /// <summary>
-        /// wcf get
+        /// 测试保留
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            var str = GlobalVar.Service.Get(100, "aaa");
-            MessageBox.Show(str);
+            MessageBox.Show(CoreHttp.HttpGet<string>(ServiceHelp.HttpUrl + "TestStr"));
         }
 
         /// <summary>
@@ -128,8 +128,7 @@ namespace Client
         /// <param name="e"></param>
         private void Button_Click_8(object sender, RoutedEventArgs e)
         {
-            //CoreHttp.HttpGet(GlobalVar.HttpUrl + "select", "id=4", out user u);
-            var u = GlobalVar.Service.Select(4, "啊啊啊");
+            var u = CoreHttp.HttpGet<user>(ServiceHelp.HttpUrl + "select", "id=4&name=hdads");
             DataGrid1.ItemsSource = new List<user> { u };
         }
 
@@ -151,10 +150,8 @@ namespace Client
         /// <param name="e"></param>
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var url = TextBoxUrl.Text;
-            Setting.ServiceUrl = url;
-            ServiceHelp.ServiceIni(url);
-            GlobalVar.Service = ServiceHelp.CreateServiceClient();
+            Setting.ServiceUrl = TextBoxUrl.Text;
+            ServiceHelp.ServiceIni(TextBoxUrl.Text);
             MessageBox.Show("服务连接成功!");
         }
 
@@ -183,7 +180,8 @@ namespace Client
 
         private void ButtonBase_OnClick2(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(GlobalVar.Service.TestStr());
+            CoreIni.Wini("ttt",DateTime.Now);
+            MessageBox.Show(CoreIni.Rini<DateTime>("ttt").ToString());
         }
     }
 }

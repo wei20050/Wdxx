@@ -10,21 +10,19 @@ namespace WcfService
     {
 
         [OperationContract]
+        [WebGet]
         void Test();
 
         [OperationContract]
+        [WebGet]
         string TestStr();
 
         [OperationContract]
-        [WebInvoke(Method = "GET", BodyStyle = WebMessageBodyStyle.WrappedRequest,
-            ResponseFormat = WebMessageFormat.Json,
-            RequestFormat = WebMessageFormat.Json)]
+        [WebGet]
         string Get(int id, string name);
 
         [OperationContract]
-        [WebInvoke(Method = "GET", BodyStyle = WebMessageBodyStyle.WrappedRequest,
-            ResponseFormat = WebMessageFormat.Json,
-            RequestFormat = WebMessageFormat.Json)]
+        [WebGet]
         user GetUser(int id, string name);
 
         [OperationContract]
@@ -58,9 +56,7 @@ namespace WcfService
         int Update(user u);
 
         [OperationContract]
-        [WebInvoke(Method = "GET", BodyStyle = WebMessageBodyStyle.WrappedRequest,
-            ResponseFormat = WebMessageFormat.Json,
-            RequestFormat = WebMessageFormat.Json)]
+        [WebGet]
         user Select(int id,string name);
 
         [OperationContract]

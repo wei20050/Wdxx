@@ -1,16 +1,10 @@
 ﻿using System.IO;
-using Client.WcfServiceReference;
 using Wdxx.Core;
 
 namespace Client
 {
     public static class GlobalVar
     {
-        
-        /// <summary>
-        /// 服务对象
-        /// </summary>
-        public static ServiceClient Service;
         
         /// <summary>
         /// 离线应用文件夹路径
