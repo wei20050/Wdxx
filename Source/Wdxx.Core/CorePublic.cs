@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -355,7 +360,7 @@ namespace Wdxx.Core
         /// 返回在指定范围内的任意整数
         /// </summary>
         /// <returns></returns>
-        public static double Random(int minValue,int maxValue)
+        public static double Random(int minValue, int maxValue)
         {
             var rd = new Random(GenerateId());
             return rd.Next(minValue, maxValue);
@@ -368,8 +373,66 @@ namespace Wdxx.Core
         public static int GenerateId()
         {
             var buffer = Guid.NewGuid().ToByteArray();
-            return (int) (BitConverter.ToInt64(buffer, 0) / 999999999);
+            return (int)(BitConverter.ToInt64(buffer, 0) / 999999999);
         }
+
+        #endregion
+
+        #region IP端口操作
+
+        /// <summary>
+        /// 获取本机IP地址
+        /// </summary>
+        /// <returns>第一个本机IP地址</returns>
+        public static string GetLocalIpv4()
+        {
+            var ips = GetLocalIp();
+            return ips == null || ips.Count() == 0 ? string.Empty : ips[0];
+        }
+
+        /// <summary>
+        /// 获取本机IP地址
+        /// </summary>
+        /// <returns>本机IP地址集合</returns>
+        public static List<string> GetLocalIp()
+        {
+            var ips = new List<string>();
+            try
+            {
+                ips.AddRange(from t in Dns.GetHostEntry(Dns.GetHostName()).AddressList where t.AddressFamily == AddressFamily.InterNetwork select t.ToString());
+                return ips;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 判断端口是否被占用
+        /// </summary>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public static bool IsPortAvailble(int port)
+        {
+            var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+            return tcpConnInfoArray.All(tcpi => tcpi.LocalEndPoint.Port != port);
+        }
+
+        /// <summary>
+        /// 动态获取可用的端口
+        /// </summary>
+        /// <returns></returns>
+        public static int GetFreeTcpPort()
+        {
+            var l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            var port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
+
 
         #endregion
 

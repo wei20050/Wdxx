@@ -180,8 +180,7 @@ namespace Client
 
         private void ButtonBase_OnClick2(object sender, RoutedEventArgs e)
         {
-            CoreIni.Wini("ttt",DateTime.Now);
-            MessageBox.Show(CoreIni.Rini<DateTime>("ttt").ToString());
+            MessageBox.Show(CorePublic.GetLocalIpv4());
         }
     }
 }
