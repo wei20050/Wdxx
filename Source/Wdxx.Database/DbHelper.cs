@@ -59,7 +59,7 @@ namespace Wdxx.Database
                 else
                 {
                     LogErr("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
-                    MDbType = DbTypeEnum.None;
+                    throw new Exception("未能加载：System.Data.SQLite.dll 请确认此插件是否存在！");
                 }
             }
             else if (pn.Contains("MySql.Data.MySqlClient"))

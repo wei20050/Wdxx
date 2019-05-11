@@ -37,7 +37,7 @@ namespace Client.Service
                 if (MessageBoxResult.Yes != MessageBox.Show("离线中！是否还要继续？", "提示", MessageBoxButton.YesNo,
                         MessageBoxImage.Warning)) return false;
                 IsOnLine = false;
-                HttpUrl = new CoreHost(typeof(WcfService.IService), typeof(WcfService.Service)).OpenHost();
+                HttpUrl = new CoreHost(typeof(HttpService.IService), typeof(HttpService.Service)).OpenHost();
                 //设置本地数据库
                 LocalDatabaseHelp.SetDatabase();
             }

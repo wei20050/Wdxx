@@ -137,13 +137,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HttpService\HttpService.csproj">
+      <Project>{61bcea7b-5b1b-464f-9270-690803dbee8f}</Project>
+      <Name>HttpService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MydbEntity\MydbEntity.csproj">
       <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
       <Name>MydbEntity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WcfService\WcfService.csproj">
-      <Project>{97e37456-995d-4f61-8612-210fe8d5f1e6}</Project>
-      <Name>WcfService</Name>
     </ProjectReference>
     <ProjectReference Include="..\Wdxx.Core\Wdxx.Core.csproj">
       <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>

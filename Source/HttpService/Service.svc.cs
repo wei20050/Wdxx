@@ -3,7 +3,7 @@ using MydbEntity;
 using Wdxx.Core;
 using Wdxx.Database;
 
-namespace WcfService
+namespace HttpService
 {
     public class Service : IService
     {

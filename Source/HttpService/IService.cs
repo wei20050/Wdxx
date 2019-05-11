@@ -3,7 +3,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using MydbEntity;
 
-namespace WcfService
+namespace HttpService
 {
     [ServiceContract]
     public interface IService
