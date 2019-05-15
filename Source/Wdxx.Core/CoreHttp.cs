@@ -254,8 +254,6 @@ namespace Wdxx.Core
             var jsonstr = new JavaScriptSerializer().Serialize(jsonObject);
             //这里处理掉无法反序列化的构造(wcf自动创建的实体会出现这个问题)
             jsonstr = jsonstr.Replace("\"ExtensionData\":{},", string.Empty);
-            //这里把json中时间戳转换成时间字符串 并且改成当前时区
-            jsonstr = JsonTime(jsonstr);
             return jsonstr;
         }
 
