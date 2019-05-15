@@ -197,13 +197,29 @@ namespace Wdxx.Core
 
 
         /// <summary>
-        /// 将json字符串中的事件戳转换成字符串时间格式
+        /// 将json字符串中的时间戳转换成字符串时间格式
         /// </summary>
         /// <param name="jsonStr"></param>
         /// <returns></returns>
-        private static string JsonTime(string jsonStr)
+        public static string JsonTime(string jsonStr)
         {
             return Regex.Replace(jsonStr, @"\\/Date\((\d+)\)\\/", match =>
+            {
+                var dt = new DateTime(1970, 1, 1);
+                dt = dt.AddMilliseconds(long.Parse(match.Groups[1].Value));
+                dt = dt.ToLocalTime();
+                return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            });
+        }
+
+        /// <summary>
+        /// 将json字符串中带时区的时间戳转换成字符串时间格式
+        /// </summary>
+        /// <param name="jsonStr"></param>
+        /// <returns></returns>
+        public static string JsonTimeZone(string jsonStr)
+        {
+            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\+(\d+)\)\\/", match =>
             {
                 var dt = new DateTime(1970, 1, 1);
                 dt = dt.AddMilliseconds(long.Parse(match.Groups[1].Value));
@@ -220,6 +236,10 @@ namespace Wdxx.Core
         /// <returns>转换后的对象</returns>
         public static T JsonToObj<T>(string jsonStr)
         {
+            //这里把json中的时间戳转换成时间字符串 并且改成当前时区
+            jsonStr = JsonTime(jsonStr);
+            //这里把json中带时区的时间戳转换成时间字符串 并且改成当前时区
+            jsonStr = JsonTimeZone(jsonStr);
             return string.IsNullOrEmpty(jsonStr) ? default(T) : new JavaScriptSerializer().Deserialize<T>(jsonStr);
         }
 

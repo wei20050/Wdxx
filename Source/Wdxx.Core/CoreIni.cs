@@ -269,7 +269,7 @@ namespace Wdxx.Core
         /// <typeparam name="T">要转换的类型</typeparam>
         /// <param name="jsonStr">json字符串</param>
         /// <returns>转换后的对象</returns>
-        public static T JsonToObj<T>(string jsonStr)
+        private static T JsonToObj<T>(string jsonStr)
         {
             return string.IsNullOrEmpty(jsonStr) ? default(T) : new JavaScriptSerializer().Deserialize<T>(jsonStr);
         }
@@ -279,7 +279,7 @@ namespace Wdxx.Core
         /// </summary>
         /// <param name="jsonObject">要转换的类型</param>
         /// <returns>json字符串</returns>
-        public static string ObjToJson(object jsonObject)
+        private static string ObjToJson(object jsonObject)
         {
             //这里是原序列化之后的json
             var jsonstr = new JavaScriptSerializer().Serialize(jsonObject);
