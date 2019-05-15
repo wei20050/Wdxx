@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.ServiceModel;
 using System.Windows;
 using System.Windows.Forms;
 
@@ -20,6 +19,69 @@ namespace ServiceVoice
             Common.Administrator();
             Common.IsStart();
             InitializeComponent();
+            //默认隐藏窗体
+            Hide();
+            //系统托盘
+            _notifyIcon = WpfNotifyIcon.SetSystemTray("音频服务 运行中 ...", ShowWin_Click, GetList());
+            _notifyIcon.Visible = true;
+            OnAutoStart();
+            CbAutoStart.IsChecked = IsAutoStart;
+            var bdip = "127.0.0.1";
+            var ips = Common.GetLocalIp();
+            CbIp.Items.Add(bdip);
+            if (ips != null && ips.Count > 0)
+            {
+                foreach (var ip in ips)
+                {
+                    bdip += Environment.NewLine + ip;
+                    CbIp.Items.Add(ip);
+                }
+            }
+            if (string.IsNullOrEmpty(ServiceIp))
+            {
+                CbIp.SelectedIndex = 0;
+                ServiceIp = "127.0.0.1";
+                TxtContent.Text = "  初次运行:" + Environment.NewLine + "请选择IP地址点击保存配置!";
+                return;
+            }
+            if (string.IsNullOrEmpty(ServicePort))
+            {
+                ServicePort = "9876";
+            }
+            CbIp.Text = ServiceIp;
+            TxtPort.Text = ServicePort;
+            ServiceUrl = string.Format("http://{0}:{1}/Voice", ServiceIp, ServicePort);
+            BtnTest.IsEnabled = true;
+            //不是第一次运行的时候 直接隐藏窗体 显示托盘
+            try
+            {
+                var host = Common.CreateServiceHost(typeof(Voice), ServiceUrl);
+                host.Opened += delegate
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        TxtContent.Text = string.Format("服务已开启 ... ... {0}时间:{1}{0}配置IP地址: {2}{0}本机IPV4 IP地址:{0}{3}", Environment.NewLine, DateTime.Now, ServiceIp, bdip);
+                    }));
+                };
+                host.Closed += delegate
+                {
+
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        TxtContent.Text = "服务已关闭 ... ..." + Environment.NewLine + "时间:" + DateTime.Now;
+                    }));
+                };
+                Action open = () =>
+                {
+                    host.Open();
+                };
+                //这里异步开启本地服务
+                open.BeginInvoke(null, null);
+            }
+            catch (Exception ex)
+            {
+                TxtContent.Text = "服务开启异常,请检查服务器配置!" + Environment.NewLine + ex.Message;
+            }
         }
 
         /// <summary>
@@ -27,8 +89,29 @@ namespace ServiceVoice
         /// </summary>
         public static string ServiceIp
         {
-            get => Ini.Rini(nameof(ServiceIp));
-            set => Ini.Wini(nameof(ServiceIp), value);
+            get
+            {
+                return Ini.Rini("ServiceIp");
+            }
+            set
+            {
+                Ini.Wini("ServiceIp", value);
+            }
+        }
+
+        /// <summary>
+        /// 服务端口
+        /// </summary>
+        public static string ServicePort
+        {
+            get
+            {
+                return Ini.Rini("ServicePort");
+            }
+            set
+            {
+                Ini.Wini("ServicePort", value);
+            }
         }
 
         /// <summary>
@@ -36,23 +119,21 @@ namespace ServiceVoice
         /// </summary>
         public static bool IsAutoStart
         {
-            get => Ini.Rini<bool>(nameof(IsAutoStart));
-            set => Ini.Wini(nameof(IsAutoStart), value);
+            get
+            {
+                return Ini.Rini<bool>("IsAutoStart");
+            }
+
+            set
+            {
+                Ini.Wini("IsAutoStart", value);
+            }
         }
 
         /// <summary>
         /// 服务地址
         /// </summary>
         public static string ServiceUrl;
-
-        /// <summary>
-        /// 服务端口
-        /// </summary>
-        public static string ServicePort
-        {
-            get => Ini.Rini(nameof(ServicePort));
-            set => Ini.Wini(nameof(ServicePort), value);
-        }
 
         #region 系统托盘
 
@@ -71,7 +152,6 @@ namespace ServiceVoice
                     Click = (sender, e) =>
                     {
                         Show();
-                        _notifyIcon.Visible = false;
                     }
                 },
                 new SystemTrayMenu
@@ -92,85 +172,15 @@ namespace ServiceVoice
         {
             if (((MouseEventArgs)e).Button != MouseButtons.Left) return;
             Show();
-            _notifyIcon.Visible = false;
         }
 
         #endregion
 
         #endregion
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            //系统托盘
-            _notifyIcon = WpfNotifyIcon.SetSystemTray("音频服务 运行中 ...", ShowWin_Click, GetList());
-            OnAutoStart();
-            CbAutoStart.IsChecked = IsAutoStart;
-            var bdip = "127.0.0.1";
-            var ips = Common.GetLocalIp();
-            CbIp.Items.Add(bdip);
-            if (ips != null && ips.Count > 0)
-            {
-                foreach (var ip in ips)
-                {
-                    bdip += Environment.NewLine + ip;
-                    CbIp.Items.Add(ip);
-                }
-            }
-            if (string.IsNullOrEmpty(ServiceIp))
-            {
-                CbIp.SelectedIndex = 0;
-                ServiceIp = "127.0.0.1";
-                TxtContent.Text = $@"  初次运行:{Environment.NewLine}请选择IP地址点击保存配置!";
-                return;
-            }
-            if (string.IsNullOrEmpty(ServicePort))
-            {
-                ServicePort = "9876";
-            }
-            CbIp.Text = ServiceIp;
-            TxtPort.Text = ServicePort;
-            ServiceUrl = $"http://{ServiceIp}:{ServicePort}/Voice";
-            BtnTest.IsEnabled = true;
-            //不是第一次运行的时候 直接隐藏窗体 显示托盘
-            Hide();
-            _notifyIcon.Visible = true;
-            try
-            {
-                var host = Common.CreateServiceHost(typeof(Voice), ServiceUrl);
-                host.Opened += delegate
-                {
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        TxtContent.Text =
-                        $@"服务已开启 ... ... {Environment.NewLine}时间:{DateTime.Now}{
-                                Environment.NewLine
-                            }配置IP地址:   {ServiceIp}{Environment.NewLine}本机IPV4 IP地址:{Environment.NewLine}{bdip}";
-                    }));
-                };
-                host.Closed += delegate
-                {
-
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        TxtContent.Text = $@"服务已关闭 ... ...{Environment.NewLine}时间:{DateTime.Now}";
-                    }));
-                };
-                Action open = () =>
-                {
-                    host.Open();
-                };
-                //这里异步开启本地服务
-                open.BeginInvoke(null, null);
-            }
-            catch (Exception ex)
-            {
-                TxtContent.Text = $@"服务开启异常,请检查服务器配置!{Environment.NewLine}{ex.Message}";
-            }
-        }
 
         private void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start($"http://{ServiceIp}:{ServicePort}/Voice/Add/语音服务测试/1");
+            Process.Start(string.Format("http://{0}:{1}/Voice/Add/语音服务测试/2", ServiceIp, ServicePort));
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -202,7 +212,6 @@ namespace ServiceVoice
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _notifyIcon.Visible = true;
             Hide();
             // 取消关闭窗体
             e.Cancel = true;

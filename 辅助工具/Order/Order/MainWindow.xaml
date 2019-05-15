@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="预约数据下拉" Height="500" Width="500" Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed">
+        Title="预约数据下拉" Height="650" Width="500" Closing="Window_Closing" Closed="Window_Closed" Activated="Window_Activated">
     <Grid>
         <StackPanel>
             <TextBox Name="TxtContent" Padding="6" TextWrapping="Wrap" FontSize="20" Height="300" Margin="6,3,6,3"/>
@@ -15,8 +15,20 @@
             <StackPanel Orientation="Horizontal" Margin="6,3,6,6" HorizontalAlignment="Center">
                 <Button Name="BtnPull" Content="根据预约日期手动拉取预约数据" FontSize="30" Click="BtnPull_Click" Width="460" Padding="6" Margin="6,0,6,0"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,3">
+                <Label Content="获取时间:" FontSize="30"/>
+                <TextBox Name="TxtSj" FontSize="30" Margin="10,0,0,0" Text="3" Width="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                <Label Content="点" FontSize="30"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,3">
+                <Label Content="服务器地址:" FontSize="30"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="6,3,6,3">
+                <TextBox Name="TxtFwqdz" FontSize="20" Text="http://localhost/queue/QueueService.svc" Width="480" VerticalContentAlignment="Center" />
+            </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="6" HorizontalAlignment="Right">
-                <CheckBox Name="CbAutoStart" Content="开机自启" FontSize="20" Margin="0,0,6,0" Click="CbAutoStart_Click" Background="#FF8891C9" Foreground="#FF720707"/>
+                <Button Content="保存配置" FontSize="20" Click="ButtonBase_OnClick" Width="180" Padding="6" Margin="6,0,66,0"/>
+                <CheckBox Name="CbAutoStart" Content="开机自启" FontSize="20" Margin="0,0,6,0" Click="CbAutoStart_Click" Background="White" Foreground="#FF720707"/>
             </StackPanel>
         </StackPanel>
     </Grid>

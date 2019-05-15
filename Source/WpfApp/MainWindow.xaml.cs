@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using Client.Service;
 using MydbEntity;
@@ -83,7 +84,7 @@ namespace Client
         /// <param name="e"></param>
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(CoreHttp.HttpGet<string>(ServiceHelp.HttpUrl + "TestStr"));
+            MessageBox.Show(CoreHttp.HttpGet(ServiceHelp.HttpUrl + "TestStr"));
         }
 
         /// <summary>
@@ -180,7 +181,10 @@ namespace Client
 
         private void ButtonBase_OnClick2(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(CorePublic.GetLocalIpv4());
+           var time = CoreConvert.ObjToJson(DateTime.Now);
+
+            var ret = CoreConvert.JsonToObj<DateTime>(time);
+            MessageBox.Show(ret.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

@@ -20,6 +20,75 @@ namespace ServiceCardRead
             Common.Administrator();
             Common.IsStart();
             InitializeComponent();
+            //默认隐藏窗体
+            Hide();
+            //系统托盘
+            _notifyIcon = WpfNotifyIcon.SetSystemTray("读卡服务 运行中 ...", ShowWin_Click, GetList());
+            _notifyIcon.Visible = true;
+            CbAutoStart.IsChecked = IsAutoStart;
+            OnAutoStart();
+            var bdip = "127.0.0.1";
+            var ips = Common.GetLocalIp();
+            CbIp.Items.Add(bdip);
+            if (ips != null && ips.Count > 0)
+            {
+                foreach (var ip in ips)
+                {
+                    bdip += Environment.NewLine + ip;
+                    CbIp.Items.Add(ip);
+                }
+            }
+            if (string.IsNullOrEmpty(ServiceIp))
+            {
+                //第一次运行显示窗体
+                Show();
+                CbIp.SelectedIndex = 0;
+                ServiceIp = "127.0.0.1";
+                TxtContent.Text = string.Format("  初次运行:{0}请进行如下操作:{0}1. 点击读卡器设置配置读卡器{0}2. 选择IP地址点击保存配置{0}", Environment.NewLine);
+                BtnIdCardRead.IsEnabled = false;
+                BtnSsCardRead.IsEnabled = false;
+                return;
+            }
+            if (string.IsNullOrEmpty(ServicePort))
+            {
+                ServicePort = "9876";
+            }
+            CbIp.Text = ServiceIp;
+            TxtPort.Text = ServicePort;
+            ServiceUrl = string.Format("http://{0}:{1}/CardRead", ServiceIp, ServicePort);
+            //不是第一次运行的时候 直接隐藏窗体 显示托盘 开启测试按钮
+            BtnIdCardRead.IsEnabled = true;
+            BtnSsCardRead.IsEnabled = true;
+            try
+            {
+                var host = Common.CreateServiceHost(typeof(CardRead), ServiceUrl);
+                host.Opened += delegate
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        TxtContent.Text = string.Format("服务已开启 ... ... {0}时间:{1}{0}配置IP地址: {2}{0}本机IPV4 IP地址:{0}{3}", Environment.NewLine, DateTime.Now, ServiceIp, bdip);
+                    }));
+
+                };
+                host.Closed += delegate
+                {
+
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        TxtContent.Text = string.Format("服务已关闭 ... ...{0}时间:{1}", Environment.NewLine, DateTime.Now);
+                    }));
+                };
+                Action open = () =>
+                {
+                    host.Open();
+                };
+                //这里异步开启本地服务
+                open.BeginInvoke(null, null);
+            }
+            catch (Exception ex)
+            {
+                TxtContent.Text = "服务开启异常,请检查服务器配置!" + Environment.NewLine + ex.Message;
+            }
         }
 
         /// <summary>
@@ -27,8 +96,14 @@ namespace ServiceCardRead
         /// </summary>
         public static string ServiceIp
         {
-            get => Ini.Rini(nameof(ServiceIp));
-            set => Ini.Wini(nameof(ServiceIp), value);
+            get
+            {
+                return Ini.Rini("ServiceIp");
+            }
+            set
+            {
+                Ini.Wini("ServiceIp", value);
+            }
         }
 
         /// <summary>
@@ -36,8 +111,14 @@ namespace ServiceCardRead
         /// </summary>
         public static string ServicePort
         {
-            get => Ini.Rini(nameof(ServicePort));
-            set => Ini.Wini(nameof(ServicePort), value);
+            get
+            {
+                return Ini.Rini("ServicePort");
+            }
+            set
+            {
+                Ini.Wini("ServicePort", value);
+            }
         }
 
         /// <summary>
@@ -45,8 +126,15 @@ namespace ServiceCardRead
         /// </summary>
         public static bool IsAutoStart
         {
-            get => Ini.Rini<bool>(nameof(IsAutoStart));
-            set => Ini.Wini(nameof(IsAutoStart), value);
+            get
+            {
+                return Ini.Rini<bool>("IsAutoStart");
+            }
+
+            set
+            {
+                Ini.Wini("IsAutoStart", value);
+            }
         }
 
         /// <summary>
@@ -72,7 +160,6 @@ namespace ServiceCardRead
                     Click = (sender, e) =>
                     {
                         Show();
-                        _notifyIcon.Visible = false;
                     }
                 },
                 new SystemTrayMenu
@@ -93,93 +180,19 @@ namespace ServiceCardRead
         {
             if (((MouseEventArgs)e).Button != MouseButtons.Left) return;
             Show();
-            _notifyIcon.Visible = false;
         }
 
         #endregion
 
         #endregion
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            //系统托盘
-            _notifyIcon = WpfNotifyIcon.SetSystemTray("读卡服务 运行中 ...", ShowWin_Click, GetList());
-            CbAutoStart.IsChecked = IsAutoStart;
-            OnAutoStart();
-            var bdip = "127.0.0.1";
-            var ips = Common.GetLocalIp();
-            CbIp.Items.Add(bdip);
-            if (ips != null && ips.Count > 0)
-            {
-                foreach (var ip in ips)
-                {
-                    bdip += Environment.NewLine + ip;
-                    CbIp.Items.Add(ip);
-                }
-            }
-            if (string.IsNullOrEmpty(ServiceIp))
-            {
-                CbIp.SelectedIndex = 0;
-                ServiceIp = "127.0.0.1";
-                TxtContent.Text = $@"  初次运行:{Environment.NewLine}请进行如下操作:{Environment.NewLine}1. 点击读卡器设置配置读卡器{Environment.NewLine}2. 选择IP地址点击保存配置";
-                BtnIdCardRead.IsEnabled = false;
-                BtnSsCardRead.IsEnabled = false;
-                return;
-            }
-            if (string.IsNullOrEmpty(ServicePort))
-            {
-                ServicePort = "9876";
-            }
-            CbIp.Text = ServiceIp;
-            TxtPort.Text = ServicePort;
-            ServiceUrl = $"http://{ServiceIp}:{ServicePort}/CardRead";
-            //不是第一次运行的时候 直接隐藏窗体 显示托盘 开启测试按钮
-            BtnIdCardRead.IsEnabled = true;
-            BtnSsCardRead.IsEnabled = true;
-            Hide();
-            _notifyIcon.Visible = true;
-            try
-            {
-                var host = Common.CreateServiceHost(typeof(CardRead), ServiceUrl);
-                host.Opened += delegate
-                {
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        TxtContent.Text =
-                        $@"服务已开启 ... ... {Environment.NewLine}时间:{DateTime.Now}{
-                                Environment.NewLine
-                            }配置IP地址:   {ServiceIp}{Environment.NewLine}本机IPV4 IP地址:{Environment.NewLine}{bdip}";
-                    }));
-
-                };
-                host.Closed += delegate
-                {
-
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        TxtContent.Text = $@"服务已关闭 ... ...{Environment.NewLine}时间:{DateTime.Now}";
-                    }));
-                };
-                Action open = () =>
-                {
-                    host.Open();
-                };
-                //这里异步开启本地服务
-                open.BeginInvoke(null, null);
-            }
-            catch (Exception ex)
-            {
-                TxtContent.Text = $@"服务开启异常,请检查服务器配置!{Environment.NewLine}{ex.Message}";
-            }
-        }
 
         private void BtnIdCardRead_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start($"http://{ServiceIp}:{ServicePort}/CardRead/IdCardRead");
+            Process.Start(string.Format("http://{0}:{1}/CardRead/IdCardRead", ServiceIp, ServicePort));
         }
         private void BtnSsCardRead_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start($"http://{ServiceIp}:{ServicePort}/CardRead/SsCardRead");
+            Process.Start(string.Format("http://{0}:{1}/CardRead/SsCardRead", ServiceIp, ServicePort));
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -216,13 +229,11 @@ namespace ServiceCardRead
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _notifyIcon.Visible = true;
             Hide();
             // 取消关闭窗体
             e.Cancel = true;
         }
 
-        //窗体已经关闭后的操作
         private void Window_Closed(object sender, EventArgs e)
         {
             _notifyIcon.Visible = false;

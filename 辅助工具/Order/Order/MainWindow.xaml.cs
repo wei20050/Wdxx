@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Security.Principal;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace Order
 {
@@ -16,46 +15,86 @@ namespace Order
     /// </summary>
     public partial class MainWindow
     {
+
+        private readonly DispatcherTimer _timer = new DispatcherTimer();
         public MainWindow()
         {
             Common.Administrator();
             Common.IsStart();
-            Administrator();
             InitializeComponent();
+            Hide();
+            //系统托盘
+            _notifyIcon = WpfNotifyIcon.SetSystemTray("预约下拉 运行中 ...", ShowWin_Click, GetList());
+            _notifyIcon.Visible = true;
+            if (string.IsNullOrEmpty(Common.ServiceUri))
+            {
+                Common.ServiceUri = "http://localhost/queue/QueueService.svc";
+            }
+            if (Xlsj == 0)
+            {
+                Xlsj = 3;
+            }
+            TxtFwqdz.Text = Common.ServiceUri;
+            TxtSj.Text = Xlsj.ToString();
+            //开启定时器
+            _timer.Tick += TimerCall;
+            _timer.Interval = TimeSpan.FromSeconds(600);
+            _timer.Start();
+            OnAutoStart();
         }
-        
+
+        private bool _isPull;
+
+        private void TimerCall(object sender, EventArgs e)
+        {
+            if (DateTime.Now.Hour == Xlsj)
+            {
+                if (_isPull) return;
+                var ret = Common.PullOrderService(string.Empty);
+                if (ret == string.Empty)
+                {
+                    _isPull = true;
+                }
+            }
+            else
+            {
+                _isPull = false;
+            }
+        }
+
         /// <summary>
         /// 是否开机自启
         /// </summary>
         public static bool IsAutoStart
         {
-            get => Ini.Rini<bool>(nameof(IsAutoStart));
-            set => Ini.Wini(nameof(IsAutoStart), value);
+            get
+            {
+                return Ini.Rini<bool>("IsAutoStart");
+            }
+            set
+            {
+                Ini.Wini("IsAutoStart", value);
+            }
         }
 
-        
         /// <summary>
-        /// 管理员身份运行程序
-        /// 在界面初始化之前调用此方法程序将以管理员权限运行
-        /// ClickOnce支持WPF应用程序 WinFrom不支持
+        /// 下拉时间
         /// </summary>
-        public static void Administrator()
+        public static int Xlsj
         {
-            var wi = WindowsIdentity.GetCurrent();
-            var wp = new WindowsPrincipal(wi);
-            if (wp.IsInRole(WindowsBuiltInRole.Administrator)) return;
-            var exePath = Assembly.GetEntryAssembly().CodeBase;
-            Process.Start(new ProcessStartInfo(exePath)
+            get
             {
-                UseShellExecute = true,
-                Verb = "runas"
-            });
-            Environment.Exit(0);
+                return Ini.Rini<int>("Xlsj");
+            }
+            set
+            {
+                Ini.Wini("Xlsj", value);
+            }
         }
 
         #region 系统托盘
 
-        private NotifyIcon _notifyIcon;
+        private readonly NotifyIcon _notifyIcon;
 
         #region 托盘右键菜单
 
@@ -70,7 +109,6 @@ namespace Order
                     Click = (sender, e) =>
                     {
                         Show();
-                        _notifyIcon.Visible = false;
                     }
                 },
                 new SystemTrayMenu
@@ -91,29 +129,17 @@ namespace Order
         {
             if (((MouseEventArgs)e).Button != MouseButtons.Left) return;
             Show();
-            _notifyIcon.Visible = false;
         }
 
         #endregion
 
         #endregion
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            //系统托盘
-            _notifyIcon = WpfNotifyIcon.SetSystemTray("预约下拉 运行中 ...", ShowWin_Click, GetList());
-            //开启作业调度
-            TimeJob.JobStat();
-            DpYy.Text = DateTime.Now.ToString("yyyy/MM/dd");
-            OnAutoStart();
-            _notifyIcon.Visible = true;
-            Hide();
-        }
 
         private void BtnPull_Click(object sender, RoutedEventArgs e)
         {
             var time = Convert.ToDateTime(DpYy.Text).ToString("yyyy-MM-dd");
             var orderInfo = Common.PullOrderService(time);
-            TxtContent.Text =   $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} 预约下拉 {time} 数据 接口返回: {orderInfo}";
+            TxtContent.Text =   string.Format("{0} 预约下拉 {1} 数据 接口返回: {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), time, orderInfo);
         }
 
         private void CbAutoStart_Click(object sender, RoutedEventArgs e)
@@ -145,6 +171,18 @@ namespace Order
         private void Window_Closed(object sender, EventArgs e)
         {
             _notifyIcon.Visible = false;
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            DpYy.Text = DateTime.Now.ToString("yyyy/MM/dd");
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            Common.ServiceUri = TxtFwqdz.Text;
+            Xlsj = Convert.ToInt32(TxtSj.Text);
+            System.Windows.MessageBox.Show("配置保存成功!");
         }
     }
 }

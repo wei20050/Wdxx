@@ -20,6 +20,7 @@ namespace ServiceCardRead
         {
             try
             {
+                Common.Log("身份证读卡被调用！");
                 var ret = _irc.ReadIdCardInfo();
                 if (ret == null)
                 {
@@ -39,6 +40,7 @@ namespace ServiceCardRead
         {
             try
             {
+                Common.Log("社保卡读卡被调用！");
                 var ret = Ini.ObjToJson(_irc.ReadSsCardInfo());
                 if (ret == null)
                 {

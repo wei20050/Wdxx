@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Security.Principal;
+using System.Text;
 using System.Windows;
 using Microsoft.Win32;
-using Order.QueueService;
+// ReSharper disable PossibleNullReferenceException
 
 namespace Order
 {
@@ -21,7 +23,7 @@ namespace Order
 
         private static readonly string AppName = Assembly.GetEntryAssembly().GetName().Name;
 
-        #region 判断系统是否已启动
+        #region 系统操作
 
         /// <summary>
         /// 管理员身份运行程序
@@ -41,79 +43,113 @@ namespace Order
             Environment.Exit(0);
         }
 
-        public static void IsStart()
-        {
-            //获取指定的进程名
-            var myProcesses = Process.GetProcessesByName(AppName);
-            if (myProcesses.Length > 1) //如果可以获取到知道的进程名则说明已经启动
-            {
-                MessageBox.Show("程序已启动！");
-                Environment.Exit(0);              //关闭系统
-            }
-
-        }
-
-        #endregion
-
-        #region 注册表添加与删除开机启动
 
         /// <summary>
-        /// 设置注册表实现开机自动启动
+        /// 判断系统是否已启动
+        /// </summary>
+        public static void IsStart()
+        {
+            for (var i = 0; i < 8; i++)
+            {
+                //获取指定的进程名
+                var myProcesses = Process.GetProcessesByName(AppName);
+                //如果可以获取到知道的进程名则说明已经启动
+                if (myProcesses.Length <= 1) return;
+                System.Threading.Thread.Sleep(168);
+            }
+            MessageBox.Show("程序已启动！");
+            //关闭系统
+            Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// 设置当前程序开机自启
         /// </summary>
         public static void AutoStart()
         {
-            try
-            {
-                Log($"开机自动启动:{AppName}");
-                var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                rKey?.SetValue(AppName, $@"""{AppDomain.CurrentDomain.BaseDirectory}{AppName}.exe""");
-            }
-            catch (Exception e)
-            {
-                Log("设置注册表实现开机自动启动异常:" + e);
-            }
+            AutoStart(AppDomain.CurrentDomain.BaseDirectory + AppName + ".exe");
         }
 
         /// <summary>
-        /// 删除注册表实现解除开机自动启动
+        /// 设置注册表实现 开机自动启动
         /// </summary>
-        public static void UnAutoStart()
+        /// <param name="appPath">程序路径</param>
+        public static void AutoStart(string appPath)
         {
             try
             {
                 var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                var value = rKey?.GetValue(AppName);
-                if (value == null || value.ToString() == string.Empty) return;
-                Log($"解除开机自动启动:{AppName}");
-                rKey.DeleteValue(AppName, true);
+                if (rKey == null)
+                {
+                    throw new Exception(@"添加开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
+                }
+                rKey.SetValue(Path.GetFileNameWithoutExtension(appPath), "\"" + appPath + "\"");
+
             }
             catch (Exception e)
             {
-                Log("删除注册表实现解除开机自动启动异常:" + e);
+                throw new Exception("添加开机自启注册表异常:" + e);
+            }
+        }
+
+        /// <summary>
+        /// 删除当前程序开机自启
+        /// </summary>
+        public static void UnAutoStart()
+        {
+            UnAutoStart(AppName);
+        }
+
+        /// <summary>
+        /// 删除注册表实现 解除开机自动启动
+        /// </summary>
+        /// <param name="appName">程序名称(不带后缀)</param>
+        public static void UnAutoStart(string appName)
+        {
+            try
+            {
+                var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
+                if (rKey == null)
+                {
+                    throw new Exception(@"删除开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
+                }
+                rKey.DeleteValue(appName, false);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("删除开机自启注册表异常:" + e);
             }
         }
 
         #endregion
 
+
         /// <summary>
-        /// 服务对象
+        /// 服务地址
         /// </summary>
-        private static readonly QueueServiceClient Sc = new QueueServiceClient();
+        public static string ServiceUri
+        {
+            get
+            {
+                return Ini.Rini("ServiceUri");
+            }
+            set
+            {
+                Ini.Wini("ServiceUri", value);
+            }
+        }
 
         /// <summary>
         /// 拉取预约数据
         /// </summary>
         /// <param name="time"></param>
-        public static string PullOrderService(string time = "")
+        public static string PullOrderService(string time)
         {
-            if (time == "")
-            {
-                time = DateTime.Now.ToString("yyyy-MM-dd");
-            }
             try
             {
-                var orderInfo = Sc.PullOrderService(time);
-                return orderInfo;
+                var orderInfo = HttpPost(ServiceUri + "/PullOrderService", @"{ ""time"":""" + time + @"""}");
+                Log("成功获取到预约数据:" + orderInfo);
+                return string.Empty;
             }
             catch (Exception e)
             {
@@ -122,13 +158,86 @@ namespace Order
             }
         }
 
+        /// <summary>
+        /// 重启程序
+        /// </summary>
+        public static void Restart()
+        {
+            System.Windows.Forms.Application.Restart();
+            Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// 简单记录日志
+        /// </summary>
+        /// <param name="content"></param>
         public static void Log(string content)
         {
-            if (!Directory.Exists("logs"))
+            if (!Directory.Exists("OrderLogs"))
             {
-                Directory.CreateDirectory("logs");
+                Directory.CreateDirectory("OrderLogs");
             }
-            File.AppendAllText($"logs\\{DateTime.Now:yyyy-MM-dd}.txt", DateTime.Now + content + Environment.NewLine);
+            File.AppendAllText("OrderLogs\\" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt", DateTime.Now + content + Environment.NewLine);
+        }
+
+        /// <summary>
+        /// Http Post请求(字符串数据 返回字符串)
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <param name="postData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
+        /// <returns></returns>
+        public static string HttpPost(string httpUri, string postData)
+        {
+            string ret;
+            if (HttpPost(httpUri, postData, out ret))
+            {
+                return ret;
+            }
+            throw new Exception("Http Post请求 发生异常:" + ret);
+        }
+
+        /// <summary>
+        /// Http Post请求(核心)
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <param name="postData">请求参数 例:{"value": "post"} C#格式(@"{""value"":""post""}")</param>
+        /// <param name="result">返回结果</param>
+        /// <returns></returns>
+        private static bool HttpPost(string httpUri, string postData, out string result)
+        {
+            try
+            {
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
+                //这个在Post的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
+                httpWebRequest.ServicePoint.Expect100Continue = false;
+                httpWebRequest.Method = "POST";
+                httpWebRequest.ContentType = "application/json";
+                var data = Encoding.UTF8.GetBytes(postData ?? string.Empty);
+                httpWebRequest.ContentLength = data.Length;
+                var outStream = httpWebRequest.GetRequestStream();
+                outStream.Write(data, 0, data.Length);
+                outStream.Close();
+                var webResponse = httpWebRequest.GetResponse();
+                var httpWebResponse = (HttpWebResponse)webResponse;
+                var stream = httpWebResponse.GetResponseStream();
+                if (stream != null)
+                {
+                    var streamReader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
+                    result = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    stream.Close();
+                }
+                else
+                {
+                    result = string.Empty;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                result = "HttpPostErr uri:" + httpUri + " postData:" + postData + "err:" + ex;
+                return false;
+            }
         }
     }
 }

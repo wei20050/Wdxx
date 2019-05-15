@@ -4,13 +4,17 @@ using System.Timers;
 
 namespace Wdxx.Core
 {
-
-    /// <inheritdoc />
+    
     /// <summary>
     /// 串口核心
     /// </summary>
-    public class CoreSerialPort : SerialPort
+    public class CoreSerialPort
     {
+
+        /// <summary>
+        /// 串行端口资源对象
+        /// </summary>
+        public  SerialPort Sp { get; set; }
 
         /// <inheritdoc />
         /// <summary>
@@ -18,9 +22,13 @@ namespace Wdxx.Core
         /// </summary>
         public CoreSerialPort()
         {
+            if (Sp == null)
+            {
+                Sp = new SerialPort();
+            }
             //默认的多次触发时间 若串口数据过大 每次传输数据量耗时长 需要修改此时间
             DataReceivedDelay = 168;
-            DataReceived += CallDataReceived;
+            Sp.DataReceived += CallDataReceived;
             _t.Interval = 1;
             _t.Elapsed += (o,e) =>
             {
@@ -71,8 +79,8 @@ namespace Wdxx.Core
         protected virtual void CallDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             _i = 0;
-            var data = new byte[BytesToRead];
-            Read(data, 0, data.Length);
+            var data = new byte[Sp.BytesToRead];
+            Sp.Read(data, 0, data.Length);
             _bytes = _bytes.Concat(data).ToArray();
             _t.Start();
         }

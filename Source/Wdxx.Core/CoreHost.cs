@@ -117,10 +117,7 @@ namespace Wdxx.Core
         /// </summary>
         public string OpenHost()
         {
-            Action open = () =>
-            {
-                Open();
-            };
+            Action open = Open;
             //这里异步开启本地服务
             open.BeginInvoke(null, null);
             return _uri;

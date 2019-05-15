@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using SpeechLib;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.ServiceModel;
 using System.ServiceModel.Web;
@@ -11,10 +10,10 @@ namespace ServiceVoice
     [ServiceContract]
     public class Voice
     {
-        private readonly BackgroundWorker _worker;
         //语音队列
-        private readonly Queue<string> _queueVoice = new Queue<string>(); 
-
+        private static readonly Queue<string> QueueVoice = new Queue<string>();
+        private static SpeechSynthesizer _speech;
+        private static Thread _t;
         /// <summary>
         /// 语音阅读
         /// </summary>
@@ -22,29 +21,41 @@ namespace ServiceVoice
         {
             try
             {
-                var speech = new SpVoice
+                if (_speech == null)
                 {
-                    Rate = 0,
-                    Volume = 100
-                };
-                _worker = new BackgroundWorker();
-                _worker.DoWork += (sender, e) =>
-                {
-                    string voice;
-                    while (_queueVoice != null && _queueVoice.Count != 0 &&
-                           !string.IsNullOrEmpty(voice = _queueVoice.Dequeue()))
+                    _speech = new SpeechSynthesizer
                     {
-                        Thread.Sleep(300);
-                        //语音阅读方法
-                        speech.Speak(voice); 
-                        Thread.Sleep(100);
-                    }
-                };
+                        Rate = 0,
+                        Volume = 100
+                    };
+                }
+                if (_t != null) return;
+                _t = new Thread(Call) { IsBackground = true };
+                _t.Start();
             }
             catch (Exception e)
             {
-               Common.Log("语音阅读异常:"+ e);
+                Common.Log("语音阅读异常:" + e);
             }
+        }
+        private static void Call()
+        {
+            while (true)
+            {
+                string voice;
+                if (QueueVoice != null && QueueVoice.Count != 0 &&
+                   !string.IsNullOrEmpty(voice = QueueVoice.Dequeue()))
+                {
+                    Thread.Sleep(300);
+                    _speech.Speak(voice);
+                    Thread.Sleep(100);
+                }
+                else
+                {
+                    Thread.Sleep(300);
+                }
+            }
+            // ReSharper disable once FunctionNeverReturns
         }
 
         /// <summary>
@@ -54,10 +65,11 @@ namespace ServiceVoice
         /// <param name="callNum">播报次数</param>
         [OperationContract]
         [WebGet(UriTemplate = "Add/{message}/{callNum}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public void Add(string message, string callNum)
+        public string Add(string message, string callNum)
         {
             try
             {
+                Common.Log("语音叫号被调用！");
                 int cNum;
                 try
                 {
@@ -69,17 +81,15 @@ namespace ServiceVoice
                 }
                 for (var i = 0; i < cNum; i++)
                 {
-                    _queueVoice.Enqueue(message);
-                }
-                if (!_worker.IsBusy)
-                {
-                    _worker.RunWorkerAsync();
+                    QueueVoice.Enqueue(message);
                 }
             }
             catch (Exception e)
             {
                 Common.Log("语音叫号执行异常:" + e);
+                return "语音叫号执行异常:" + e;
             }
+            return "语音叫号执行成功";
         }
     }
 }

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="音频服务端" Height="500" Width="500" Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed">
+        Title="音频服务端" Height="500" Width="500" Closing="Window_Closing" Closed="Window_Closed">
     <Grid>
         <StackPanel>
             <TextBox Name="TxtContent" Padding="6" TextWrapping="Wrap" FontSize="20" Height="300" Margin="6,3,6,3"/>

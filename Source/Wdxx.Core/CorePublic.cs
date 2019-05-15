@@ -12,6 +12,7 @@ using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
+// ReSharper disable PossibleNullReferenceException
 
 namespace Wdxx.Core
 {
@@ -387,7 +388,7 @@ namespace Wdxx.Core
         public static string GetLocalIpv4()
         {
             var ips = GetLocalIp();
-            return ips == null || ips.Count() == 0 ? string.Empty : ips[0];
+            return ips == null || ips.Count == 0 ? string.Empty : ips[0];
         }
 
         /// <summary>
