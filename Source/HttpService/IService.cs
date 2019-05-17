@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using MydbEntity;
@@ -14,8 +15,10 @@ namespace HttpService
         void Test();
 
         [OperationContract]
-        [WebGet]
-        string TestStr();
+        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        DateTime TestStr(DateTime dt);
 
         [OperationContract]
         [WebGet]

@@ -29,7 +29,7 @@ namespace Client
         /// <param name="e"></param>
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            CorePublic.DeleteExit();
+            //CorePublic.DeleteExit();
             CorePublic.DeleteMax();
         }
 
@@ -75,16 +75,6 @@ namespace Client
             var user = new { id = 4, name = "六麻子" };
             var u = CoreHttp.HttpPost<user>(ServiceHelp.HttpUrl + "postuser", user);
             MessageBox.Show(u.id + u.name);
-        }
-
-        /// <summary>
-        /// 测试保留
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Button_Click_4(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(CoreHttp.HttpGet(ServiceHelp.HttpUrl + "TestStr"));
         }
 
         /// <summary>
@@ -154,6 +144,17 @@ namespace Client
             Setting.ServiceUrl = TextBoxUrl.Text;
             ServiceHelp.ServiceIni(TextBoxUrl.Text);
             MessageBox.Show("服务连接成功!");
+        }
+
+        /// <summary>
+        /// 测试保留
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(CoreHttp.HttpPost<DateTime>(ServiceHelp.HttpUrl + "TestStr", new {dt = DateTime.Now})
+                .ToString());
         }
 
         //private struct Tmxx

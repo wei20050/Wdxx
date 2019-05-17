@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
+// ReSharper disable PossibleNullReferenceException
 
 namespace Wdxx.Core
 {
@@ -11,10 +13,11 @@ namespace Wdxx.Core
     public static class CoreLog
     {
 
-        //日志文件夹默认根目录logs文件夹
-        private static readonly string FilePath = AppDomain.CurrentDomain.BaseDirectory + "logs\\";
+        //日志文件夹默认根目录{AppName}Logs文件夹
+        private static readonly string FilePath =
+            AppDomain.CurrentDomain.BaseDirectory + Assembly.GetEntryAssembly().GetName().Name + "Logs\\";
 
-        //日志分隔文件大小 100M
+        //默认日志分隔文件大小 100M
         private const int FileSize = 100 * 1024 * 1024;
 
         /// <summary>

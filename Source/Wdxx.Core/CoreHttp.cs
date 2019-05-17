@@ -195,6 +195,20 @@ namespace Wdxx.Core
             }
         }
 
+        /// <summary>
+        /// 将json字符串中的时间戳加上当前时区
+        /// </summary>
+        /// <param name="jsonStr"></param>
+        /// <returns></returns>
+        public static string JsonTimeAddZone(string jsonStr)
+        {
+            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\)\\/", match =>
+            {
+                var zone = DateTime.Now.ToString("zz00");
+                var math = match.Groups[1].Value;
+                return @"\/Date(" + math + zone + @")\/";
+            });
+        }
 
         /// <summary>
         /// 将json字符串中的时间戳转换成字符串时间格式
@@ -254,6 +268,8 @@ namespace Wdxx.Core
             var jsonstr = new JavaScriptSerializer().Serialize(jsonObject);
             //这里处理掉无法反序列化的构造(wcf自动创建的实体会出现这个问题)
             jsonstr = jsonstr.Replace("\"ExtensionData\":{},", string.Empty);
+            //为json字符串时间戳补上时区
+            jsonstr = JsonTimeAddZone(jsonstr);
             return jsonstr;
         }
 

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
+// ReSharper disable PossibleNullReferenceException
 
 namespace Wdxx.Core
 {

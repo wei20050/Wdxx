@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MydbEntity;
 using Wdxx.Core;
 using Wdxx.Database;
@@ -11,10 +12,9 @@ namespace HttpService
         {
 
         }
-        public string TestStr()
+        public DateTime TestStr(DateTime dt)
         {
-            var ret = _db.Select<user>(new Sql().AddField("id").Equal(1).Or("name").Equal("张三"));
-            return CoreConvert.ObjToJson(ret);
+            return DateTime.Now;
         }
 
         public Service()
