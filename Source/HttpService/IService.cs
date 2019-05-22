@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using MydbEntity;
+using Tset.Entity;
 
 namespace HttpService
 {

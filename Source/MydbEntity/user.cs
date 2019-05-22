@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace MydbEntity
+namespace Tset.Entity
 {
     /// <summary>
     /// 

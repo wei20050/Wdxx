@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Wdxx.Core
 {
@@ -9,28 +9,39 @@ namespace Wdxx.Core
     /// </summary>
     public static class CoreConvert
     {
-        
+
         /// <summary>
-        /// 将JSON数据转化为对应的类型  
+        /// JSON反序列化
         /// </summary>
         /// <typeparam name="T">要转换的类型</typeparam>
-        /// <param name="jsonStr">json字符串</param>
+        /// <param name="json">json字符串</param>
         /// <returns>转换后的对象</returns>
-        public static T JsonToObj<T>(string jsonStr)
+        public static T JsonToObj<T>(string json)
         {
-            return new JavaScriptSerializer().Deserialize<T>(jsonStr);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         /// <summary>
-        /// 将对应的类型转化为JSON字符串
+        /// JSON反序列化
+        /// </summary>
+        /// <param name="jsonStr">json字符串</param>
+        /// <param name="t">要转换的类型</param>
+        /// <returns>转换后的对象</returns>
+        public static object JsonToObj(string jsonStr, Type t)
+        {
+            return JsonConvert.DeserializeObject(jsonStr, t);
+        }
+
+        /// <summary>
+        /// JSON序列化
         /// </summary>
         /// <param name="jsonObject">要转换的类型</param>
         /// <returns>json字符串</returns>
         public static string ObjToJson(object jsonObject)
         {
-            return new JavaScriptSerializer().Serialize(jsonObject);
+            return JsonConvert.SerializeObject(jsonObject);
         }
-        
+
         /// <summary>
         /// 文件转Base64字符串
         /// </summary>
@@ -60,6 +71,5 @@ namespace Wdxx.Core
                 fs.Flush();
             }
         }
-
     }
 }

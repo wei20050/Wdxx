@@ -4,7 +4,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
+
 // ReSharper disable PossibleNullReferenceException
 
 namespace Wdxx.Core
@@ -272,7 +273,7 @@ namespace Wdxx.Core
         /// <returns>转换后的对象</returns>
         private static T JsonToObj<T>(string jsonStr)
         {
-            return string.IsNullOrEmpty(jsonStr) ? default(T) : new JavaScriptSerializer().Deserialize<T>(jsonStr);
+            return string.IsNullOrEmpty(jsonStr) ? default(T) : JsonConvert.DeserializeObject<T>(jsonStr);
         }
 
         /// <summary>
@@ -283,7 +284,7 @@ namespace Wdxx.Core
         private static string ObjToJson(object jsonObject)
         {
             //这里是原序列化之后的json
-            var jsonstr = new JavaScriptSerializer().Serialize(jsonObject);
+            var jsonstr = JsonConvert.SerializeObject(jsonObject);
             //这里处理掉无法反序列化的构造(wcf自动创建的实体会出现这个问题)
             jsonstr = jsonstr.Replace("\"ExtensionData\":{},", string.Empty);
             //这里把json中时间戳转换成时间字符串 并且改成当前时区

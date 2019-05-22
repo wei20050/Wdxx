@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using Microsoft.Win32;
 // ReSharper disable PossibleNullReferenceException
 
@@ -68,28 +67,18 @@ namespace Wdxx.Core
         /// <summary>
         /// 判断系统是否已启动
         /// </summary>
-        public static void IsStart()
+        public static bool IsStart()
         {
             for (var i = 0; i < 8; i++)
             {
                 //获取指定的进程名
                 var myProcesses = Process.GetProcessesByName(Assembly.GetEntryAssembly().GetName().Name);
-                //如果可以获取到知道的进程名则说明已经启动
-                if (myProcesses.Length <= 1) return;
+                //如果获取到的进程只有一个 判断没有重复启动
+                if (myProcesses.Length <= 1) return false;
                 System.Threading.Thread.Sleep(168);
             }
-            MessageBox.Show("程序已启动！");
-            //关闭系统
-            Environment.Exit(0);
-        }
-
-        /// <summary>
-        /// 重启程序
-        /// </summary>
-        public static void Restart()
-        {
-            Application.Restart();
-            Environment.Exit(0);
+            //连续八次检测到多个进程判断是重复启动了
+            return true;
         }
 
         #endregion

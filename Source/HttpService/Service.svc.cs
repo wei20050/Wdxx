@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MydbEntity;
+using Tset.Entity;
 using Wdxx.Core;
 using Wdxx.Database;
 

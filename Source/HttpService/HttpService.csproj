@@ -84,9 +84,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MydbEntity\MydbEntity.csproj">
+    <ProjectReference Include="..\MydbEntity\Tset.Entity.csproj">
       <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
-      <Name>MydbEntity</Name>
+      <Name>Tset.Entity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Wdxx.Core\Wdxx.Core.csproj">
       <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>
