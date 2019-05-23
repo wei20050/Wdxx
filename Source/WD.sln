@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.ServiceHost", "Test.Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Client", "Test.Client\Test.Client.csproj", "{B2608FEB-948F-45CA-891F-AA88C621B35A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "WpfApp\Client.csproj", "{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

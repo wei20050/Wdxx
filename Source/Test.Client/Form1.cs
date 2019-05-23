@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Test.Client.Service;
 using Tset.Entity;
 using Wdxx.Core;
 
@@ -10,61 +11,117 @@ namespace Test.Client
     {
         public Form1()
         {
-            //CorePublic.Administrator();
+            CorePublic.Administrator();
             CorePublic.IsStart();
             InitializeComponent();
         }
-
-        private void Form1_Load(object sender, System.EventArgs e)
+        //界面初始化
+        private void Form1_Load(object sender, EventArgs e)
         {
         }
-
-        private void button1_Click(object sender, System.EventArgs e)
+        //get无参返回字符串
+        private void button1_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void button2_Click(object sender, System.EventArgs e)
-        {
-
-        }
-
-        private void button3_Click(object sender, System.EventArgs e)
-        {
-            var ret = CoreHttp.Get<string>(textBox1.Text + "/test?id=11&msg=张三");
+            var ret = CoreHttp.Get(ServiceHelp.HttpUrl + "test");
             listBox1.Items.Add(ret);
         }
-
-        private void button4_Click(object sender, System.EventArgs e)
+        //get无参返回泛型
+        private void button2_Click(object sender, EventArgs e)
         {
-
+            var ret = CoreHttp.Get<DateTime>(ServiceHelp.HttpUrl + "test");
+            listBox1.Items.Add(ret);
         }
-
-        private void button5_Click(object sender, System.EventArgs e)
+        //get带参数返回字符串
+        private void button3_Click(object sender, EventArgs e)
         {
+            var ret = CoreHttp.Get(ServiceHelp.HttpUrl + "test?id=11&msg=张三");
+            listBox1.Items.Add(ret);
         }
-
-        private void button6_Click(object sender, System.EventArgs e)
+        //post无参返回字符串
+        private void button4_Click(object sender, EventArgs e)
         {
-            var u1 = new user
+            var ret = CoreHttp.Post(ServiceHelp.HttpUrl + "test");
+            listBox1.Items.Add(ret);
+        }
+        //post无参返回泛型
+        private void button5_Click(object sender, EventArgs e)
+        {
+            var ret = CoreHttp.Post<DateTime>(ServiceHelp.HttpUrl + "test");
+            listBox1.Items.Add(ret);
+        }
+        //post带参数返回字符串
+        private void button6_Click(object sender, EventArgs e)
+        {
+            var data = new
+            {
+                id = 1,
+                msg = "post带参数"
+            };
+            var ret = CoreHttp.Post(ServiceHelp.HttpUrl + "test", data);
+            listBox1.Items.Add(ret);
+        }
+        //新增
+        private void button8_Click(object sender, EventArgs e)
+        {
+            var u = new user
             {
                 id = 1,
                 name = "张三"
             };
-            var u2 = new user
-            {
-                id = 1,
-                name = "张三"
-            };
-            var ret = CoreHttp.Post<string>(textBox1.Text + "/DateTime", new {u1,u2});
+            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "user", new { u });
             listBox1.Items.Add(ret);
         }
-
+        //修改
+        private void button9_Click(object sender, EventArgs e)
+        {
+            var u = new user
+            {
+                id = 1,
+                name = CorePublic.GenerateId().ToString()
+            };
+            var ret = CoreHttp.Put<int>(ServiceHelp.HttpUrl + "user", new { u });
+            listBox1.Items.Add(ret);
+        }
+        //删除
+        private void button10_Click(object sender, EventArgs e)
+        {
+            var ret = CoreHttp.Delete<int>(ServiceHelp.HttpUrl + "user", new { id = 1 });
+            listBox1.Items.Add(ret);
+        }
+        //查询id=1
+        private void button11_Click(object sender, EventArgs e)
+        {
+            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "user?id=1");
+            dataGridView1.DataSource = new List<user> {ret};
+        }
+        //查询id=1name=张三
+        private void button12_Click(object sender, EventArgs e)
+        {
+            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "user?id=1&name=张三");
+            dataGridView1.DataSource = new List<user> { ret };
+        }
+        //查询所有
+        private void button13_Click(object sender, EventArgs e)
+        {
+            var ret = CoreHttp.Get<List<user>>(ServiceHelp.HttpUrl + "user");
+            dataGridView1.DataSource = ret;
+        }
+        //清空列表框
+        private void button15_Click(object sender, EventArgs e)
+        {
+            listBox1.Items.Clear();
+        }
+        //测试服务器连接
+        private void button14_Click(object sender, EventArgs e)
+        {
+            ServiceHelp.ServiceIni(textBox1.Text);
+            MessageBox.Show(@"服务连接成功!");
+        }
+        //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            var jsonstr = CoreConvert.ObjToJson("http://127.0.0.1:888/");
-            var obj = CoreConvert.JsonToObj<string>(jsonstr);
-
+            
         }
+
     }
 }

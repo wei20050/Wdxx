@@ -48,6 +48,11 @@ namespace Wdxx.Database
         public DbHelper(string dbConnectionName)
         {
             var cm = ConfigurationManager.ConnectionStrings[dbConnectionName];
+            if (cm == null)
+            {
+                LogErr("数据库配置文件不存在或无法读取!");
+                throw new Exception("数据库配置文件不存在或无法读取!");
+            }
             var pn = cm.ProviderName;
             if (pn.Contains("System.Data.SQLite"))
             {

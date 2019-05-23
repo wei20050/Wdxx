@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -53,6 +54,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\localDatabaseHelp.cs" />
+    <Compile Include="Service\ServiceHelp.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -66,6 +69,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
+    <None Include="Data\mydb.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -81,10 +88,19 @@
       <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
       <Name>Tset.Entity</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Test.ServiceHost\Test.ServiceHost.csproj">
+      <Project>{2129bd15-2094-41a3-a4eb-191328566fb1}</Project>
+      <Name>Test.ServiceHost</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Wdxx.Core\Wdxx.Core.csproj">
       <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>
       <Name>Wdxx.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\dbver.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
