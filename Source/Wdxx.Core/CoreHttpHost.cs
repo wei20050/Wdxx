@@ -8,13 +8,13 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using Newtonsoft.Json;
 
 namespace Wdxx.Core
 {
 
     /// <summary>
-    /// 本地服务挂接类
+    /// 本地Http服务挂接类
+    /// 方法名后面带http方法 如GET请求Test方法 方法名为 TestGet 不区分大小写 
     /// </summary>
     public class CoreHttpHost
     {
@@ -412,6 +412,7 @@ namespace Wdxx.Core
                         }
                     }
                 }
+
             }
             return Fun(mi, objArr);
         }
@@ -443,8 +444,6 @@ namespace Wdxx.Core
                     } while (readLen != 0);
                     //获取得到数据data
                     var data = Encoding.UTF8.GetString(byteList.ToArray(), 0, len);
-                    //获取参数
-                    var dataObj = JsonConvert.DeserializeObject<IDictionary<string, object>>(data);
                     //url路径
                     var postSegments = request.Url.Segments;
                     string funName;
@@ -488,6 +487,8 @@ namespace Wdxx.Core
                     }
                     else
                     {
+                        //获取参数
+                        var dataObj = JsonToObj<Dictionary<string, object>>(data);
                         //这里是参数数组
                         objArr = new object[dataObj.Count];
                         foreach (var m in mis)
@@ -504,8 +505,8 @@ namespace Wdxx.Core
                                     try
                                     {
                                         if (ps[i].Name != d.Key) continue;
-                                        var objStr = JsonConvert.SerializeObject(d.Value);
-                                        objArr[i] = JsonConvert.DeserializeObject(objStr, ps[i].ParameterType);
+                                        var objStr = d.Value.ToString();
+                                        objArr[i] = JsonToObj(objStr, ps[i].ParameterType);
                                         break;
                                     }
                                     catch (Exception e)
@@ -546,11 +547,67 @@ namespace Wdxx.Core
         /// <returns></returns>
         private string Fun(MethodInfo mi, object[] pos)
         {
-            //创建实例
-            var o = Activator.CreateInstance(_serviceClass);
-            //调用方法
-            var ret = mi == null ? string.Empty : JsonConvert.SerializeObject(mi.Invoke(o, pos));
-            return ret;
+            try
+            {
+                //创建实例
+                var o = Activator.CreateInstance(_serviceClass);
+                //调用方法
+                var ret = mi == null ? string.Empty : ObjToJson(mi.Invoke(o, pos));
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                Error(ex);
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// JSON反序列化
+        /// </summary>
+        /// <typeparam name="T">要转换的类型</typeparam>
+        /// <param name="jsonStr">json字符串</param>
+        /// <returns>转换后的对象</returns>
+        public static T JsonToObj<T>(string jsonStr)
+        {
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+                return (T)deseralizer.ReadObject(ms);
+            }
+        }
+
+        /// <summary>
+        /// JSON反序列化
+        /// </summary>
+        /// <param name="jsonStr">json字符串</param>
+        /// <param name="type">要转换的类型</param>
+        /// <returns>转换后的对象</returns>
+        public static object JsonToObj(string jsonStr, Type type)
+        {
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(type);
+                return deseralizer.ReadObject(ms);
+            }
+        }
+
+        /// <summary>
+        /// JSON序列化
+        /// </summary>
+        /// <param name="jsonObject">要转换的类型</param>
+        /// <returns>json字符串</returns>
+        public static string ObjToJson(object jsonObject)
+        {
+            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
+            var msObj = new MemoryStream();
+            js.WriteObject(msObj, jsonObject);
+            msObj.Position = 0;
+            var sr = new StreamReader(msObj, Encoding.UTF8);
+            string json = sr.ReadToEnd();
+            sr.Close();
+            msObj.Close();
+            return json;
         }
     }
 }

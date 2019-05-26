@@ -6,13 +6,13 @@ using System.Threading;
 namespace Wdxx.Database
 {
     /// <summary>
-    /// 数据库日志 (路径 操作数据库的应用或服务根目录 logs文件夹)
+    /// 日志 (路径 根目录 logs文件夹)
     /// </summary>
-    internal static class DbLog
+    public static class Log
     {
 
         //日志文件夹默认根目录logs文件夹
-        private static readonly string FilePath = AppDomain.CurrentDomain.BaseDirectory + "logs\\";
+        private static readonly string FilePath = Environment.CurrentDirectory + "\\logs\\";
 
         //日志分隔文件大小 100M
         private const int FileSize = 100 * 1024 * 1024;
@@ -22,7 +22,7 @@ namespace Wdxx.Database
         /// </summary>
         public static void Error(object log)
         {
-            WriteFile("[Error] " + log, CreateLogPath("DB_"));
+            Error(log, string.Empty);
         }
 
         /// <summary>
@@ -30,7 +30,23 @@ namespace Wdxx.Database
         /// </summary>
         public static void Info(object log)
         {
-            WriteFile("[Info] " + log, CreateLogPath("DB_"));
+            Info(log, string.Empty);
+        }
+
+        /// <summary>
+        /// 写错误日志
+        /// </summary>
+        public static void Error(object log,string prefix)
+        {
+            WriteFile("[Error] " + log, CreateLogPath(prefix));
+        }
+
+        /// <summary>
+        /// 写操作日志
+        /// </summary>
+        public static void Info(object log, string prefix)
+        {
+            WriteFile("[Info] " + log, CreateLogPath(prefix));
         }
 
         /// <summary>

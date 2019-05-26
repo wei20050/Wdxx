@@ -3,8 +3,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 
 // ReSharper disable PossibleNullReferenceException
 
@@ -248,51 +246,54 @@ namespace Wdxx.Core
             return WriteIniData(endpoint, key, value, configPath);
         }
 
-
         /// <summary>
-        /// 将json字符串中的事件戳转换成字符串时间格式
-        /// </summary>
-        /// <param name="jsonStr"></param>
-        /// <returns></returns>
-        private static string JsonTime(string jsonStr)
-        {
-            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\)\\/", match =>
-            {
-                var dt = new DateTime(1970, 1, 1);
-                dt = dt.AddMilliseconds(long.Parse(match.Groups[1].Value));
-                dt = dt.ToLocalTime();
-                return dt.ToString("yyyy-MM-dd HH:mm:ss");
-            });
-        }
-
-        /// <summary>
-        /// 将JSON数据转化为对应的类型  
+        /// JSON反序列化
         /// </summary>
         /// <typeparam name="T">要转换的类型</typeparam>
         /// <param name="jsonStr">json字符串</param>
         /// <returns>转换后的对象</returns>
-        private static T JsonToObj<T>(string jsonStr)
+        public static T JsonToObj<T>(string jsonStr)
         {
-            return string.IsNullOrEmpty(jsonStr) ? default(T) : JsonConvert.DeserializeObject<T>(jsonStr);
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+                return (T)deseralizer.ReadObject(ms);
+            }
         }
 
         /// <summary>
-        /// 将对应的类型转化为JSON字符串
+        /// JSON反序列化
+        /// </summary>
+        /// <param name="jsonStr">json字符串</param>
+        /// <param name="type">要转换的类型</param>
+        /// <returns>转换后的对象</returns>
+        public static object JsonToObj(string jsonStr, Type type)
+        {
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(type);
+                return deseralizer.ReadObject(ms);
+            }
+        }
+
+        /// <summary>
+        /// JSON序列化
         /// </summary>
         /// <param name="jsonObject">要转换的类型</param>
         /// <returns>json字符串</returns>
-        private static string ObjToJson(object jsonObject)
+        public static string ObjToJson(object jsonObject)
         {
-            //这里是原序列化之后的json
-            var jsonstr = JsonConvert.SerializeObject(jsonObject);
-            //这里处理掉无法反序列化的构造(wcf自动创建的实体会出现这个问题)
-            jsonstr = jsonstr.Replace("\"ExtensionData\":{},", string.Empty);
-            //这里把json中时间戳转换成时间字符串 并且改成当前时区
-            jsonstr = JsonTime(jsonstr);
-            return jsonstr;
+            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
+            var msObj = new MemoryStream();
+            js.WriteObject(msObj, jsonObject);
+            msObj.Position = 0;
+            var sr = new StreamReader(msObj, Encoding.UTF8);
+            string json = sr.ReadToEnd();
+            sr.Close();
+            msObj.Close();
+            return json;
         }
-
-
+        
         #endregion
     }
 }

@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.ServiceHost", "Test.Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Client", "Test.Client\Test.Client.csproj", "{B2608FEB-948F-45CA-891F-AA88C621B35A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "WpfApp\Client.csproj", "{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClient", "HttpClient\HttpClient.csproj", "{0B3FDB5F-91C9-44D4-9A9E-5ED234F9D473}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -56,7 +56,7 @@ namespace Test.ServiceHost
             return _db.Select<user>(new Sql().AddField("id").Equal(id));
         }
 
-        public user UserGet(int id,string name)
+        public user UserGet(int id, string name)
         {
             return _db.Select<user>(new Sql().AddField("id").Equal(id).And("name").Equal(name));
         }

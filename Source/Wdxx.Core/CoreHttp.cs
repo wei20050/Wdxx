@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace Wdxx.Core
 {
@@ -61,8 +60,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T Post<T>(string httpUri, object postData)
         {
-            var data = JsonConvert.SerializeObject(postData);
-            return HttpSend<T>(httpUri, "POST", data);
+            return HttpSend<T>(httpUri, "POST", postData);
         }
 
         /// <summary>
@@ -73,8 +71,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string Post(string httpUri, object postData)
         {
-            var data = JsonConvert.SerializeObject(postData);
-            return HttpSend(httpUri, "POST", data);
+            return HttpSend(httpUri, "POST", postData);
         }
 
         /// <summary>
@@ -127,8 +124,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T Delete<T>(string httpUri, object putData)
         {
-            var data = JsonConvert.SerializeObject(putData);
-            return HttpSend<T>(httpUri, "DELETE", data);
+            return HttpSend<T>(httpUri, "DELETE", putData);
         }
 
         /// <summary>
@@ -139,8 +135,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string Delete(string httpUri, object putData)
         {
-            var data = JsonConvert.SerializeObject(putData);
-            return HttpSend(httpUri, "DELETE", data);
+            return HttpSend(httpUri, "DELETE", putData);
         }
 
         /// <summary>
@@ -193,8 +188,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T Put<T>(string httpUri, object putData)
         {
-            var data = JsonConvert.SerializeObject(putData);
-            return HttpSend<T>(httpUri, "PUT", data);
+            return HttpSend<T>(httpUri, "PUT", putData);
         }
 
         /// <summary>
@@ -205,8 +199,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string Put(string httpUri, object putData)
         {
-            var data = JsonConvert.SerializeObject(putData);
-            return HttpSend(httpUri, "PUT", data);
+            return HttpSend(httpUri, "PUT", putData);
         }
 
         /// <summary>
@@ -254,11 +247,11 @@ namespace Wdxx.Core
         }
 
         /// <summary>
-        /// Http发送请求 返回泛型
+        /// Http发送请求 字符串参数 返回泛型
         /// </summary>
         /// <param name="httpUri">请求地址</param>
         /// <param name="method">请求的方法</param>
-        /// <param name="httpData">请求参数 例:{"value": "post"} C#格式(@"{""value"":""post""}")</param>
+        /// <param name="httpData">请求参数 例:{"value": "http"} C#格式(@"{""value"":""http""}")</param>
         /// <returns></returns>
         public static T HttpSend<T>(string httpUri, string method, string httpData)
         {
@@ -266,7 +259,37 @@ namespace Wdxx.Core
             {
                 return (T)(object)HttpSend(httpUri, method, httpData);
             }
-            return JsonConvert.DeserializeObject<T>(HttpSend(httpUri, method, httpData));
+            return JsonToObj<T>(HttpSend(httpUri, method, httpData));
+        }
+
+        /// <summary>
+        /// Http发送请求 匿名类型参数 返回字符串
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <param name="method">请求的方法</param>
+        /// <param name="httpData">请求参数 匿名类型代替的JSON对象 例:var httpData = new {参数名1 = 参数值1,参数名2 = 参数值2}</param>
+        /// <returns></returns>
+        public static string HttpSend(string httpUri, string method, object httpData)
+        {
+            var data = ObjToJson(httpData);
+            return HttpSend(httpUri, method, data);
+        }
+
+        /// <summary>
+        /// Http发送请求 匿名类型参数 返回泛型
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <param name="method">请求的方法</param>
+        /// <param name="httpData">请求参数 匿名类型代替的JSON对象 例:var httpData = new {参数名1 = 参数值1,参数名2 = 参数值2}</param>
+        /// <returns></returns>
+        public static T HttpSend<T>(string httpUri, string method, object httpData)
+        {
+            var data = ObjToJson(httpData);
+            if (typeof(T) == typeof(string))
+            {
+                return (T)(object)HttpSend(httpUri, method, data);
+            }
+            return JsonToObj<T>(HttpSend(httpUri, method, data));
         }
 
         /// <summary>
@@ -320,6 +343,39 @@ namespace Wdxx.Core
             catch (Exception ex)
             {
                 throw new Exception("HttpErr method:" + method + " uri:" + httpUri + " postData:" + httpData + "err:" + ex);
+            }
+        }
+
+        /// <summary>
+        /// JSON序列化
+        /// </summary>
+        /// <param name="jsonObject">要转换的类型</param>
+        /// <returns>json字符串</returns>
+        public static string ObjToJson(object jsonObject)
+        {
+            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
+            var msObj = new MemoryStream();
+            js.WriteObject(msObj, jsonObject);
+            msObj.Position = 0;
+            var sr = new StreamReader(msObj, Encoding.UTF8);
+            string json = sr.ReadToEnd();
+            sr.Close();
+            msObj.Close();
+            return json;
+        }
+
+        /// <summary>
+        /// JSON反序列化
+        /// </summary>
+        /// <typeparam name="T">要转换的类型</typeparam>
+        /// <param name="jsonStr">json字符串</param>
+        /// <returns>转换后的对象</returns>
+        public static T JsonToObj<T>(string jsonStr)
+        {
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+                return (T)deseralizer.ReadObject(ms);
             }
         }
     }

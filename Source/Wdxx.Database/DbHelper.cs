@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.Objects.DataClasses;
@@ -21,15 +20,6 @@ namespace Wdxx.Database
 
     /// <summary>
     /// 数据库操作类
-    /// <para>连接字符串示例:</para>
-    /// <para>connectionStrings</para>
-    /// <para>    <!--默认连接--></para>
-    /// <para>    <add name = "DbContext" connectionString="server=localhost;database=mydb;user id=root;password=123456;" providerName="MySql.Data.MySqlClient" /></para>
-    /// <para>    <add name = "SqliteConnection" connectionString="Data Source=D:\mydb.db;Version=3;" providerName="System.Data.SQLite"/></para>
-    /// <para>    <add name = "MySqlConnection" connectionString="server=localhost;database=mydb;user id=root;password=123456;" providerName="MySql.Data.MySqlClient" /></para>
-    /// <para>    <add name = "MsSqlConnection" connectionString="Data Source=localhost;Initial Catalog=mydb;User ID=sa;Password=123456;Integrated Security=false;" providerName="System.Data.SqlClient" /></para>
-    /// <para>    <add name = "OracleConnection" connectionString="Data Source=(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = orcl)));Persist Security Info=True;User Id=mydb;Password=123456;" providerName="System.Data.OracleClient" /></para>
-    /// <para>/connectionStrings</para>
     /// </summary>
     public class DbHelper
     {
@@ -47,44 +37,58 @@ namespace Wdxx.Database
         /// <param name="dbConnectionName">数据库连接字符串Name</param>
         public DbHelper(string dbConnectionName)
         {
-            var cm = ConfigurationManager.ConnectionStrings[dbConnectionName];
-            if (cm == null)
+            // 数据库配置ini文件路径
+            string ConfigPath = Environment.CurrentDirectory + "\\Database.ini";
+            var connectionString = Ini.Rini(dbConnectionName, "connectionString", ConfigPath);
+            var providerName = Ini.Rini(dbConnectionName, "providerName", ConfigPath);
+            if (string.IsNullOrEmpty(connectionString))
             {
-                LogErr("数据库配置文件不存在或无法读取!");
+                Ini.Wini(dbConnectionName, "connectionString", "Data Source=D:\\mydb.db;", ConfigPath);
+            }
+            if (string.IsNullOrEmpty(providerName))
+            {
+                Ini.Wini(dbConnectionName, "providerName", "System.Data.SQLite", ConfigPath);
+            }
+            connectionString = Ini.Rini(dbConnectionName, "connectionString", ConfigPath);
+            providerName = Ini.Rini(dbConnectionName, "providerName", ConfigPath);
+            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName))
+            {
+                Error("数据库配置文件不存在或无法读取!");
                 throw new Exception("数据库配置文件不存在或无法读取!");
             }
-            var pn = cm.ProviderName;
-            if (pn.Contains("System.Data.SQLite"))
+            if (providerName.Contains("System.Data.SQLite"))
             {
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll"))
+                var sqlItePath = Environment.CurrentDirectory + "\\runtime\\lib\\System.Data.SQLite.dll";
+                if (File.Exists(sqlItePath))
                 {
-                    _sqliteAss = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll");
+                    _sqliteAss = Assembly.LoadFrom(sqlItePath);
                     MDbType = DbTypeEnum.Sqlite;
                 }
                 else
                 {
-                    LogErr("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
-                    throw new Exception("未能加载：System.Data.SQLite.dll 请确认此插件是否存在！");
+                    Error("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
+                    throw new Exception("未能加载：" + sqlItePath + " 请确认此插件是否存在！");
                 }
             }
-            else if (pn.Contains("MySql.Data.MySqlClient"))
+            else if (providerName.Contains("MySql.Data.MySqlClient"))
             {
                 MDbType = DbTypeEnum.Mysql;
             }
-            else if (pn.Contains("System.Data.SqlClient"))
+            else if (providerName.Contains("System.Data.SqlClient"))
             {
                 MDbType = DbTypeEnum.Mssql;
             }
-            else if (pn.Contains("System.Data.OracleClient"))
+            else if (providerName.Contains("System.Data.OracleClient"))
             {
                 MDbType = DbTypeEnum.Oracle;
             }
             else
             {
                 MDbType = DbTypeEnum.None;
-                LogErr("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
+                Error("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
+                throw new Exception("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
             }
-            _mConnectionString = cm.ToString();
+            _mConnectionString = connectionString;
             _mParameterMark = GetParameterMark();
         }
 
@@ -416,20 +420,20 @@ namespace Wdxx.Database
         /// <summary>
         /// SQL记录日志
         /// </summary>
-        public void Log(string sqlString, params DbParameter[] cmdParms)
+        private void LogInfo(string sqlString, params DbParameter[] cmdParms)
         {
             if (SqlLog)
             {
-                DbLog.Info(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
+                Info(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
             }
         }
 
         /// <summary>
         /// SQL错误日志
         /// </summary>
-        public void LogErr(string sqlString, params DbParameter[] cmdParms)
+        private void LogErr(string sqlString, params DbParameter[] cmdParms)
         {
-            DbLog.Error(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
+            Error(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
         }
 
         #endregion
@@ -444,7 +448,7 @@ namespace Wdxx.Database
         public bool Exists(string sqlString)
         {
             SqlFilter(ref sqlString);
-            Log(sqlString);
+            LogInfo(sqlString);
             using (var conn = GetConnection())
             {
                 using (var cmd = GetCommand(sqlString, conn))
@@ -457,8 +461,8 @@ namespace Wdxx.Database
                     }
                     catch (Exception ex)
                     {
-                        DbLog.Error(sqlString);
-                        DbLog.Error(ex);
+                        Error(sqlString);
+                        Error(ex);
                         return false;
                     }
                     finally
@@ -482,7 +486,7 @@ namespace Wdxx.Database
         public object GetSingle(string sqlString)
         {
             SqlFilter(ref sqlString);
-            Log(sqlString);
+            LogInfo(sqlString);
             using (var conn = GetConnection())
             {
                 using (var cmd = GetCommand(sqlString, conn))
@@ -502,8 +506,8 @@ namespace Wdxx.Database
                     }
                     catch (Exception ex)
                     {
-                        DbLog.Error(sqlString);
-                        DbLog.Error(ex);
+                        Error(sqlString);
+                        Error(ex);
                         return false;
                     }
                     finally
@@ -526,7 +530,7 @@ namespace Wdxx.Database
         /// <returns>影响的记录数</returns>
         public int ExecuteSql(string sqlString, params DbParameter[] cmdParms)
         {
-            Log(sqlString, cmdParms);
+            LogInfo(sqlString, cmdParms);
             var conn = _mTran == null ? GetConnection() : _mTran.Connection;
             using (var cmd = GetCommand())
             {
@@ -540,7 +544,7 @@ namespace Wdxx.Database
                 catch (Exception ex)
                 {
                     LogErr(sqlString, cmdParms);
-                    DbLog.Error(ex);
+                    Error(ex);
                     return 0;
                 }
                 finally
@@ -563,7 +567,7 @@ namespace Wdxx.Database
         /// <returns>IDataReader</returns>
         public DbDataReader ExecuteReader(string sqlString, params DbParameter[] cmdParms)
         {
-            Log(sqlString, cmdParms);
+            LogInfo(sqlString, cmdParms);
             var conn = GetConnection();
             var cmd = GetCommand();
             try
@@ -576,7 +580,7 @@ namespace Wdxx.Database
             catch (Exception ex)
             {
                 LogErr(sqlString, cmdParms);
-                DbLog.Error(ex);
+                Error(ex);
                 return null;
             }
 
@@ -594,7 +598,7 @@ namespace Wdxx.Database
         /// <returns>DataSet</returns>
         public DataSet ExecuteSet(string sqlString, params DbParameter[] cmdParms)
         {
-            Log(sqlString, cmdParms);
+            LogInfo(sqlString, cmdParms);
             var conn = GetConnection();
             var cmd = GetCommand();
             PrepareCommand(cmd, conn, null, sqlString, cmdParms);
@@ -609,7 +613,7 @@ namespace Wdxx.Database
                 catch (Exception ex)
                 {
                     LogErr(sqlString, cmdParms);
-                    DbLog.Error(ex);
+                    Error(ex);
                     return null;
                 }
                 finally
@@ -959,7 +963,7 @@ namespace Wdxx.Database
             }
             catch (Exception ex)
             {
-                DbLog.Error(ex);
+                Error(ex);
             }
             finally
             {
@@ -1065,7 +1069,7 @@ namespace Wdxx.Database
             }
             catch (Exception ex)
             {
-                DbLog.Error(ex);
+                Error(ex);
             }
             finally
             {
@@ -1332,7 +1336,7 @@ namespace Wdxx.Database
         /// </summary>
         public void BeginTransaction()
         {
-            if (SqlLog) DbLog.Info("开始事务");
+            if (SqlLog) Info("开始事务");
             var conn = GetConnection();
             if (conn.State != ConnectionState.Open) conn.Open();
             _mTran = conn.BeginTransaction();
@@ -1349,7 +1353,7 @@ namespace Wdxx.Database
         {
             //防止重复提交
             if (_mTran == null) return;
-            if (SqlLog) DbLog.Info("提交事务");
+            if (SqlLog) Info("提交事务");
             var conn = _mTran.Connection;
             try
             {
@@ -1358,7 +1362,7 @@ namespace Wdxx.Database
             catch (Exception ex)
             {
                 _mTran.Rollback();
-                DbLog.Error("提交事务:" + ex);
+                Error("提交事务:" + ex);
             }
             finally
             {
@@ -1379,7 +1383,7 @@ namespace Wdxx.Database
         {
             //防止重复回滚
             if (_mTran == null) return;
-            if (SqlLog) DbLog.Info("回滚事务");
+            if (SqlLog) Info("回滚事务");
             var conn = _mTran.Connection;
             try
             {
@@ -1387,12 +1391,26 @@ namespace Wdxx.Database
             }
             catch (Exception ex)
             {
-                DbLog.Error("回滚事务:" + ex);
+                Error("回滚事务:" + ex);
             }
             if (conn.State == ConnectionState.Open) conn.Close();
         }
 
         #endregion
+
+        #endregion
+
+        #region 日志封装
+
+        private void Info(object o)
+        {
+            Database.Log.Info(o, "DB_");
+        }
+        
+        private void Error(object o)
+        {
+            Database.Log.Error(o, "DB_");
+        }
 
         #endregion
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using Wdxx.Core;
@@ -80,10 +79,7 @@ namespace Test.Client.Service
                 }
             }
             //设置数据库连接字符串
-            var clientConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            clientConfig.ConnectionStrings.ConnectionStrings["DbContext"].ConnectionString = DbContext;
-            clientConfig.Save(ConfigurationSaveMode.Modified, true);
-            ConfigurationManager.RefreshSection("connectionStrings");
+            CoreIni.Wini("connectionString", DbContext, Environment.CurrentDirectory + "\\Database.ini", "DbContext");
         }
     }
 }

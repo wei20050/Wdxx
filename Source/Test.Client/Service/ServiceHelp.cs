@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using Test.ServiceHost;
 using Wdxx.Core;
 
 namespace Test.Client.Service
@@ -36,7 +37,7 @@ namespace Test.Client.Service
                 //离线服务开启
                 if (DialogResult.Yes != MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo)) return false;
                 IsOnLine = false;
-                HttpUrl = new CoreHttpHost(typeof(ServiceHost.TestService)).Open();
+                HttpUrl = new CoreHttpHost(typeof(TestService)).Open();
                 //设置本地数据库
                 LocalDatabaseHelp.SetDatabase();
             }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Newtonsoft.Json;
+using System.Text;
 
 namespace Wdxx.Core
 {
@@ -14,22 +14,30 @@ namespace Wdxx.Core
         /// JSON反序列化
         /// </summary>
         /// <typeparam name="T">要转换的类型</typeparam>
-        /// <param name="json">json字符串</param>
+        /// <param name="jsonStr">json字符串</param>
         /// <returns>转换后的对象</returns>
-        public static T JsonToObj<T>(string json)
+        public static T JsonToObj<T>(string jsonStr)
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+                return (T)deseralizer.ReadObject(ms);
+            }
         }
 
         /// <summary>
         /// JSON反序列化
         /// </summary>
         /// <param name="jsonStr">json字符串</param>
-        /// <param name="t">要转换的类型</param>
+        /// <param name="type">要转换的类型</param>
         /// <returns>转换后的对象</returns>
-        public static object JsonToObj(string jsonStr, Type t)
+        public static object JsonToObj(string jsonStr, Type type)
         {
-            return JsonConvert.DeserializeObject(jsonStr, t);
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
+            {
+                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(type);
+                return deseralizer.ReadObject(ms);
+            }
         }
 
         /// <summary>
@@ -39,7 +47,15 @@ namespace Wdxx.Core
         /// <returns>json字符串</returns>
         public static string ObjToJson(object jsonObject)
         {
-            return JsonConvert.SerializeObject(jsonObject);
+            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
+            var msObj = new MemoryStream();
+            js.WriteObject(msObj, jsonObject);
+            msObj.Position = 0;
+            var sr = new StreamReader(msObj, Encoding.UTF8);
+            string json = sr.ReadToEnd();
+            sr.Close();
+            msObj.Close();
+            return json;
         }
 
         /// <summary>
