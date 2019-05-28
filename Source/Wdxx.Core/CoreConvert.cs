@@ -52,7 +52,7 @@ namespace Wdxx.Core
             js.WriteObject(msObj, jsonObject);
             msObj.Position = 0;
             var sr = new StreamReader(msObj, Encoding.UTF8);
-            string json = sr.ReadToEnd();
+            var json = sr.ReadToEnd();
             sr.Close();
             msObj.Close();
             return json;

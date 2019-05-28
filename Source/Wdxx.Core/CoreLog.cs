@@ -12,8 +12,7 @@ namespace Wdxx.Core
     {
 
         //日志文件夹默认根目录Logs文件夹
-        private static readonly string FilePath =
-            AppDomain.CurrentDomain.BaseDirectory + "Logs\\";
+        private static readonly string FilePath = Environment.CurrentDirectory + "\\logs\\";
 
         //默认日志分隔文件大小 100M
         private const int FileSize = 100 * 1024 * 1024;

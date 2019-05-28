@@ -42,7 +42,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string ExePath
         {
-            get { return AppDomain.CurrentDomain.BaseDirectory; }
+            get { return Environment.CurrentDirectory + "\\"; }
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Wdxx.Core
         /// </summary>
         public static void AutoStart()
         {
-            AutoStart(AppDomain.CurrentDomain.BaseDirectory + Assembly.GetEntryAssembly().GetName().Name + ".exe");
+            AutoStart(Environment.CurrentDirectory + "\\" + Assembly.GetEntryAssembly().GetName().Name + ".exe");
         }
 
         /// <summary>
@@ -156,12 +156,18 @@ namespace Wdxx.Core
         {
             try
             {
+                var name = Path.GetFileNameWithoutExtension(appPath);
                 var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
                 if (rKey == null)
                 {
                     throw new Exception(@"添加开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
                 }
-                rKey.SetValue(Path.GetFileNameWithoutExtension(appPath), "\"" + appPath + "\"");
+                var reg = rKey.GetValue(name);
+                if (reg != null)
+                {
+                    return;
+                }
+                rKey.SetValue(name, "\"" + appPath + "\"");
 
             }
             catch (Exception e)

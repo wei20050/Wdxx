@@ -4,3 +4,4 @@ obj
 logs
 /Source/HttpService/Web.Debug.config
 /Source/HttpService/Web.Release.config
+*.user

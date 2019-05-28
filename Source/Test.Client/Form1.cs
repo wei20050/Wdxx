@@ -52,41 +52,46 @@ namespace Test.Client
         //post带参数返回字符串
         private void button6_Click(object sender, EventArgs e)
         {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic.Add("id",1);
-            dic.Add("msg", "post带参数");
+            var dic = new Dictionary<string, object> {{"id", 1}, {"msg", "post带参数"}};
             var ret = CoreHttp.Post(ServiceHelp.HttpUrl + "test", dic);
             listBox1.Items.Add(ret);
         }
         //新增
         private void button8_Click(object sender, EventArgs e)
         {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic.Add("u", CoreConvert.ObjToJson(new user
+            var dic = new Dictionary<string, object>
             {
-                id = 1,
-                name = "张三"
-            }));
+                {
+                    "u", CoreConvert.ObjToJson(new user
+                    {
+                        id = 1,
+                        name = "张三"
+                    })
+                }
+            };
             var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "user", dic);
             listBox1.Items.Add(ret);
         }
         //修改
         private void button9_Click(object sender, EventArgs e)
         {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic.Add("u", CoreConvert.ObjToJson(new user
+            var dic = new Dictionary<string, object>
             {
-                id = 1,
-                name = CorePublic.GenerateId().ToString()
-            }));
+                {
+                    "u", CoreConvert.ObjToJson(new user
+                    {
+                        id = 1,
+                        name = CorePublic.GenerateId().ToString()
+                    })
+                }
+            };
             var ret = CoreHttp.Put<int>(ServiceHelp.HttpUrl + "user", dic);
             listBox1.Items.Add(ret);
         }
         //删除
         private void button10_Click(object sender, EventArgs e)
         {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic.Add("id", 1);
+            var dic = new Dictionary<string, object> {{"id", 1}};
             var ret = CoreHttp.Delete<int>(ServiceHelp.HttpUrl + "user", dic);
             listBox1.Items.Add(ret);
         }
