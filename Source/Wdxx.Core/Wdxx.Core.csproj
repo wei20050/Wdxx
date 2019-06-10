@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DocumentationFile>bin\Debug\Wdxx.Core.xml</DocumentationFile>
     <LangVersion>3</LangVersion>
   </PropertyGroup>
@@ -38,16 +38,18 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreEncrypt.cs" />
-    <Compile Include="CoreServiceHost.cs" />
-    <Compile Include="CoreHttpHost.cs" />
     <Compile Include="CorePublic.cs" />
     <Compile Include="CoreHttp.cs" />
     <Compile Include="CoreIni.cs" />
     <Compile Include="CoreLog.cs" />
+    <Compile Include="CoreSerialPort.cs" />
+    <Compile Include="CoreHost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CoreConvert.cs" />
   </ItemGroup>

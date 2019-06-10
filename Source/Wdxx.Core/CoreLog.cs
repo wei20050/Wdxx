@@ -10,19 +10,22 @@ namespace Wdxx.Core
     /// </summary>
     public static class CoreLog
     {
+        /// <summary>
+        /// 日志文件夹默认根目录logs文件夹
+        /// </summary>
+        private static readonly string FilePath = AppDomain.CurrentDomain.BaseDirectory + "logs\\";
 
-        //日志文件夹默认根目录Logs文件夹
-        private static readonly string FilePath = Environment.CurrentDirectory + "\\logs\\";
-
-        //默认日志分隔文件大小 100M
-        private const int FileSize = 100 * 1024 * 1024;
+        /// <summary>
+        /// 日志分隔文件大小 10M
+        /// </summary>
+        private const int FileSize = 10 * 1024 * 1024;
 
         /// <summary>
         /// 写错误日志
         /// </summary>
         public static void Error(object log)
         {
-            WriteFile("[Error] " + log, CreateLogPath(string.Empty));
+            Error(log, string.Empty);
         }
 
         /// <summary>
@@ -30,7 +33,23 @@ namespace Wdxx.Core
         /// </summary>
         public static void Info(object log)
         {
-            WriteFile("[Info] " + log, CreateLogPath(string.Empty));
+            Info(log, string.Empty);
+        }
+
+        /// <summary>
+        /// 写错误日志
+        /// </summary>
+        public static void Error(object log, string prefix)
+        {
+            WriteFile("[Error] " + log, CreateLogPath(prefix));
+        }
+
+        /// <summary>
+        /// 写操作日志
+        /// </summary>
+        public static void Info(object log, string prefix)
+        {
+            WriteFile("[Info] " + log, CreateLogPath(prefix));
         }
 
         /// <summary>
@@ -138,6 +157,7 @@ namespace Wdxx.Core
         }
 
         #endregion
+
 
     }
 }

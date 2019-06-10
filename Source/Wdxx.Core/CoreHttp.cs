@@ -259,7 +259,7 @@ namespace Wdxx.Core
             {
                 return (T)(object)HttpSend(httpUri, method, httpData);
             }
-            return JsonToObj<T>(HttpSend(httpUri, method, httpData));
+            return CoreConvert.JsonToObj<T>(HttpSend(httpUri, method, httpData));
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string HttpSend(string httpUri, string method, object httpData)
         {
-            var data = ObjToJson(httpData);
+            var data = CoreConvert.ObjToJson(httpData);
             return HttpSend(httpUri, method, data);
         }
 
@@ -284,12 +284,12 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static T HttpSend<T>(string httpUri, string method, object httpData)
         {
-            var data = ObjToJson(httpData);
+            var data = CoreConvert.ObjToJson(httpData);
             if (typeof(T) == typeof(string))
             {
                 return (T)(object)HttpSend(httpUri, method, data);
             }
-            return JsonToObj<T>(HttpSend(httpUri, method, data));
+            return CoreConvert.JsonToObj<T>(HttpSend(httpUri, method, data));
         }
 
         /// <summary>
@@ -343,39 +343,6 @@ namespace Wdxx.Core
             catch (Exception ex)
             {
                 throw new Exception("HttpErr method:" + method + " uri:" + httpUri + " postData:" + httpData + "err:" + ex);
-            }
-        }
-
-        /// <summary>
-        /// JSON序列化
-        /// </summary>
-        /// <param name="jsonObject">要转换的类型</param>
-        /// <returns>json字符串</returns>
-        public static string ObjToJson(object jsonObject)
-        {
-            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
-            var msObj = new MemoryStream();
-            js.WriteObject(msObj, jsonObject);
-            msObj.Position = 0;
-            var sr = new StreamReader(msObj, Encoding.UTF8);
-            var json = sr.ReadToEnd();
-            sr.Close();
-            msObj.Close();
-            return json;
-        }
-
-        /// <summary>
-        /// JSON反序列化
-        /// </summary>
-        /// <typeparam name="T">要转换的类型</typeparam>
-        /// <param name="jsonStr">json字符串</param>
-        /// <returns>转换后的对象</returns>
-        public static T JsonToObj<T>(string jsonStr)
-        {
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
-            {
-                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
-                return (T)deseralizer.ReadObject(ms);
             }
         }
     }

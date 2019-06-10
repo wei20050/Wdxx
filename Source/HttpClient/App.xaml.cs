@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Client
+namespace HttpClient
 {
     /// <summary>
     /// App.xaml 的交互逻辑

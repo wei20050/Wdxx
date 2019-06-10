@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Timers;
 
-namespace Wdxx.Tool
+namespace Wdxx.Core
 {
     
     /// <summary>

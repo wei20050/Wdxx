@@ -1,6 +1,6 @@
 ﻿using Wdxx.Core;
 
-namespace Client
+namespace HttpClient
 {
     public static class Setting
     {

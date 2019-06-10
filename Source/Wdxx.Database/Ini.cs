@@ -17,11 +17,6 @@ namespace Wdxx.Database
         /// </summary>
         public static uint IniSize = 524288;
 
-        /// <summary>
-        /// 默认路径
-        /// </summary>
-        private const string DefaultPath = "DefaultPath";
-
         #region API函数声明
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -77,7 +72,6 @@ namespace Wdxx.Database
 
         #region 封装读写
 
-
         /// <summary>
         /// 读取字符串类型
         /// </summary>
@@ -101,6 +95,28 @@ namespace Wdxx.Database
         public static bool Wini(string endpoint, string key, string value, string configPath)
         {
             return WriteIniData(endpoint, key, value, configPath);
+        }
+        /// <summary>
+        /// 读取字符串类型
+        /// </summary>
+        /// <param name="endpoint">终结点</param>
+        /// <param name="key">配置键</param>
+        /// <returns>配置值</returns>
+        public static string Rini(string endpoint, string key)
+        {
+            return ReadIniData(endpoint, key, string.Empty, AppDomain.CurrentDomain.BaseDirectory + "Database.ini");
+        }
+
+        /// <summary>
+        /// 写入字符串类型
+        /// </summary>
+        /// <param name="endpoint">终结点</param>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <returns></returns>
+        public static bool Wini(string endpoint, string key, string value)
+        {
+            return WriteIniData(endpoint, key, value, AppDomain.CurrentDomain.BaseDirectory + "Database.ini");
         }
 
         #endregion

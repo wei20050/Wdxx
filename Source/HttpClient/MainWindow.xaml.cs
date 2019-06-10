@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Windows;
-using Client.Service;
+using HttpClient.Service;
 using Tset.Entity;
 using Wdxx.Core;
 
-namespace Client
+namespace HttpClient
 {
     
     public partial class MainWindow
     {
         public MainWindow()
         {
-            CorePublic.Administrator();
-            CorePublic.IsStart();
+            //CorePublic.Administrator();
+            //CorePublic.IsStart();
             InitializeComponent();
         }
 
@@ -26,7 +27,7 @@ namespace Client
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             //CorePublic.DeleteExit();
-            CorePublic.DeleteMax();
+            //CorePublic.DeleteMax();
         }
 
         /// <summary>
@@ -178,10 +179,12 @@ namespace Client
 
         private void ButtonBase_OnClick2(object sender, RoutedEventArgs e)
         {
-           var time = CoreConvert.ObjToJson(DateTime.Now);
+            //var time = CoreConvert.ObjToJson(DateTime.Now);
+            //var ret = CoreConvert.JsonToObj<DateTime>(time);
+            //MessageBox.Show(ret.ToString(CultureInfo.InvariantCulture));
 
-            var ret = CoreConvert.JsonToObj<DateTime>(time);
-            MessageBox.Show(ret.ToString(CultureInfo.InvariantCulture));
+            var name = Path.GetFileName(System.Windows.Forms.Application.ExecutablePath);
+            MessageBox.Show(name);
         }
     }
 }

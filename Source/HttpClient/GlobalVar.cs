@@ -1,7 +1,7 @@
-﻿using System.IO;
-using Wdxx.Core;
+﻿using System;
+using System.IO;
 
-namespace Client
+namespace HttpClient
 {
     public static class GlobalVar
     {
@@ -9,7 +9,7 @@ namespace Client
         /// <summary>
         /// 离线应用文件夹路径
         /// </summary>
-        public static string AppDbDirectory = Path.Combine(CorePublic.AppPath, "Data\\");
+        public static string AppDbDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data\\");
 
         /// <summary>
         /// 离线数据库文件路径(生成的源文件)
@@ -24,12 +24,12 @@ namespace Client
         /// <summary>
         /// 离线应用数据库文件路径(使用的文件)
         /// </summary>
-        public static string AppDbName = Path.Combine(CorePublic.AppPath, DbName);
+        public static string AppDbName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbName);
 
         /// <summary>
         /// 离线应用数据库版本文件路径(使用的文件)
         /// </summary>
-        public static string AppDbVer = Path.Combine(CorePublic.AppPath, DbVer);
+        public static string AppDbVer = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbVer);
 
         /// <summary>
         /// 离线应用数据库连接字符串

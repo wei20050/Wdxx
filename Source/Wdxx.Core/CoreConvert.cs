@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Text;
+using System.Text.RegularExpressions;
+using System.Web.Script.Serialization;
 
 namespace Wdxx.Core
 {
@@ -11,51 +12,83 @@ namespace Wdxx.Core
     {
 
         /// <summary>
-        /// JSON反序列化
+        /// 将json字符串中的时间戳加上当前时区
+        /// </summary>
+        /// <param name="jsonStr"></param>
+        /// <returns></returns>
+        private static string JsonTimeAddZone(string jsonStr)
+        {
+            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\)\\/", match =>
+            {
+                var zone = DateTime.Now.ToString("zz00");
+                var math = match.Groups[1].Value;
+                return @"\/Date(" + math + zone + @")\/";
+            });
+        }
+
+        /// <summary>
+        /// 将json字符串中带时区的时间戳转换成字符串时间格式
+        /// </summary>
+        /// <param name="jsonStr"></param>
+        /// <returns></returns>
+        private static string JsonTimeZone(string jsonStr)
+        {
+            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\+(\d+)\)\\/", match =>
+            {
+                //拿到的时间戳
+                var ts = match.Groups[1].Value;
+                //时间戳double
+                var datetime = Convert.ToDouble(ts);
+                //时区秒数double
+                var zone = Convert.ToDouble(match.Groups[2].Value) * 60 * 60;
+                //这里如果判断到时间戳是13位带毫秒的
+                if (ts.Length == 13)
+                {
+                    zone *= 1000;
+                }
+                var date = datetime + zone;
+                return @"\/Date(" + date + @")\/";
+            });
+        }
+
+        /// <summary>
+        /// 将JSON字符串转化为对应类型的对象
         /// </summary>
         /// <typeparam name="T">要转换的类型</typeparam>
-        /// <param name="jsonStr">json字符串</param>
+        /// <param name="json">json字符串</param>
         /// <returns>转换后的对象</returns>
-        public static T JsonToObj<T>(string jsonStr)
+        public static T JsonToObj<T>(string json)
         {
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
-            {
-                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
-                return (T)deseralizer.ReadObject(ms);
-            }
+            //这里把json中带时区的时间戳转换成准确时间
+            json = JsonTimeZone(json);
+            return string.IsNullOrEmpty(json) ? default(T) : new JavaScriptSerializer().Deserialize<T>(json);
         }
 
         /// <summary>
-        /// JSON反序列化
+        /// 将JSON字符串转化为object对象
         /// </summary>
-        /// <param name="jsonStr">json字符串</param>
-        /// <param name="type">要转换的类型</param>
+        /// <param name="json">json字符串</param>
         /// <returns>转换后的对象</returns>
-        public static object JsonToObj(string jsonStr, Type type)
+        public static object JsonToObj(string json)
         {
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
-            {
-                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(type);
-                return deseralizer.ReadObject(ms);
-            }
+            //这里把json中带时区的时间戳转换成准确时间
+            json = JsonTimeZone(json);
+            return new JavaScriptSerializer().DeserializeObject(json);
         }
 
         /// <summary>
-        /// JSON序列化
+        /// 将任意类型对象转化为JSON字符串
         /// </summary>
-        /// <param name="jsonObject">要转换的类型</param>
+        /// <param name="obj">要转换的对象</param>
         /// <returns>json字符串</returns>
-        public static string ObjToJson(object jsonObject)
+        public static string ObjToJson(object obj)
         {
-            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
-            var msObj = new MemoryStream();
-            js.WriteObject(msObj, jsonObject);
-            msObj.Position = 0;
-            var sr = new StreamReader(msObj, Encoding.UTF8);
-            var json = sr.ReadToEnd();
-            sr.Close();
-            msObj.Close();
-            return json;
+            //这里是原序列化之后的json
+            var jsonstr = new JavaScriptSerializer().Serialize(obj);
+            //这里处理掉无法反序列化的构造(wcf自动创建的实体会出现这个问题) 暂时不用wcf注释掉
+            //jsonstr = jsonstr.Replace("\"ExtensionData\":{},", string.Empty);
+            //为json字符串时间戳补上时区
+            return JsonTimeAddZone(jsonstr);
         }
 
         /// <summary>

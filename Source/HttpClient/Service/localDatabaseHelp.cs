@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Wdxx.Core;
 
-namespace Client.Service
+namespace HttpClient.Service
 {
     public static class LocalDatabaseHelp
     {

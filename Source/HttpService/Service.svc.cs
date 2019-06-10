@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Tset.Entity;
-using Wdxx.Core;
 using Wdxx.Database;
 
 namespace HttpService

@@ -1,16 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-
-// ReSharper disable PossibleNullReferenceException
 
 namespace Wdxx.Core
 {
     /// <summary>
     /// INI文件操作核心
-    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\{程序集名}\Config.ini
+    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\Default\Config.ini
     /// </summary>
     public static class CoreIni
     {
@@ -19,8 +16,9 @@ namespace Wdxx.Core
         /// <summary>
         /// ini文件路径
         /// </summary>
-        private static readonly string ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                                        Assembly.GetEntryAssembly().GetName().Name) + "\\Config.ini";
+        private static readonly string ConfigPath =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Default\\Config.ini");
 
         /// <summary>
         /// ini配置节大小
@@ -125,7 +123,7 @@ namespace Wdxx.Core
         /// <returns>配置值</returns>
         public static T Rini<T>(string key, string configPath , string endpoint)
         {
-            return JsonToObj<T>(Rini(key, configPath, endpoint));
+            return CoreConvert.JsonToObj<T>(Rini(key, configPath, endpoint));
         }
 
         /// <summary>
@@ -202,7 +200,7 @@ namespace Wdxx.Core
             {
                 configPath = ConfigPath;
             }
-            return Wini(key, ObjToJson(value), configPath, endpoint);
+            return Wini(key, CoreConvert.ObjToJson(value), configPath, endpoint);
         }
 
 
@@ -244,54 +242,6 @@ namespace Wdxx.Core
                 configPath = ConfigPath;
             }
             return WriteIniData(endpoint, key, value, configPath);
-        }
-
-        /// <summary>
-        /// JSON反序列化
-        /// </summary>
-        /// <typeparam name="T">要转换的类型</typeparam>
-        /// <param name="jsonStr">json字符串</param>
-        /// <returns>转换后的对象</returns>
-        public static T JsonToObj<T>(string jsonStr)
-        {
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
-            {
-                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
-                return (T)deseralizer.ReadObject(ms);
-            }
-        }
-
-        /// <summary>
-        /// JSON反序列化
-        /// </summary>
-        /// <param name="jsonStr">json字符串</param>
-        /// <param name="type">要转换的类型</param>
-        /// <returns>转换后的对象</returns>
-        public static object JsonToObj(string jsonStr, Type type)
-        {
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonStr)))
-            {
-                var deseralizer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(type);
-                return deseralizer.ReadObject(ms);
-            }
-        }
-
-        /// <summary>
-        /// JSON序列化
-        /// </summary>
-        /// <param name="jsonObject">要转换的类型</param>
-        /// <returns>json字符串</returns>
-        public static string ObjToJson(object jsonObject)
-        {
-            var js = new System.Runtime.Serialization.Json.DataContractJsonSerializer(jsonObject.GetType());
-            var msObj = new MemoryStream();
-            js.WriteObject(msObj, jsonObject);
-            msObj.Position = 0;
-            var sr = new StreamReader(msObj, Encoding.UTF8);
-            var json = sr.ReadToEnd();
-            sr.Close();
-            msObj.Close();
-            return json;
         }
         
         #endregion

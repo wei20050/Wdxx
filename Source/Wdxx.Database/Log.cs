@@ -11,11 +11,15 @@ namespace Wdxx.Database
     public static class Log
     {
 
-        //日志文件夹默认根目录logs文件夹
-        private static readonly string FilePath = Environment.CurrentDirectory + "\\logs\\";
+        /// <summary>
+        /// 日志文件夹默认根目录logs文件夹
+        /// </summary>
+        private static readonly string FilePath = AppDomain.CurrentDomain.BaseDirectory + "logs\\";
 
-        //日志分隔文件大小 100M
-        private const int FileSize = 100 * 1024 * 1024;
+        /// <summary>
+        /// 日志分隔文件大小 10M
+        /// </summary>
+        private const int FileSize = 10 * 1024 * 1024;
 
         /// <summary>
         /// 写错误日志

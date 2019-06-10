@@ -37,20 +37,18 @@ namespace Wdxx.Database
         /// <param name="dbConnectionName">数据库连接字符串Name</param>
         public DbHelper(string dbConnectionName)
         {
-            // 数据库配置ini文件路径
-            string ConfigPath = Environment.CurrentDirectory + "\\Database.ini";
-            var connectionString = Ini.Rini(dbConnectionName, "connectionString", ConfigPath);
-            var providerName = Ini.Rini(dbConnectionName, "providerName", ConfigPath);
+            var connectionString = Ini.Rini(dbConnectionName, "connectionString");
+            var providerName = Ini.Rini(dbConnectionName, "providerName");
             if (string.IsNullOrEmpty(connectionString))
             {
-                Ini.Wini(dbConnectionName, "connectionString", "Data Source=D:\\mydb.db;", ConfigPath);
+                Ini.Wini(dbConnectionName, "connectionString", "Data Source=D:\\mydb.db;");
             }
             if (string.IsNullOrEmpty(providerName))
             {
-                Ini.Wini(dbConnectionName, "providerName", "System.Data.SQLite", ConfigPath);
+                Ini.Wini(dbConnectionName, "providerName", "System.Data.SQLite");
             }
-            connectionString = Ini.Rini(dbConnectionName, "connectionString", ConfigPath);
-            providerName = Ini.Rini(dbConnectionName, "providerName", ConfigPath);
+            connectionString = Ini.Rini(dbConnectionName, "connectionString");
+            providerName = Ini.Rini(dbConnectionName, "providerName");
             if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName))
             {
                 Error("数据库配置文件不存在或无法读取!");
@@ -58,7 +56,7 @@ namespace Wdxx.Database
             }
             if (providerName.Contains("System.Data.SQLite"))
             {
-                var sqlItePath = Environment.CurrentDirectory + "\\runtime\\lib\\System.Data.SQLite.dll";
+                var sqlItePath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
                 if (File.Exists(sqlItePath))
                 {
                     _sqliteAss = Assembly.LoadFrom(sqlItePath);
@@ -1402,14 +1400,14 @@ namespace Wdxx.Database
 
         #region 日志封装
 
-        private void Info(object o)
+        private static void Info(object o)
         {
-            Database.Log.Info(o, "DB_");
+            Log.Info(o, "DB_");
         }
         
-        private void Error(object o)
+        private static void Error(object o)
         {
-            Database.Log.Error(o, "DB_");
+            Log.Error(o, "DB_");
         }
 
         #endregion

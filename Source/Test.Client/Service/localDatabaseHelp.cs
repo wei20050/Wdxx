@@ -10,7 +10,7 @@ namespace Test.Client.Service
         /// <summary>
         /// 离线应用文件夹路径
         /// </summary>
-        public static string AppDbDirectory = Path.Combine(CorePublic.AppPath, "Data\\");
+        public static string AppDbDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data\\");
 
         /// <summary>
         /// 离线数据库文件路径(生成的源文件)
@@ -25,12 +25,12 @@ namespace Test.Client.Service
         /// <summary>
         /// 离线应用数据库文件路径(使用的文件)
         /// </summary>
-        public static string AppDbName = Path.Combine(CorePublic.AppPath, DbName);
+        public static string AppDbName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbName);
 
         /// <summary>
         /// 离线应用数据库版本文件路径(使用的文件)
         /// </summary>
-        public static string AppDbVer = Path.Combine(CorePublic.AppPath, DbVer);
+        public static string AppDbVer = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbVer);
 
         /// <summary>
         /// 离线应用数据库连接字符串
@@ -79,7 +79,7 @@ namespace Test.Client.Service
                 }
             }
             //设置数据库连接字符串
-            CoreIni.Wini("connectionString", DbContext, Environment.CurrentDirectory + "\\Database.ini", "DbContext");
+            CoreIni.Wini("connectionString", DbContext, AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
         }
     }
 }

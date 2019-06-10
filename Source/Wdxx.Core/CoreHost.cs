@@ -13,7 +13,7 @@ namespace Wdxx.Core
     /// <summary>
     /// 本地服务挂接类
     /// </summary>
-    public class CoreServiceHost : ServiceHost
+    public class CoreHost : ServiceHost
     {
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Wdxx.Core
         /// 单服务类构造
         /// </summary>
         /// <param name="t">要挂服务的类</param>
-        public CoreServiceHost(Type t) : this(t, t, GetUri()) { }
+        public CoreHost(Type t) : this(t, t, GetUri()) { }
 
         /// <inheritdoc />
         /// <summary>
@@ -34,7 +34,7 @@ namespace Wdxx.Core
         /// </summary>
         /// <param name="it">服务类接口</param>
         /// <param name="t">要挂服务的类</param>
-        public CoreServiceHost(Type it,Type t) : this(it, t, GetUri()) { }
+        public CoreHost(Type it,Type t) : this(it, t, GetUri()) { }
 
         /// <inheritdoc />
         /// <summary>
@@ -42,7 +42,7 @@ namespace Wdxx.Core
         /// </summary>
         /// <param name="t">要挂服务的类</param>
         /// <param name="uri">服务基地址</param>
-        public CoreServiceHost(Type t, string uri) : this(t, t, uri) { }
+        public CoreHost(Type t, string uri) : this(t, t, uri) { }
 
         /// <inheritdoc />
         /// <summary>
@@ -51,7 +51,7 @@ namespace Wdxx.Core
         /// <param name="it">服务类接口</param>
         /// <param name="t">要挂服务的类</param>
         /// <param name="uri">服务基地址</param>
-        public CoreServiceHost(Type it, Type t, string uri) : base(t, new Uri(uri))
+        public CoreHost(Type it, Type t, string uri) : base(t, new Uri(uri))
         {
             //保存基地址
             _uri = uri.TrimEnd('/') + "/";

@@ -11,8 +11,8 @@ namespace Test.Client
     {
         public Form1()
         {
-            CorePublic.Administrator();
-            CorePublic.IsStart();
+            //CorePublic.Administrator();
+            //CorePublic.IsStart();
             InitializeComponent();
         }
         //界面初始化
