@@ -8,7 +8,10 @@ namespace Test.ServiceHost
         private static void Main()
         {
             var chh = new CoreHost(typeof(HttpService.IService), typeof(HttpService.Service), "http://127.0.0.1:8080/Test");
-            Console.WriteLine("服务已开启,地址   " + chh.OpenHost());
+            chh.Opened += (o,e) =>
+            {
+                Console.WriteLine("服务已开启,地址   " + chh.OpenHost());
+            };
             Console.Read();
         }
     }
