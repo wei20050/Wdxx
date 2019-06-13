@@ -11,8 +11,6 @@ namespace Test.Client
     {
         public Form1()
         {
-            //CorePublic.Administrator();
-            //CorePublic.IsStart();
             InitializeComponent();
         }
         //界面初始化
@@ -52,65 +50,46 @@ namespace Test.Client
         //post带参数返回字符串
         private void button6_Click(object sender, EventArgs e)
         {
-            var dic = new Dictionary<string, object> {{"id", 1}, {"msg", "post带参数"}};
+            var dic = new Dictionary<string, object> { { "id", 1 }, { "msg", "post带参数" } };
             var ret = CoreHttp.Post(ServiceHelp.HttpUrl + "test", dic);
             listBox1.Items.Add(ret);
         }
         //新增
         private void button8_Click(object sender, EventArgs e)
         {
-            var dic = new Dictionary<string, object>
-            {
-                {
-                    "u", CoreConvert.ObjToJson(new user
-                    {
-                        id = 1,
-                        name = "张三"
-                    })
-                }
-            };
-            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "user", dic);
+            var user = new user { id = 1, name = "张三" };
+            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "insert", new { u = user });
             listBox1.Items.Add(ret);
         }
         //修改
         private void button9_Click(object sender, EventArgs e)
         {
-            var dic = new Dictionary<string, object>
-            {
-                {
-                    "u", CoreConvert.ObjToJson(new user
-                    {
-                        id = 1,
-                        name = CorePublic.GenerateId().ToString()
-                    })
-                }
-            };
-            var ret = CoreHttp.Put<int>(ServiceHelp.HttpUrl + "user", dic);
+            var user = new user { id = 1, name = "山大圣诞礼物" };
+            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "update", new { u = user });
             listBox1.Items.Add(ret);
         }
         //删除
         private void button10_Click(object sender, EventArgs e)
         {
-            var dic = new Dictionary<string, object> {{"id", 1}};
-            var ret = CoreHttp.Delete<int>(ServiceHelp.HttpUrl + "user", dic);
+            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "delete", new { id = 1 });
             listBox1.Items.Add(ret);
         }
         //查询id=1
         private void button11_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "user?id=1");
-            dataGridView1.DataSource = new List<user> {ret};
+            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "select?id=1");
+            dataGridView1.DataSource = new List<user> { ret };
         }
         //查询id=1name=张三
         private void button12_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "user?id=1&name=张三");
+            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "select?id=1&name=张三");
             dataGridView1.DataSource = new List<user> { ret };
         }
         //查询所有
         private void button13_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<List<user>>(ServiceHelp.HttpUrl + "user");
+            var ret = CoreHttp.Get<List<user>>(ServiceHelp.HttpUrl + "selectall");
             dataGridView1.DataSource = ret;
         }
         //清空列表框
@@ -127,7 +106,7 @@ namespace Test.Client
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            
+
         }
 
     }

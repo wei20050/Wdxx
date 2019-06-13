@@ -38,6 +38,7 @@ namespace Wdxx.Database
         {
             var connectionString = Ini.Rini(dbConnectionName, "connectionString");
             var providerName = Ini.Rini(dbConnectionName, "providerName");
+            SqlLog = Ini.Rini(dbConnectionName, "sqlLog") == "1";
             if (string.IsNullOrEmpty(connectionString))
             {
                 Ini.Wini(dbConnectionName, "connectionString", "Data Source=D:\\mydb.db;");
@@ -168,7 +169,7 @@ namespace Wdxx.Database
         /// <summary>
         /// 数据库sql操作日志(true开启日志  false关闭日志)
         /// </summary>
-        public bool SqlLog { get; set; }
+        private bool SqlLog { get; set; }
 
         /// <summary>
         /// 数据库连接字符串

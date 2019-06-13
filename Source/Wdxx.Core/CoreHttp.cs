@@ -342,7 +342,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                throw new Exception("HttpErr method:" + method + " uri:" + httpUri + " postData:" + httpData + "err:" + ex);
+                throw new Exception("HttpErr method:" + method + " uri:" + httpUri + " httpData:" + httpData + "err:" + ex);
             }
         }
     }

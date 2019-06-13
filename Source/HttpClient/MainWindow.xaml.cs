@@ -82,8 +82,7 @@ namespace HttpClient
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
             var user = new user { id = 1, name = "六麻子111" };
-            var data = new { u = user };
-            MessageBox.Show(CoreHttp.Post<int>(ServiceHelp.HttpUrl + "insert", data).ToString());
+            MessageBox.Show(CoreHttp.Post<int>(ServiceHelp.HttpUrl + "insert", new { u = user }).ToString());
         }
 
         /// <summary>
@@ -93,8 +92,7 @@ namespace HttpClient
         /// <param name="e"></param>
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
-            var data = new { id = 1 };
-            MessageBox.Show(CoreHttp.Post<int>(ServiceHelp.HttpUrl + "delete", data).ToString());
+            MessageBox.Show(CoreHttp.Post<int>(ServiceHelp.HttpUrl + "delete", new { id = 1 }).ToString());
         }
 
         /// <summary>
@@ -105,8 +103,7 @@ namespace HttpClient
         private void Button_Click_7(object sender, RoutedEventArgs e)
         {
             var user = new user { id = 4, name = "山大圣诞礼物" };
-            var data = new { u = user };
-            MessageBox.Show(CoreHttp.Post<int>(ServiceHelp.HttpUrl + "update", data).ToString());
+            MessageBox.Show(CoreHttp.Post<int>(ServiceHelp.HttpUrl + "update", new { u = user }).ToString());
         }
 
         /// <summary>
@@ -127,7 +124,7 @@ namespace HttpClient
         /// <param name="e"></param>
         private void Button_Click_9(object sender, RoutedEventArgs e)
         {
-            var us = CoreHttp.Post<List<user>>(ServiceHelp.HttpUrl + "selectall");
+            var us = CoreHttp.Get<List<user>>(ServiceHelp.HttpUrl + "selectall");
             DataGrid1.ItemsSource = us;
         }
 

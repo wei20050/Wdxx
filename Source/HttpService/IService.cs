@@ -35,7 +35,7 @@ namespace HttpService
         user Select(int id,string name);
 
         [OperationContract]
-        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebGet]
         List<user> SelectAll();
     }
 }

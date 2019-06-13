@@ -11,14 +11,6 @@ namespace HttpService
         private readonly DbHelper _db = new DbHelper();
 
         /// <summary>
-        /// 构造
-        /// </summary>
-        public Service()
-        {
-            _db.SqlLog = true;
-        }
-
-        /// <summary>
         /// 测试服务是否正常
         /// </summary>
         public void Test()

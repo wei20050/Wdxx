@@ -78,8 +78,11 @@ namespace Test.Client.Service
                     File.Delete(files[0]);
                 }
             }
+
             //设置数据库连接字符串
             CoreIni.Wini("connectionString", DbContext, AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
+            CoreIni.Wini("providerName", "System.Data.SQLite", AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
+            CoreIni.Wini("sqlLog", "1", AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
         }
     }
 }

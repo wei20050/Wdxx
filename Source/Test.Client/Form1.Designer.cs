@@ -123,9 +123,9 @@
             // 
             this.textBox1.Location = new System.Drawing.Point(80, 73);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(239, 21);
+            this.textBox1.Size = new System.Drawing.Size(286, 21);
             this.textBox1.TabIndex = 7;
-            this.textBox1.Text = "http://127.0.0.1:888";
+            this.textBox1.Text = "http://localhost:8888/HttpService/Service.svc";
             // 
             // listBox1
             // 
@@ -218,9 +218,9 @@
             // 
             // button14
             // 
-            this.button14.Location = new System.Drawing.Point(321, 72);
+            this.button14.Location = new System.Drawing.Point(372, 72);
             this.button14.Name = "button14";
-            this.button14.Size = new System.Drawing.Size(150, 23);
+            this.button14.Size = new System.Drawing.Size(99, 23);
             this.button14.TabIndex = 17;
             this.button14.Text = "测试服务器连接";
             this.button14.UseVisualStyleBackColor = true;

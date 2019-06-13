@@ -27,7 +27,7 @@ namespace Test.Client.Service
             {
                 //检测服务是否正常连接  若无法连接 开启离线模式
                 CoreHttp.Get(url + "/Test");
-                HttpUrl = url + "/";
+                HttpUrl = url.TrimEnd('/') + "/";
                 IsOnLine = true;
             }
             catch (Exception ex)

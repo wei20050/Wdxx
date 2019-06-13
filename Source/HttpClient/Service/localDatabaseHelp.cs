@@ -50,11 +50,11 @@ namespace HttpClient.Service
                     File.Delete(files[0]);
                 }
             }
+
             //设置数据库连接字符串
-            var clientConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            clientConfig.ConnectionStrings.ConnectionStrings["DbContext"].ConnectionString = GlobalVar.DbContext;
-            clientConfig.Save(ConfigurationSaveMode.Modified, true);
-            ConfigurationManager.RefreshSection("connectionStrings");
+            CoreIni.Wini("connectionString", GlobalVar.DbContext, AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
+            CoreIni.Wini("providerName", "System.Data.SQLite", AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
+            CoreIni.Wini("sqlLog", "1", AppDomain.CurrentDomain.BaseDirectory + "Database.ini", "DbContext");
 
         }
     }
