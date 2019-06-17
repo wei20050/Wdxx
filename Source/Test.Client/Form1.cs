@@ -103,10 +103,15 @@ namespace Test.Client
             ServiceHelp.ServiceIni(textBox1.Text);
             MessageBox.Show(@"服务连接成功!");
         }
+        CoreFile cf = new CoreFile();
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-
+            cf.FilePathReceived += path =>
+            {
+                MessageBox.Show(path);
+            };
+            cf.StartWatcher("d:\\test","txt");
         }
 
     }

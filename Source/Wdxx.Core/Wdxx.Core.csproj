@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreEncrypt.cs" />
+    <Compile Include="CoreFile.cs" />
     <Compile Include="CorePublic.cs" />
     <Compile Include="CoreHttp.cs" />
     <Compile Include="CoreIni.cs" />
