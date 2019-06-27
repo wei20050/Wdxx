@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.Objects.DataClasses;
@@ -36,25 +37,9 @@ namespace Wdxx.Database
         /// <param name="dbConnectionName">数据库连接字符串Name</param>
         public DbHelper(string dbConnectionName)
         {
-            var connectionString = Ini.Rini(dbConnectionName, "connectionString");
-            var providerName = Ini.Rini(dbConnectionName, "providerName");
-            SqlLog = Ini.Rini(dbConnectionName, "sqlLog") == "1";
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                Ini.Wini(dbConnectionName, "connectionString", "Data Source=D:\\mydb.db;");
-            }
-            if (string.IsNullOrEmpty(providerName))
-            {
-                Ini.Wini(dbConnectionName, "providerName", "System.Data.SQLite");
-            }
-            connectionString = Ini.Rini(dbConnectionName, "connectionString");
-            providerName = Ini.Rini(dbConnectionName, "providerName");
-            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName))
-            {
-                Error("数据库配置文件不存在或无法读取!");
-                throw new Exception("数据库配置文件不存在或无法读取!");
-            }
-            if (providerName.Contains("System.Data.SQLite"))
+            var cm = ConfigurationManager.ConnectionStrings[dbConnectionName];
+            var pn = cm.ProviderName;
+            if (pn.Contains("System.Data.SQLite"))
             {
                 var dllPath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
                 if (File.Exists(dllPath))
@@ -76,7 +61,7 @@ namespace Wdxx.Database
                     throw new Exception("未能加载：" + dllPath + " 请确认此插件是否存在！");
                 }
             }
-            else if (providerName.Contains("MySql.Data.MySqlClient"))
+            else if (pn.Contains("MySql.Data.MySqlClient"))
             {
                 var dllPath = AppDomain.CurrentDomain.BaseDirectory + "MySql.Data.dll";
                 if (File.Exists(dllPath))
@@ -98,11 +83,11 @@ namespace Wdxx.Database
                     throw new Exception("未能加载：" + dllPath + " 请确认此插件是否存在！");
                 }
             }
-            else if (providerName.Contains("System.Data.SqlClient"))
+            else if (pn.Contains("System.Data.SqlClient"))
             {
                 MDbType = DbTypeEnum.Mssql;
             }
-            else if (providerName.Contains("System.Data.OracleClient"))
+            else if (pn.Contains("System.Data.OracleClient"))
             {
                 MDbType = DbTypeEnum.Oracle;
             }
@@ -112,7 +97,7 @@ namespace Wdxx.Database
                 Error("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
                 throw new Exception("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
             }
-            _mConnectionString = connectionString;
+            _mConnectionString = cm.ToString();
             _mParameterMark = GetParameterMark();
         }
 
@@ -169,7 +154,7 @@ namespace Wdxx.Database
         /// <summary>
         /// 数据库sql操作日志(true开启日志  false关闭日志)
         /// </summary>
-        private bool SqlLog { get; set; }
+        public bool SqlLog { get; set; }
 
         /// <summary>
         /// 数据库连接字符串
