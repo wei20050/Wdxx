@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Test.Client.Service;
 using Tset.Entity;
-using Wdxx.Core;
 
 namespace Test.Client
 {
@@ -17,101 +16,102 @@ namespace Test.Client
         private void Form1_Load(object sender, EventArgs e)
         {
         }
-        //get无参返回字符串
+        //无参返回字符串
         private void button1_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get(ServiceHelp.HttpUrl + "test");
+            var ret = GlobalVar.TestService.Send("Test");
             listBox1.Items.Add(ret);
         }
-        //get无参返回泛型
+        //无参返回泛型
         private void button2_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<DateTime>(ServiceHelp.HttpUrl + "test");
-            listBox1.Items.Add(ret);
+            var ret = GlobalVar.TestService.Send<DateTime>("GetTime");
+            listBox1.Items.Add(ret.ToString("yyyy-MM-dd HH:mm:ss"));
         }
-        //get带参数返回字符串
+        //带参数返回泛型
         private void button3_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get(ServiceHelp.HttpUrl + "test?id=11&msg=张三");
-            listBox1.Items.Add(ret);
+            var ret = GlobalVar.TestService.Send<user>("TestStr", 1, "张三丰");
+            listBox1.Items.Add(ret.name);
         }
-        //post无参返回字符串
-        private void button4_Click(object sender, EventArgs e)
-        {
-            var ret = CoreHttp.Post(ServiceHelp.HttpUrl + "test");
-            listBox1.Items.Add(ret);
-        }
-        //post无参返回泛型
-        private void button5_Click(object sender, EventArgs e)
-        {
-            var ret = CoreHttp.Post<DateTime>(ServiceHelp.HttpUrl + "test");
-            listBox1.Items.Add(ret);
-        }
-        //post带参数返回字符串
-        private void button6_Click(object sender, EventArgs e)
-        {
-            var dic = new Dictionary<string, object> { { "id", 1 }, { "msg", "post带参数" } };
-            var ret = CoreHttp.Post(ServiceHelp.HttpUrl + "test", dic);
-            listBox1.Items.Add(ret);
-        }
-        //新增
+
+        //新增id=1
         private void button8_Click(object sender, EventArgs e)
         {
-            var user = new user { id = 1, name = "张三" };
-            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "insert", new { u = user });
+            var user = new user { id = 1, name = "李四" };
+            var ret = GlobalVar.TestService.Send<int>("Insert", user);
             listBox1.Items.Add(ret);
         }
+
+        //新增id根据时间来
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var user = new user { id = Convert.ToInt32(DateTime.Now.ToString("ddHHmmss")), name = "张三" };
+            var ret = GlobalVar.TestService.Send<int>("Insert", user);
+            listBox1.Items.Add(ret);
+        }
+
         //修改
         private void button9_Click(object sender, EventArgs e)
         {
             var user = new user { id = 1, name = "山大圣诞礼物" };
-            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "update", new { u = user });
+            var ret = GlobalVar.TestService.Send<int>("Update", user);
             listBox1.Items.Add(ret);
         }
+
         //删除
         private void button10_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Post<int>(ServiceHelp.HttpUrl + "delete", new { id = 1 });
+            var ret = GlobalVar.TestService.Send<int>("Delete", 1);
             listBox1.Items.Add(ret);
         }
+
         //查询id=1
         private void button11_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "select?id=1");
-            dataGridView1.DataSource = new List<user> { ret };
+            var ret = GlobalVar.TestService.Send<List<user>>("Select", 1);
+            dataGridView1.DataSource = ret;
         }
+
         //查询id=1name=张三
         private void button12_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<user>(ServiceHelp.HttpUrl + "select?id=1&name=张三");
-            dataGridView1.DataSource = new List<user> { ret };
+            var ret = GlobalVar.TestService.Send<List<user>>("Select", 1, "张三");
+            dataGridView1.DataSource = ret;
         }
+
         //查询所有
         private void button13_Click(object sender, EventArgs e)
         {
-            var ret = CoreHttp.Get<List<user>>(ServiceHelp.HttpUrl + "selectall");
+            var ret = GlobalVar.TestService.Send<List<user>>("SelectAll");
             dataGridView1.DataSource = ret;
         }
+
         //清空列表框
         private void button15_Click(object sender, EventArgs e)
         {
             listBox1.Items.Clear();
         }
-        //测试服务器连接
+
+        //连接服务器
         private void button14_Click(object sender, EventArgs e)
         {
-            ServiceHelp.ServiceIni(textBox1.Text);
-            MessageBox.Show(@"服务连接成功!");
+            if (ServiceHelp.ServiceIni(textBox1.Text))
+            {
+                Text = @"服务已连接!";
+                MessageBox.Show(@"服务连接成功!" );
+            }
+            else
+            {
+                Text = @"等待连接... ...";
+                MessageBox.Show(@"服务没有连接!");
+            }
         }
-        CoreFile cf = new CoreFile();
+
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            cf.FilePathReceived += path =>
-            {
-                MessageBox.Show(path);
-            };
-            cf.StartWatcher("d:\\test","txt");
+
         }
 
     }

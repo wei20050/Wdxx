@@ -55,6 +55,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoreIni.cs" />
+    <Compile Include="CoreSerialPort.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

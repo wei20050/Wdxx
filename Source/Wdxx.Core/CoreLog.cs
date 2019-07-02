@@ -13,7 +13,7 @@ namespace Wdxx.Core
         /// <summary>
         /// 日志文件夹默认根目录logs文件夹
         /// </summary>
-        private static readonly string FilePath = AppDomain.CurrentDomain.BaseDirectory + "logs\\";
+        private static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
 
         /// <summary>
         /// 日志分隔文件大小 10M
@@ -65,7 +65,7 @@ namespace Wdxx.Core
             do
             {
                 index++;
-                logPath = FilePath + prefix + DateTime.Now.ToString("yyyyMMdd") + "_" + index + ".log";
+                logPath = Path.Combine(FilePath, prefix + DateTime.Now.ToString("yyyyMMdd") + "_" + index + ".log");
                 if (File.Exists(logPath))
                 {
                     var fileInfo = new FileInfo(logPath);

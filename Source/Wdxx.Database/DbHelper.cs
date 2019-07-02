@@ -7,11 +7,12 @@ using System.Data.Common;
 using System.Data.Objects.DataClasses;
 using System.Data.OracleClient;
 using System.Data.SqlClient;
-using System.IO;
+using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using MySql.Data.MySqlClient;
 
 #pragma warning disable 618
 
@@ -41,47 +42,11 @@ namespace Wdxx.Database
             var pn = cm.ProviderName;
             if (pn.Contains("System.Data.SQLite"))
             {
-                var dllPath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
-                if (File.Exists(dllPath))
-                {
-                    try
-                    {
-                        _sqliteAss = Assembly.LoadFrom(dllPath);
-                        MDbType = DbTypeEnum.Sqlite;
-                    }
-                    catch (Exception e)
-                    {
-                        Error("System.Data.SQLite.dll 文件异常:" + e);
-                        throw new Exception("未能加载：" + dllPath + " 请确认此插件版本是否正常！");
-                    }
-                }
-                else
-                {
-                    Error("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
-                    throw new Exception("未能加载：" + dllPath + " 请确认此插件是否存在！");
-                }
+                MDbType = DbTypeEnum.Sqlite;
             }
             else if (pn.Contains("MySql.Data.MySqlClient"))
             {
-                var dllPath = AppDomain.CurrentDomain.BaseDirectory + "MySql.Data.dll";
-                if (File.Exists(dllPath))
-                {
-                    try
-                    {
-                        _mysqlAss = Assembly.LoadFrom(dllPath);
-                        MDbType = DbTypeEnum.Mysql;
-                    }
-                    catch (Exception e)
-                    {
-                        Error("MySql.Data.dll 文件异常:" + e);
-                        throw new Exception("未能加载：" + dllPath + " 请确认此插件版本是否正常！");
-                    }
-                }
-                else
-                {
-                    Error("MySql.Data.dll 文件不存在 无法支持MySql");
-                    throw new Exception("未能加载：" + dllPath + " 请确认此插件是否存在！");
-                }
+                MDbType = DbTypeEnum.Mysql;
             }
             else if (pn.Contains("System.Data.SqlClient"))
             {
@@ -137,16 +102,6 @@ namespace Wdxx.Database
         #region 变量
 
         /// <summary>
-        /// Sqlite程序集
-        /// </summary>
-        private readonly Assembly _sqliteAss;
-
-        /// <summary>
-        /// Mysql程序集
-        /// </summary>
-        private readonly Assembly _mysqlAss;
-
-        /// <summary>
         /// 数据库类型
         /// </summary>
         public readonly DbTypeEnum MDbType;
@@ -187,12 +142,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    var objSqLite = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand");
-                    command = (DbCommand)objSqLite;
+                    command = new SQLiteCommand();
                     break;
                 case DbTypeEnum.Mysql:
-                    var objMySql = _mysqlAss.CreateInstance("MySql.Data.MySqlClient.MySqlCommand");
-                    command = (DbCommand)objMySql;
+                    command = new MySqlCommand();
                     break;
                 case DbTypeEnum.Mssql:
                     command = new SqlCommand();
@@ -219,16 +172,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    var parametersSqLite = new object[1];
-                    parametersSqLite[0] = sql;
-                    var objSqLite = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand", true, BindingFlags.Default, null, parametersSqLite, null, null);
-                    command = (DbCommand)objSqLite;
+                    command = new SQLiteCommand(sql);
                     break;
                 case DbTypeEnum.Mysql:
-                    var parametersMySql = new object[1];
-                    parametersMySql[0] = sql;
-                    var objMySql = _mysqlAss.CreateInstance("MySql.Data.MySqlClient.MySqlCommand", true, BindingFlags.Default, null, parametersMySql, null, null);
-                    command = (DbCommand)objMySql;
+                    command = new MySqlCommand(sql);
                     break;
                 case DbTypeEnum.Mssql:
                     command = new SqlCommand(sql);
@@ -241,7 +188,6 @@ namespace Wdxx.Database
                 default:
                     return null;
             }
-            if (command == null) return null;
             command.Connection = conn;
             return command;
         }
@@ -261,16 +207,10 @@ namespace Wdxx.Database
                 switch (MDbType)
                 {
                     case DbTypeEnum.Sqlite:
-                        var parametersSqLite = new object[1];
-                        parametersSqLite[0] = _mConnectionString;
-                        var objSqLite = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteConnection", true, BindingFlags.Default, null, parametersSqLite, null, null);
-                        conn = (DbConnection)objSqLite;
+                        conn = new SQLiteConnection(_mConnectionString);
                         break;
                     case DbTypeEnum.Mysql:
-                        var parametersMySql = new object[1];
-                        parametersMySql[0] = _mConnectionString;
-                        var objMySql = _mysqlAss.CreateInstance("MySql.Data.MySqlClient.MySqlConnection", true, BindingFlags.Default, null, parametersMySql, null, null);
-                        conn = (DbConnection)objMySql;
+                        conn = new MySqlConnection(_mConnectionString);
                         break;
                     case DbTypeEnum.Mssql:
                         conn = new SqlConnection(_mConnectionString);
@@ -308,12 +248,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    var objSqLite = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteDataAdapter");
-                    dataAdapter = (DbDataAdapter)objSqLite;
+                    dataAdapter = new SQLiteDataAdapter();
                     break;
                 case DbTypeEnum.Mysql:
-                    var objMySql = _mysqlAss.CreateInstance("MySql.Data.MySqlClient.MySqlDataAdapter");
-                    dataAdapter = (DbDataAdapter)objMySql;
+                    dataAdapter = new MySqlDataAdapter();
                     break;
                 case DbTypeEnum.Mssql:
                     dataAdapter = new SqlDataAdapter();
@@ -326,7 +264,6 @@ namespace Wdxx.Database
                 default:
                     return null;
             }
-            if (dataAdapter == null) return null;
             dataAdapter.SelectCommand = cmd;
             return dataAdapter;
         }
@@ -348,18 +285,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    var parametersSqLite = new object[2];
-                    parametersSqLite[0] = name;
-                    parametersSqLite[1] = vallue;
-                    var objSqLite = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteParameter", true, BindingFlags.Default, null, parametersSqLite, null, null);
-                    dbParameter = (DbParameter)objSqLite;
+                    dbParameter = new SQLiteParameter(name, vallue);
                     break;
                 case DbTypeEnum.Mysql:
-                    var parametersMySql = new object[2];
-                    parametersMySql[0] = name;
-                    parametersMySql[1] = vallue;
-                    var objMySql = _mysqlAss.CreateInstance("MySql.Data.MySqlClient.MySqlParameter", true, BindingFlags.Default, null, parametersMySql, null, null);
-                    dbParameter = (DbParameter)objMySql;
+                    dbParameter = new MySqlParameter(name, vallue);
                     break;
                 case DbTypeEnum.Mssql:
                     dbParameter = new SqlParameter(name, vallue);

@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\Wdxx.Core.xml</DocumentationFile>
     <LangVersion>3</LangVersion>
   </PropertyGroup>
@@ -45,13 +45,14 @@
   <ItemGroup>
     <Compile Include="CoreEncrypt.cs" />
     <Compile Include="CoreFile.cs" />
-    <Compile Include="CoreHttpHost.cs" />
+    <Compile Include="CoreClientHost.cs" />
+    <Compile Include="CoreClient.cs" />
     <Compile Include="CorePublic.cs" />
     <Compile Include="CoreHttp.cs" />
     <Compile Include="CoreIni.cs" />
     <Compile Include="CoreLog.cs" />
     <Compile Include="CoreSerialPort.cs" />
-    <Compile Include="CoreHost.cs" />
+    <Compile Include="CoreHttpHost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CoreConvert.cs" />
   </ItemGroup>

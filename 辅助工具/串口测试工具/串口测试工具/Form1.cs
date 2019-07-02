@@ -5,10 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
 namespace 串口测试工具
@@ -21,8 +18,8 @@ namespace 串口测试工具
         }
 
         //串口操作对象
-        private readonly SerialPortEx _comDevice = new SerialPortEx();
-        
+        private readonly CoreSerialPort _comDevice = new CoreSerialPort();
+
         private static Parity GetParity(int parity)
         {
             switch (parity)
@@ -62,13 +59,13 @@ namespace 串口测试工具
             {
                 GlobalVar.ConfigStr = string.Format("{0},{1},{2},{3},{4}", comboBox2.SelectedIndex, comboBox3.SelectedIndex, comboBox4.SelectedIndex, comboBox5.SelectedIndex, comboBox6.SelectedIndex);
                 GlobalVar.Com = comboBox1.Text;
-                _comDevice.PortName = comboBox1.Text;
-                _comDevice.BaudRate = Convert.ToInt32(comboBox2.Text);
-                _comDevice.Parity = GetParity(comboBox3.SelectedIndex);
-                _comDevice.DataBits = Convert.ToInt32(comboBox4.Text);
-                _comDevice.StopBits = GetStopBits(comboBox5.SelectedIndex);
-                _comDevice.RtsEnable = true;
-                _comDevice.Open();
+                _comDevice.Sp.PortName = comboBox1.Text;
+                _comDevice.Sp.BaudRate = Convert.ToInt32(comboBox2.Text);
+                _comDevice.Sp.Parity = GetParity(comboBox3.SelectedIndex);
+                _comDevice.Sp.DataBits = Convert.ToInt32(comboBox4.Text);
+                _comDevice.Sp.StopBits = GetStopBits(comboBox5.SelectedIndex);
+                _comDevice.Sp.RtsEnable = true;
+                _comDevice.Sp.Open();
                 comboBox1.Enabled = comboBox2.Enabled = comboBox3.Enabled =
                     comboBox4.Enabled = comboBox5.Enabled = comboBox6.Enabled = false;
                 richTextBox1.Text += @"打开串口成功!" + Environment.NewLine;
@@ -82,7 +79,7 @@ namespace 串口测试工具
         //关闭端口
         private void button2_Click(object sender, EventArgs e)
         {
-            _comDevice.Close();
+            _comDevice.Sp.Close();
             comboBox1.Enabled = comboBox2.Enabled = comboBox3.Enabled =
                 comboBox4.Enabled = comboBox5.Enabled = comboBox6.Enabled = true;
             richTextBox1.Text += @"关闭串口成功!" + Environment.NewLine;
@@ -94,7 +91,7 @@ namespace 串口测试工具
             try
             {
                 GlobalVar.StrText = textBox1.Text;
-                _comDevice.Write(textBox1.Text);
+                _comDevice.Sp.Write(textBox1.Text);
                 richTextBox1.Text += @"发送文本成功:  文本:" + textBox1.Text + Environment.NewLine;
             }
             catch (Exception exception)
@@ -108,19 +105,33 @@ namespace 串口测试工具
             GlobalVar.ByteText = textBox2.Text;
             Fszj(textBox2.Text.Trim());
         }
-        //发送字节
+        //发送字节(或HEX发送)
         private void Fszj(string zj)
         {
             try
             {
-                var strs = zj.Split(' ');
-                var bs = new byte[strs.Length];
-                for (var i = 0; i < strs.Length; i++)
+                if (GlobalVar.IsHex)
                 {
-                    bs[i] = (byte)Convert.ToInt32(strs[i]);
+                    var strs = zj.Split(' ');
+                    var cs = new byte[strs.Length];
+                    for (var i = 0; i < strs.Length; i++)
+                    {
+                        cs[i] = byte.Parse(strs[i], System.Globalization.NumberStyles.HexNumber);
+                    }
+                    _comDevice.Sp.Write(cs, 0, cs.Length);
+                    richTextBox1.Text += @"发送字符数组数据成功:  字符:" + zj + Environment.NewLine;
                 }
-                _comDevice.Write(bs, 0, bs.Length);
-                richTextBox1.Text += @"发送字节数组数据成功:  字节:" + zj + Environment.NewLine;
+                else
+                {
+                    var strs = zj.Split(' ');
+                    var bs = new byte[strs.Length];
+                    for (var i = 0; i < strs.Length; i++)
+                    {
+                        bs[i] = (byte)Convert.ToInt32(strs[i]);
+                    }
+                    _comDevice.Sp.Write(bs, 0, bs.Length);
+                    richTextBox1.Text += @"发送字节数组数据成功:  字节:" + zj + Environment.NewLine;
+                }
             }
             catch (Exception exception)
             {
@@ -153,6 +164,7 @@ namespace 串口测试工具
             {
                 ShuaXinZdy();
             }
+            checkBox1.Checked = GlobalVar.IsHex;
         }
 
         private void Com_DataReceived(byte[] b)
@@ -185,13 +197,13 @@ namespace 串口测试工具
             var zdytmp = GlobalVar.Zdy.Cast<string>().Aggregate(string.Empty, (current, z) => current + z + ',');
             zdytmp = zdytmp.TrimEnd(',');
             str = str.Replace("[zdy]", zdytmp);
-            File.WriteAllText("SerialPortHelp.cs",str);
+            File.WriteAllText("SerialPortHelp.cs", str);
             MessageBox.Show(@"代码生成成功！", @"生成代码");
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _comDevice.Close();
+            _comDevice.Sp.Close();
         }
         //打开串口监控软件
         private void button6_Click(object sender, EventArgs e)
@@ -270,7 +282,7 @@ namespace 串口测试工具
             for (var i = 0; i < nexti; i++)
             {
                 var nextj = 10;
-                if (i == nexti -1 && m != 0)
+                if (i == nexti - 1 && m != 0)
                 {
                     nextj = m;
                 }
@@ -282,7 +294,7 @@ namespace 串口测试工具
                     {
                         Width = 70,
                         Height = 23,
-                        Text = values[0].Substring(0, len>4?4:len),
+                        Text = values[0].Substring(0, len > 4 ? 4 : len),
                         Tag = values[1],
                         Location = new Point(xl * j + x, yl * i + y)
                     };
@@ -341,213 +353,18 @@ namespace 串口测试工具
             saveFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
             saveFileDialog1.Filter = @"文件类型 (*.ckpz)|*.ckpz";
             saveFileDialog1.OverwritePrompt = false;
-             var dr = saveFileDialog1.ShowDialog();
+            var dr = saveFileDialog1.ShowDialog();
             if (dr != DialogResult.OK || saveFileDialog1.FileName.Length <= 0) return;
             var zdytmp = GlobalVar.Zdy.Cast<string>().Aggregate(string.Empty, (current, z) => current + z + ',');
             zdytmp = zdytmp.TrimEnd(',');
             var str = string.Format("{0},{1},{2},{3},{4}", GlobalVar.ConfigStr, GlobalVar.Com, GlobalVar.StrText, GlobalVar.ByteText, zdytmp);
-            File.WriteAllText(saveFileDialog1.FileName,str);
+            File.WriteAllText(saveFileDialog1.FileName, str);
             MessageBox.Show(@"导出配置成功！", @"导出配置");
         }
-    }
-    
-    public static class CoreIni
-    {
-        #region INI读写底层
 
-        /// <summary>
-        /// ini文件路径
-        /// </summary>
-        private static readonly string ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                                        Assembly.GetEntryAssembly().GetName().Name) + "\\Config.ini";
-
-        /// <summary>
-        /// ini配置节大小
-        /// </summary>
-        public static uint IniSize = 524288;
-
-        /// <summary>
-        /// 默认路径
-        /// </summary>
-        private const string DefaultPath = "DefaultPath";
-
-        /// <summary>
-        /// 默认终结点
-        /// </summary>
-        private const string DefaultEndpoint = "Default";
-
-        #region API函数声明
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool WritePrivateProfileString(string lpAppName,
-            string lpKeyName, string lpString, string lpFileName);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern uint GetPrivateProfileString(
-            string lpAppName,
-            string lpKeyName,
-            string lpDefault,
-            StringBuilder lpReturnedString,
-            uint nSize,
-            string lpFileName);
-
-        #endregion
-
-        #region 读Ini文件
-
-        private static string ReadIniData(string section, string key, string noText, string iniFilePath)
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (!File.Exists(iniFilePath)) return string.Empty;
-            var temp = new StringBuilder((int)IniSize);
-            GetPrivateProfileString(section, key, noText, temp, IniSize, iniFilePath);
-            return temp.ToString();
-        }
-
-        #endregion
-
-        #region 写Ini文件
-
-        private static bool WriteIniData(string section, string key, string value, string iniFilePath)
-        {
-            var dir = Path.GetDirectoryName(iniFilePath);
-            if (!Directory.Exists(dir) && !string.IsNullOrEmpty(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-            if (!File.Exists(iniFilePath))
-            {
-                File.Create(iniFilePath).Dispose();
-            }
-            if (WritePrivateProfileString(section, key, value, iniFilePath)) return true;
-            var errorCode = Marshal.GetLastWin32Error();
-            throw new Exception("ini写入 section:" + section + " key:" + key + " value:" + value + " iniFilePath:" +
-                                iniFilePath + " 失败,错误:" + errorCode);
-        }
-
-        #endregion
-
-        #endregion
-
-        #region 封装读写
-
-        /// <summary>
-        /// 读取泛型类型
-        /// </summary>
-        /// <typeparam name="T">读取的类型</typeparam>
-        /// <param name="key">配置键</param>
-        /// <param name="configPath">配置文件路径</param>
-        /// <param name="endpoint">终结点(默认root)</param>
-        /// <returns>配置值</returns>
-        public static T Rini<T>(string key, string configPath = DefaultPath, string endpoint = DefaultEndpoint)
-        {
-            if (configPath == DefaultPath)
-            {
-                configPath = ConfigPath;
-            }
-            return JsonToObj<T>(ReadIniData(endpoint, key, string.Empty, configPath));
-        }
-
-        /// <summary>
-        /// 读取字符串类型
-        /// </summary>
-        /// <param name="key">配置键</param>
-        /// <param name="configPath">配置文件路径</param>
-        /// <param name="endpoint">终结点(默认root)</param>
-        /// <returns>配置值</returns>
-        public static string Rini(string key, string configPath = DefaultPath, string endpoint = DefaultEndpoint)
-        {
-            if (configPath == DefaultPath)
-            {
-                configPath = ConfigPath;
-            }
-            return ReadIniData(endpoint, key, string.Empty, configPath);
-        }
-
-        /// <summary>
-        /// 写入所有类型
-        /// </summary>
-        /// <param name="key">配置键</param>
-        /// <param name="value">配置值</param>
-        /// <param name="configPath">配置文件路径</param>
-        /// <param name="endpoint">终结点(默认root)</param>
-        /// <returns></returns>
-        public static bool Wini(string key, object value, string configPath = DefaultPath, string endpoint = DefaultEndpoint)
-        {
-            if (configPath == DefaultPath)
-            {
-                configPath = ConfigPath;
-            }
-            return WriteIniData(endpoint, key, ObjToJson(value), configPath);
-        }
-
-        /// <summary>
-        /// 将JSON数据转化为对应的类型  
-        /// </summary>
-        /// <typeparam name="T">要转换的类型</typeparam>
-        /// <param name="jsonStr">json字符串</param>
-        /// <returns>转换后的对象</returns>
-        private static T JsonToObj<T>(string jsonStr)
-        {
-            //时间类型直接转换
-            if (typeof(T) == typeof(DateTime))
-            {
-                return (T)(object)Convert.ToDateTime(jsonStr);
-            }
-            return string.IsNullOrEmpty(jsonStr) ? default(T) : new JavaScriptSerializer().Deserialize<T>(jsonStr);
-        }
-
-        /// <summary>
-        /// 将对应的类型转化为JSON字符串
-        /// </summary>
-        /// <param name="jsonObject">要转换的类型</param>
-        /// <returns>json字符串</returns>
-        private static string ObjToJson(object jsonObject)
-        {
-            //单独的时间格式不支持反序列化 这里直接转string
-            if (jsonObject is DateTime)
-            {
-                return jsonObject.ToString();
-            }
-            return new JavaScriptSerializer().Serialize(jsonObject);
-        }
-
-        #endregion
-    }
-
-    public class SerialPortEx : SerialPort
-    {
-        public SerialPortEx()
-        {
-            DataReceivedDelay = 168;
-            DataReceived += CallDataReceived;
-            _t.Interval = 1;
-            _t.Tick += (o, e) =>
-            {
-                if (_i++ <= DataReceivedDelay) return;
-                _t.Stop();
-                _i = 0;
-                OnDataReceivedEx(_bytes);
-                _bytes = null;
-            };
-        }
-        public delegate void DeleDataReceived(byte[] b);
-        public event DeleDataReceived DataReceivedEx;
-        public int DataReceivedDelay { get; set; }
-        private readonly Timer _t = new Timer();
-        private int _i;
-        private byte[] _bytes;
-        protected virtual void CallDataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            _i = 0;
-            var data = new byte[BytesToRead];
-            Read(data, 0, data.Length);
-            _bytes = _bytes.Concat(data).ToArray();
-            _t.Start();
-        }
-        protected virtual void OnDataReceivedEx(byte[] b)
-        {
-            if (DataReceivedEx != null) DataReceivedEx.Invoke(b);
+            GlobalVar.IsHex = checkBox1.Checked;
         }
     }
 }
