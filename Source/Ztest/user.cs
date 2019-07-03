@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Tset.Entity
+namespace Ztest
 {
     public class user
     {

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-namespace Wdxx.Core
+namespace Ztest
 {
 
     /// <summary>
@@ -221,6 +221,7 @@ namespace Wdxx.Core
         }
 
         #endregion
+        
 
         #region 绝对随机
 
@@ -245,7 +246,7 @@ namespace Wdxx.Core
         }
 
         /// <summary>
-        /// 获随机整数(作为Random的种子 或其他用途)
+        /// 获随机正整数(作为Random的种子 或其他用途)
         /// </summary>
         /// <returns></returns>
         public static int GenerateId()

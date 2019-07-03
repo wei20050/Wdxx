@@ -14,7 +14,7 @@ namespace Model生成器.DBUtil
         /// <summary>
         /// 数据库连接字符串
         /// </summary>
-        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["MSSQLConnection"].ToString();
+        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["DbContext"].ToString();
         #endregion
 
         #region Exists

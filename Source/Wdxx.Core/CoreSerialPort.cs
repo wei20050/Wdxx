@@ -81,7 +81,7 @@ namespace Wdxx.Core
             _i = 0;
             var data = new byte[Sp.BytesToRead];
             Sp.Read(data, 0, data.Length);
-            _bytes = _bytes.Concat(data).ToArray();
+            _bytes = _bytes == null ? data : _bytes.Concat(data).ToArray();
             _t.Start();
         }
 

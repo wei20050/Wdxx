@@ -69,6 +69,22 @@ public class SerialPortHelp
     }
 
     /// <summary>
+    /// 发送字节数据(16进制)
+    /// </summary>
+    public void Write16(string s)
+    {
+        //这里是自定义发送功能与参数:[zdy]
+        var str = "[zijie]";
+        var strs = str.Split(' ');
+        var bs = new byte[strs.Length];
+        for (var i = 0; i < strs.Length; i++)
+        {
+            bs[i] = byte.Parse(strs[i], System.Globalization.NumberStyles.HexNumber);
+        }
+        _comDevice.Write(bs, 0, bs.Length);
+    }
+
+    /// <summary>
     /// 关闭串口
     /// </summary>
     public void CloseSerial()

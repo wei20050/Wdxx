@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Test.Client.Service;
 using Tset.Entity;
+using Wdxx.Core;
 
 namespace Test.Client
 {
@@ -46,7 +47,7 @@ namespace Test.Client
         //新增id根据时间来
         private void button4_Click(object sender, EventArgs e)
         {
-            var user = new user { id = Convert.ToInt32(DateTime.Now.ToString("ddHHmmss")), name = "张三" };
+            var user = new user { id = Convert.ToInt32(DateTime.Now.ToString("HHmmssfff")), name = "张三" };
             var ret = GlobalVar.TestService.Send<int>("Insert", user);
             listBox1.Items.Add(ret);
         }
@@ -111,7 +112,10 @@ namespace Test.Client
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-
+            GlobalVar.TestService = new CoreClient("http://localhost:61070/Ws.asmx");
+            var user = new user { id = 1, name = "张三" };
+            var ret = GlobalVar.TestService.Send<int>("Insert", user);
+            MessageBox.Show(ret.ToString());
         }
 
     }

@@ -21,9 +21,10 @@ namespace Model生成器
             {
                 try
                 {
-                    var dal = DalFactory.CreateDal(ConfigurationManager.AppSettings["DBType"]);
+                    var cm = ConfigurationManager.ConnectionStrings["DbContext"];
+                    var dal = DalFactory.CreateDal(cm.ProviderName);
                     var tableList = dal.GetAllTables();
-                    var strNamespace = ConfigurationManager.AppSettings["Namespace"];
+                    const string strNamespace = "Entity";
 
                     #region 操作控件
                     InvokeDelegate invokeDelegate = delegate
@@ -47,7 +48,7 @@ namespace Model生成器
                         #region 原始Model
                         sb.Append("using System;\r\n");
                         //sb.Append("using System.Collections.Generic;\r\n");
-                        //sb.Append("using System.Linq;\r\n");
+                        sb.Append("using System.ComponentModel.DataAnnotations;");
                         sb.Append("\r\n");
                         sb.Append("namespace " + strNamespace + "\r\n");
                         sb.Append("{\r\n");
@@ -66,17 +67,17 @@ namespace Model生成器
                             sb.Append("        /// " + column["comments"] + "\r\n");
                             sb.Append("        /// </summary>\r\n");
 
-                            //if (column["constraint_type"] == "P")
-                            //{
-                            //    sb.Append("        [IsId]\r\n");
-                            //}
+                            if (column["constraint_type"] == "P")
+                            {
+                                sb.Append("        [Key]\r\n");
+                            }
 
                             //sb.Append("        [IsDBField]\r\n");
                             sb.Append("        public " + dataType + " " + column["columns_name"] + " { get; set; }\r\n");
                         }
                         sb.Append("    }\r\n");
                         sb.Append("}\r\n");
-                        FileHelper.WriteFile(AppDomain.CurrentDomain.BaseDirectory + "Entity", sb.ToString(), table["table_name"]);
+                        FileHelper.WriteFile(AppDomain.CurrentDomain.BaseDirectory + strNamespace, sb.ToString(), table["table_name"]);
                         #endregion
 
                         #region 扩展Model

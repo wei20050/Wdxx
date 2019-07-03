@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
@@ -38,7 +39,21 @@ namespace Wdxx.Database
         /// <param name="dbConnectionName">数据库连接字符串Name</param>
         public DbHelper(string dbConnectionName)
         {
+            var sqlLogCm = ConfigurationManager.ConnectionStrings["SqlLog"];
+            if (sqlLogCm == null)
+            {
+                Error("没有找到名为:SqlLog 的连接字符串,默认不记录Sql日志");
+            }
+            else
+            {
+                _sqlLog = sqlLogCm.ConnectionString == "1";
+            }
             var cm = ConfigurationManager.ConnectionStrings[dbConnectionName];
+            if (cm == null)
+            {
+                Error("没有找到名为:" + dbConnectionName + " 的连接字符串");
+                throw new Exception("没有找到名为:" + dbConnectionName + " 的连接字符串");
+            }
             var pn = cm.ProviderName;
             if (pn.Contains("System.Data.SQLite"))
             {
@@ -107,9 +122,9 @@ namespace Wdxx.Database
         public readonly DbTypeEnum MDbType;
 
         /// <summary>
-        /// 数据库sql操作日志(true开启日志  false关闭日志)
+        /// 数据库sql操作日志(1:开启日志  0:关闭日志)
         /// </summary>
-        public bool SqlLog { get; set; }
+        private static bool _sqlLog;
 
         /// <summary>
         /// 数据库连接字符串
@@ -307,7 +322,7 @@ namespace Wdxx.Database
         }
 
         #endregion
-        
+
         #region 获取 ParameterMark
 
         /// <summary>
@@ -376,30 +391,7 @@ namespace Wdxx.Database
         }
 
         #endregion
-
-        #region SQL日志
-
-        /// <summary>
-        /// SQL记录日志
-        /// </summary>
-        private void LogInfo(string sqlString, params DbParameter[] cmdParms)
-        {
-            if (SqlLog)
-            {
-                Info(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
-            }
-        }
-
-        /// <summary>
-        /// SQL错误日志
-        /// </summary>
-        private void LogErr(string sqlString, params DbParameter[] cmdParms)
-        {
-            Error(sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value + " ")));
-        }
-
-        #endregion
-
+        
         #region 执行sql 返回是否成功
 
         /// <summary>
@@ -684,6 +676,71 @@ namespace Wdxx.Database
                 parameters[k++] = param;
             }
             return ExecuteSql(strSql.ToString(), parameters);
+        }
+
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="objList">要批量添加的实体集合</param>
+        /// <returns>返回影响的行数 成功为1 失败为0</returns>
+        public bool Inserts(List<object> objList)
+        {
+            try
+            {
+                BeginTransaction();
+                foreach (var obj in objList)
+                {
+                    InsertOrUpdate(obj);
+                }
+                CommitTransaction();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Error("批量添加发生异常:" + e);
+                RollbackTransaction();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 添加或修改
+        /// </summary>
+        /// <param name="obj">要添加的实体对象</param>
+        /// <returns>返回影响的行数 成功为1 失败为0</returns>
+        public int InsertOrUpdate(object obj)
+        {
+            var sql = new Sql();
+            var type = obj.GetType();
+            sql.Add(string.Format("select count(*) as c from {0} where ", type.Name));
+            var propertyInfoList = GetEntityProperties(type);
+            foreach (var propertyInfo in propertyInfoList)
+            {
+                if (propertyInfo.GetCustomAttributes(typeof(KeyAttribute), true).Length < 1) continue;
+                var val = propertyInfo.GetValue(obj, null);
+                sql.AddField(propertyInfo.Name).Equal(val).Or();
+            }
+            if (!string.IsNullOrEmpty(sql.ToString()))
+            {
+                sql.Add("1=2");
+            }
+            var conditions = sql.ToString();
+            var parameters = new DbParameter[sql.ParamDict.Count];
+            var i = 0;
+            foreach (var p in sql.ParamDict)
+            {
+                //这里为了匹配多个数据库这里补上参数前缀
+                var parmsKey = GetParameterMark() + p.Key;
+                conditions = conditions.Replace(p.Key, parmsKey);
+                parameters[i] = GetDbParameter(_mParameterMark + p.Key, p.Value);
+                i++;
+            }
+            var rd = ExecuteReader(conditions, parameters);
+            rd.Read();
+            var ret = rd["c"].ToString() == "0" ? Insert(obj) : Update(obj);
+            rd.Close();
+            rd.Dispose();
+            return ret;
         }
 
         #endregion
@@ -1305,7 +1362,7 @@ namespace Wdxx.Database
         /// </summary>
         public void BeginTransaction()
         {
-            if (SqlLog) Info("开始事务");
+            if (_sqlLog) Info("开始事务");
             var conn = GetConnection();
             if (conn.State != ConnectionState.Open) conn.Open();
             _mTran = conn.BeginTransaction();
@@ -1322,7 +1379,7 @@ namespace Wdxx.Database
         {
             //防止重复提交
             if (_mTran == null) return;
-            if (SqlLog) Info("提交事务");
+            if (_sqlLog) Info("提交事务");
             var conn = _mTran.Connection;
             try
             {
@@ -1352,7 +1409,7 @@ namespace Wdxx.Database
         {
             //防止重复回滚
             if (_mTran == null) return;
-            if (SqlLog) Info("回滚事务");
+            if (_sqlLog) Info("回滚事务");
             var conn = _mTran.Connection;
             try
             {
@@ -1369,7 +1426,73 @@ namespace Wdxx.Database
 
         #endregion
 
-        #region 日志封装
+        #region SQL日志
+
+        /// <summary>
+        /// 获取具体执行的SQL
+        /// </summary>
+        /// <returns></returns>
+        private static string GetSql(string sqlString, params DbParameter[] cmdParms)
+        {
+            var sqlStr = sqlString;
+            foreach (var p in cmdParms)
+            {
+                // ReSharper disable once SwitchStatementMissingSomeCases
+                switch (p.DbType)
+                {
+                    case DbType.AnsiString:
+                        
+                    case DbType.Binary:
+                        
+                    case DbType.Date:
+                        
+                    case DbType.DateTime:
+                        
+                    case DbType.Guid:
+                        
+                    case DbType.Object:
+                        
+                    case DbType.String:
+                        
+                    case DbType.Time:
+                        
+                    case DbType.AnsiStringFixedLength:
+                        
+                    case DbType.StringFixedLength:
+                        
+                    case DbType.Xml:
+                        
+                    case DbType.DateTime2:
+                        
+                    case DbType.DateTimeOffset:
+                        sqlStr = sqlStr.Replace(p.ParameterName, "'" + p.Value + "'");
+                        break;
+                    default:
+                        sqlStr = sqlStr.Replace(p.ParameterName, p.Value.ToString());
+                        break;
+                }
+            }
+            return sqlStr;
+        }
+
+        /// <summary>
+        /// SQL记录日志
+        /// </summary>
+        private static void LogInfo(string sqlString, params DbParameter[] cmdParms)
+        {
+            if (!_sqlLog) return;
+            Info("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value)));
+            Info("调试查询:" + GetSql(sqlString, cmdParms));
+        }
+
+        /// <summary>
+        /// SQL错误日志
+        /// </summary>
+        private static void LogErr(string sqlString, params DbParameter[] cmdParms)
+        {
+            Error("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value)));
+            Error("调试查询:" + GetSql(sqlString, cmdParms));
+        }
 
         private static void Info(object o)
         {

@@ -13,15 +13,15 @@ namespace Model生成器.DAL
         /// <param name="databaseType">数据库类型，如SQLite、MySql</param>
         public static IDal CreateDal(string databaseType)
         {
-            switch (databaseType.ToLower())
+            switch (databaseType)
             {
-                case "mysql":
+                case "MySql.Data.MySqlClient":
                     return new MySqlDal();
-                case "sqlite":
+                case "System.Data.SQLite":
                     return new SqLiteDal();
-                case "oracle":
+                case "System.Data.OracleClient":
                     return new OracleDal();
-                case "mssql":
+                case "System.Data.SqlClient":
                     return new MssqlDal();
                 default:
                     throw new Exception("数据库类型错误");
