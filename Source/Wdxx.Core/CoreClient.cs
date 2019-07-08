@@ -130,7 +130,7 @@ namespace Wdxx.Core
         /// <param name="serviceUrl">请求地址</param>
         /// <param name="sendData">请求参数</param>
         /// <returns></returns>
-        public string HttpSend(string serviceUrl, string sendData)
+        public static string HttpSend(string serviceUrl, string sendData)
         {
             try
             {
