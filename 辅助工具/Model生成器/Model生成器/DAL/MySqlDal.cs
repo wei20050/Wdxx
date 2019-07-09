@@ -42,7 +42,7 @@ namespace Model生成器.DAL
         /// </summary>
         public List<Dictionary<string, string>> GetAllColumns(string tableName)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ToString();
+            var connectionString = ConfigurationManager.ConnectionStrings["DbContext"].ToString();
             var start = connectionString.IndexOf("database=", StringComparison.Ordinal) + 9;
             var end = connectionString.IndexOf("user id=", StringComparison.Ordinal);
             var owner = connectionString.Substring(start, end - start).Replace(";", "").ToUpper();

@@ -27,6 +27,13 @@ namespace Wdxx.Core
         private readonly string _wsdl;
 
         /// <summary>
+        /// 默认构造函数
+        /// </summary>
+        public CoreClient()
+        {
+        }
+
+        /// <summary>
         /// 带服务地址构造函数
         /// </summary>
         /// <param name="serviceUrl">服务地址</param>
@@ -79,7 +86,7 @@ namespace Wdxx.Core
         /// <param name="method">请求的方法</param>
         /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
         /// <returns></returns>
-        private string Send(string serviceUrl, string method, params object[] sendData)
+        public string Send(string serviceUrl, string method, params object[] sendData)
         {
             try
             {
@@ -89,7 +96,7 @@ namespace Wdxx.Core
                 httpWebRequest.ContentType = "text/xml; charset=utf-8";
                 //这个在非GET的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
                 httpWebRequest.ServicePoint.Expect100Continue = false;
-                if (sendData != null )
+                if (sendData != null)
                 {
                     var xmlData = GetData(method, sendData);
                     var data = Encoding.UTF8.GetBytes(xmlData);
