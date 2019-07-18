@@ -39,59 +39,55 @@ namespace Wdxx.Core
         /// <param name="serviceUrl">服务地址</param>
         public CoreClient(string serviceUrl)
         {
-            ServiceUrl = serviceUrl;
+            ServiceUrl = serviceUrl.TrimEnd('/');
             _wsdl = Wsdl();
         }
 
         /// <summary>
-        /// 发送请求
+        /// 发送请求(返回字符串类型)
         /// </summary>
         /// <param name="method">请求的方法</param>
         /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
         /// <returns></returns>
         public string Send(string method, params object[] sendData)
         {
-            return Send<string>(method, sendData);
+            var retXml = SendCore(method, sendData);
+            var resultXml = GetResult(retXml);
+            return string.IsNullOrEmpty(resultXml) ? string.Empty : resultXml;
         }
 
         /// <summary>
-        /// 发送请求
+        /// 发送请求(返回有构造函数的类)
         /// </summary>
         /// <param name="method">请求的方法</param>
         /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
         /// <returns></returns>
-        public T Send<T>(string method, params object[] sendData)
+        public T Send<T>(string method, params object[] sendData) where T : new()
         {
-            var retXml = Send(ServiceUrl, method, sendData);
-            if (string.IsNullOrEmpty(retXml))
-            {
-                return default(T);
-            }
-            var doc = new XmlDocument();
-            doc.LoadXml(retXml);
-            var body = doc.DocumentElement;
-            if (body == null) return default(T);
-            var response = body.ChildNodes[0];
-            var result = response.ChildNodes[0].InnerXml;
-            var t = typeof(T);
-            result = result.Replace(method + "Result", ClassName(t));
-            result = result.Replace(" xmlns=\"http://tempuri.org/\"", string.Empty);
-            return string.IsNullOrEmpty(result) ? default(T) : XmlToObject<T>(result);
+            var retXml = SendCore(method, sendData);
+            var resultXml = GetResult(retXml);
+            if (string.IsNullOrEmpty(resultXml)) return default(T);
+            var xmlTmp = ObjectToXml(new T());
+            var docTmp = new XmlDocument();
+            docTmp.LoadXml(xmlTmp);
+            var root = docTmp.DocumentElement;
+            if (root == null) return default(T);
+            root.InnerXml = resultXml;
+            return string.IsNullOrEmpty(docTmp.OuterXml) ? default(T) : XmlToObject<T>(docTmp.OuterXml);
         }
 
         /// <summary>
         /// 发送请求(核心)
         /// </summary>
-        /// <param name="serviceUrl">请求地址</param>
         /// <param name="method">请求的方法</param>
         /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
         /// <returns></returns>
-        public string Send(string serviceUrl, string method, params object[] sendData)
+        public string SendCore(string method, params object[] sendData)
         {
             try
             {
                 string result;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(serviceUrl);
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(ServiceUrl);
                 httpWebRequest.Method = "POST";
                 httpWebRequest.ContentType = "text/xml; charset=utf-8";
                 //这个在非GET的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
@@ -127,7 +123,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                throw new Exception("HttpErr" + " uri:" + serviceUrl + " method:" + method + " httpData:" + sendData + "err:" + ex);
+                throw new Exception("HttpErr" + " uri:" + ServiceUrl + " method:" + method + " httpData:" + sendData + "err:" + ex);
             }
         }
 
@@ -198,20 +194,46 @@ namespace Wdxx.Core
             {
                 var d = ObjectToXml(data[i]);
                 d = d.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n", string.Empty);
-                d = d.Replace(" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", string.Empty);
                 if (ps != null)
                 {
                     var docd = new XmlDocument();
                     docd.LoadXml(d);
                     var noded = docd.DocumentElement;
-                    if (noded != null) d = d.Replace(noded.Name, ps[i]);
+                    if (noded != null)
+                    {
+                        var tmp = "<" + ps[i] + ">";
+                        tmp += noded.InnerXml;
+                        tmp += "</" + ps[i] + ">";
+                        d = tmp;
+                    }
                 }
+                d = d.Replace(" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", string.Empty);
+                d = d.Replace(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", string.Empty);
                 xmlData += d + Environment.NewLine;
             }
             xmlData += "</" + method + ">" + Environment.NewLine +
                 "</soap:Body>" + Environment.NewLine +
                   "</soap:Envelope>";
             return xmlData;
+        }
+
+        /// <summary>
+        /// 获取接收的数据
+        /// </summary>
+        /// <returns></returns>
+        private string GetResult(string resultXml)
+        {
+            if (string.IsNullOrEmpty(resultXml)) return string.Empty;
+            var doc = new XmlDocument();
+            doc.LoadXml(resultXml);
+            var envelope = doc.DocumentElement;
+            if (envelope == null) return string.Empty;
+            var body = envelope.ChildNodes[0];
+            if (body == null) return string.Empty;
+            var response = body.ChildNodes[0];
+            if (response == null) return string.Empty;
+            var result = response.ChildNodes[0];
+            return result == null ? string.Empty : result.InnerXml.Replace(" xmlns=\"http://tempuri.org/\"", string.Empty); ;
         }
 
         /// <summary>
@@ -276,25 +298,6 @@ namespace Wdxx.Core
             catch (Exception ex)
             {
                 throw new Exception("HttpErr uri:" + ServiceUrl + "?WSDL err:" + ex);
-            }
-        }
-
-        /// <summary>
-        /// 处理类名
-        /// </summary>
-        /// <returns></returns>
-        private static string ClassName(Type t)
-        {
-            var name = t.Name;
-            switch (name)
-            {
-                case "Int32":
-                    return "int";
-                case "List`1":
-                    var typeName = t.GetGenericArguments()[0].Name;
-                    return "ArrayOf" + typeName.Substring(0, 1).ToUpper() + typeName.Substring(1);
-                default:
-                    return t.FullName != null && t.FullName.Contains("System.") ? name.Substring(0, 1).ToLower() + name.Substring(1) : name;
             }
         }
 
