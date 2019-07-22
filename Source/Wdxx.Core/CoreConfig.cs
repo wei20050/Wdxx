@@ -9,7 +9,7 @@ namespace Wdxx.Core
 {
     /// <summary>
     /// 配置核心类
-    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName或Default\Config.ini
+    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName或DefaultSettings\Config.ini
     /// </summary>
     public class CoreConfig
     {
