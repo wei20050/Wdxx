@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -8,6 +9,7 @@ namespace Wdxx.Core
 {
     /// <summary>
     /// 配置核心类
+    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName或Default\Config.ini
     /// </summary>
     public class CoreConfig
     {
@@ -15,10 +17,17 @@ namespace Wdxx.Core
         #region 配置读写
 
         /// <summary>
-        /// 配置文件路径
+        /// 默认配置文件路径
         /// </summary>
-        private static readonly string ConfigPath =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Default\\Config.cfg");
+        private static readonly string DefaultPath;
+
+        static CoreConfig()
+        {
+            var exe = Assembly.GetEntryAssembly();
+            var appName = exe == null ? "DefaultSettings" : exe.GetName().Name;
+            DefaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                appName, "Config.cfg");
+        }
 
         /// <summary>
         /// 读取配置
@@ -27,7 +36,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string Rcfg(string key)
         {
-            return ReadCfg(key, ConfigPath);
+            return ReadCfg(key, DefaultPath);
         }
 
         /// <summary>
@@ -38,14 +47,60 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static bool Wcfg(string key, string value)
         {
-            return WriteCfg(key, value, ConfigPath);
+            return WriteCfg(key, value, DefaultPath);
         }
 
-        #endregion
+        /// <summary>
+        /// 读取配置
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <returns>配置值</returns>
+        public static T ReadCfg<T>(string key)
+        {
+            return ReadCfg<T>(key,DefaultPath);
+        }
 
-        #region 配置读写核心
+        /// <summary>
+        /// 写入配置
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <returns></returns>
+        public static bool WriteCfg(string key, object value)
+        {
+            return WriteCfg(key, value, DefaultPath);
+        }
 
-        private static string ReadCfg(string key, string path)
+        /// <summary>
+        /// 读取配置
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="path">配置文件路径</param>
+        /// <returns>配置值</returns>
+        public static T ReadCfg<T>(string key, string path)
+        {
+            return CoreConvert.JsonToObj<T>(ReadCfg(key, path));
+        }
+
+        /// <summary>
+        /// 写入配置
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <param name="path">配置文件路径</param>
+        /// <returns></returns>
+        public static bool WriteCfg(string key, object value, string path)
+        {
+            return WriteCfg(key, CoreConvert.ObjToJson(value), path);
+        }
+
+        /// <summary>
+        /// 读取配置
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="path">配置文件路径</param>
+        /// <returns>配置值</returns>
+        public static string ReadCfg(string key, string path)
         {
             var ret = string.Empty;
             MutexExec(path, () =>
@@ -68,7 +123,15 @@ namespace Wdxx.Core
             });
             return ret;
         }
-        private static bool WriteCfg(string key, string value, string path)
+
+        /// <summary>
+        /// 写入配置
+        /// </summary>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
+        /// <param name="path">配置文件路径</param>
+        /// <returns></returns>
+        public static bool WriteCfg(string key, string value, string path)
         {
             var ret = false;
             try
