@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
 using System.Reflection;
@@ -10,31 +10,29 @@ namespace CardReading.Core
     {
         public static IReadCard GetCardReader()
         {
-            var type = GetBusinessEntityType(Settings.CardReaderType);
-            if (!(Activator.CreateInstance(type) is IReadCard cardReader)) return null;
-            var paths = Environment.GetEnvironmentVariable("PATH")?.Split(';');
-            var dir = Directory.GetParent(type.Assembly.Location).FullName;
-            var exist = (paths ?? throw new InvalidOperationException()).Any(i =>
-                0 == string.Compare(i, dir, StringComparison.CurrentCultureIgnoreCase));
-            if (!exist)
+            try
             {
-                Environment.SetEnvironmentVariable("PATH",
-                    Environment.GetEnvironmentVariable("PATH") + ";" + dir);
-            }
-            if (SerialPort.GetPortNames().Length == 1)
-            {
-                Settings.CardReaderComPort = SerialPort.GetPortNames()[0];
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(Settings.CardReaderComPort) && SerialPort.GetPortNames().Length > 0)
+                var type = GetBusinessEntityType(Settings.CardReaderType);
+                if (!(Activator.CreateInstance(type) is IReadCard cardReader)) return null;
+                if (SerialPort.GetPortNames().Length == 1)
                 {
                     Settings.CardReaderComPort = SerialPort.GetPortNames()[0];
                 }
+                else
+                {
+                    if (string.IsNullOrEmpty(Settings.CardReaderComPort) && SerialPort.GetPortNames().Length > 0)
+                    {
+                        Settings.CardReaderComPort = SerialPort.GetPortNames()[0];
+                    }
+                }
+                cardReader.Ini();
+                return cardReader;
             }
-            cardReader.ComPort = Settings.CardReaderComPort;
-            cardReader.Ini();
-            return cardReader;
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private static Type GetBusinessEntityType(string typeName)
@@ -49,8 +47,14 @@ namespace CardReading.Core
                     Assembly.LoadFrom(fullPath);
                 }
             }
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.FullName.StartsWith("CardReading")).ToList();
+            var assemblies = new List<Assembly>();
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (a.FullName.StartsWith("CardReading"))
+                {
+                    assemblies.Add(a);
+                }
+            }
             if (assemblies.Count < 2)
             {
                 throw new ArgumentException("没有读卡插件!");

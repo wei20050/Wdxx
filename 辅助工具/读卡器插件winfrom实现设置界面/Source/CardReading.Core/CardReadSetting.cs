@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using System.Windows.Threading;
 
 namespace CardReading.Core
 {
@@ -31,16 +29,14 @@ namespace CardReading.Core
         /// </summary>
         private string _cardReaderType;
 
-        private readonly DispatcherTimer _timer = new DispatcherTimer();
         private void CardReadSetting_Load(object sender, EventArgs e)
         {
             _cardReaderType = Settings.CardReaderType;
             Loads();
             DgvDllInfo.DataSource = _craList;
-            _timer.Tick += TimerCall;
-            _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Start();
+            timer1.Tick += TimerCall;
         }
+
         /// <summary>
         /// 端口刷新定时器
         /// </summary>
@@ -86,10 +82,17 @@ namespace CardReading.Core
             {
                 var fullPath = Path.GetFullPath(file);
                 var assembly = Assembly.LoadFrom(fullPath);
-                var types = assembly.GetTypes().Where(t => typeof(IReadCard).IsAssignableFrom(t)).ToList();
+                var types = new List<Type>();
+                foreach (var t in assembly.GetTypes())
+                {
+                    if (typeof(IReadCard).IsAssignableFrom(t))
+                    {
+                        types.Add(t);
+                    }
+                }
                 foreach (var t in types)
                 {
-                    var attribute = t.GetCustomAttributes(typeof(CardReaderInfoAttribute), false).FirstOrDefault();
+                    var attribute = t.GetCustomAttributes(typeof(CardReaderInfoAttribute), false)[0];
                     if (!(attribute is CardReaderInfoAttribute cardReaderInfoAttribute)) continue;
                     cardReaderInfoAttribute.Type = t;
                     _craList.Add(cardReaderInfoAttribute);

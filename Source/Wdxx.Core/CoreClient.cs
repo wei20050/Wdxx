@@ -66,14 +66,14 @@ namespace Wdxx.Core
         {
             var retXml = SendCore(method, sendData);
             var resultXml = GetResult(retXml);
-            if (string.IsNullOrEmpty(resultXml)) return default(T);
+            if (string.IsNullOrEmpty(resultXml)) return new T();
             var xmlTmp = ObjectToXml(new T());
             var docTmp = new XmlDocument();
             docTmp.LoadXml(xmlTmp);
             var root = docTmp.DocumentElement;
-            if (root == null) return default(T);
+            if (root == null) return new T();
             root.InnerXml = resultXml;
-            return string.IsNullOrEmpty(docTmp.OuterXml) ? default(T) : XmlToObject<T>(docTmp.OuterXml);
+            return string.IsNullOrEmpty(docTmp.OuterXml) ? new T() : XmlToObject<T>(docTmp.OuterXml);
         }
 
         /// <summary>

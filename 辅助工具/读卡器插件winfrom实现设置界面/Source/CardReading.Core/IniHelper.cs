@@ -8,12 +8,20 @@ namespace CardReading.Core
 {
     public static class IniHelper
     {
+
+        static IniHelper()
+        {
+            var exe = Assembly.GetEntryAssembly();
+            var appName = exe == null ? "DefaultCardReading" : exe.GetName().Name;
+            ConfigPath = Path.Combine(Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                appName), "CardReadingConfig.ini");
+        }
+
         /// <summary>
         /// ini文件路径
         /// </summary>
-        private static readonly string ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                                        // ReSharper disable once PossibleNullReferenceException
-                                                        Assembly.GetEntryAssembly().GetName().Name) + "\\CardReadingConfig.ini";
+        private static readonly string ConfigPath ;
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool WritePrivateProfileString(string lpAppName,

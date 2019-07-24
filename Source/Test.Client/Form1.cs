@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Test.Client.Service;
 using Tset.Entity;
-using Wdxx.Core;
 
 namespace Test.Client
 {
@@ -112,44 +111,10 @@ namespace Test.Client
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            GlobalVar.TestService = new CoreClient("http://localhost:6600/QueueService.asmx/");
-            var ret = GlobalVar.TestService.Send<List<queue_call_station>>("GetQueueCallStationList");
-            MessageBox.Show(ret.ToString());
+            //GlobalVar.TestService = new CoreClient("http://localhost:6600/QueueService.asmx/");
+            //var ret = GlobalVar.TestService.Send<List<queue_call_station>>("GetQueueTakeNoList");
+            //MessageBox.Show(ret.ToString());
         }
     }
-
-    /// <summary>
-    /// 叫号站表
-    /// </summary>
-    public class queue_call_station
-    {
-        /// <summary>
-        /// 叫号站id
-        /// </summary>
-        public int? queue_call_station_id { get; set; }
-        /// <summary>
-        /// 叫号站名称
-        /// </summary>
-        public string call_station_name { get; set; }
-        /// <summary>
-        /// 推送方式(0 共享 1 不共享 2全部)
-        /// </summary>
-        public int? push_share { get; set; }
-        /// <summary>
-        /// 取号来源(0 共享 1 不共享 2全部)
-        /// </summary>
-        public int? takeno_share { get; set; }
-        /// <summary>
-        /// 号类型 1 预检 2 登记 3 接种 6 儿保测量室 7 儿保诊疗室
-        /// </summary>
-        public int? takeno_type { get; set; }
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? update_date { get; set; }
-        /// <summary>
-        /// 删除标记0：正常 1：删除
-        /// </summary>
-        public int? del_flag { get; set; }
-    }
+    
 }

@@ -6,9 +6,9 @@
     public interface IReadCard
     {
         /// <summary>
-        ///     Com 端口
+        /// 初始化
         /// </summary>
-        string ComPort { get; set; }
+        void Ini();
 
         /// <summary>
         ///     读社保卡
@@ -21,11 +21,6 @@
         /// </summary>
         /// <returns>身份证信息</returns>
         IdCardInfo ReadIdCardInfo();
-
-        /// <summary>
-        ///     初始化读卡器
-        /// </summary>
-        void Ini();
         
     }
 }

@@ -12,8 +12,29 @@ namespace CardReading.Common
         false)]
     public class CardReadingCommon : IReadCard
     {
-        public string ComPort { get; set; }
-
+        public void Ini()
+        {
+            try
+            {
+                for (var port = 1001; port <= 1016; ++port)
+                {
+                    _iRetUsb = CVR_InitComm(port);
+                    if (_iRetUsb == 1)
+                        break;
+                }
+                if (_iRetUsb == 1) return;
+                for (var port = 1; port <= 4; ++port)
+                {
+                    _iRetCom = CVR_InitComm(port);
+                    if (_iRetCom == 1)
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+        }
         public IdCardInfo ReadIdCardInfo()
         {
             try
@@ -41,30 +62,7 @@ namespace CardReading.Common
 
         #endregion
 
-        public void Ini()
-        {
-            try
-            {
-                for (var port = 1001; port <= 1016; ++port)
-                {
-                    _iRetUsb = CVR_InitComm(port);
-                    if (_iRetUsb == 1)
-                        break;
-                }
-                if (_iRetUsb == 1) return;
-                for (var port = 1; port <= 4; ++port)
-                {
-                    _iRetCom = CVR_InitComm(port);
-                    if (_iRetCom == 1)
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
-        }
-        public IdCardInfo Read()
+        private IdCardInfo Read()
         {
             if (!Monitor.TryEnter(_readingLocker)) return null;
             try

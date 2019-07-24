@@ -7,20 +7,19 @@ using CardReading.Core;
 namespace CardReading.HuaXu
 {
     [CardReaderInfo(
-        "(华旭金卡三合一/华大身份证读卡器)",
-        "华旭三合一读卡器 兼容华大身份证读卡器",
+        "(华旭金卡/华大身份证读卡器)",
+        "华旭金卡读卡器 兼容华大身份证读卡器",
         false)]
     public class CardReadingHuaXu : IReadCard
     {
-        public string ComPort { get; set; }
 
         public void Ini()
         {
             SetDllDirectory(AppDomain.CurrentDomain.BaseDirectory + @"IdCardReader\HuaXu");
-            const string filePath = @"C:\SendRcv.ini";
-            IniHelper.CheckIni("TCPIP", "127.0.0.1", filePath, "Host");
-            IniHelper.CheckIni("TimeOut", "1000", filePath, "System");
-            IniHelper.Write("ComPort", ComPort, filePath, "System");
+            //const string filePath = @"C:\SendRcv.ini";
+            //IniHelper.CheckIni("TCPIP", "127.0.0.1", filePath, "Host");
+            //IniHelper.CheckIni("TimeOut", "1000", filePath, "System");
+            //IniHelper.Write("ComPort", Settings.CardReaderComPort, filePath, "System");
         }
         
         public IdCardInfo ReadIdCardInfo()
@@ -86,7 +85,7 @@ namespace CardReading.HuaXu
         }
         
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern bool SetDllDirectory(string lpPathName);
+        private static extern bool SetDllDirectory(string lpPathName);
         [DllImport(@"SSSE32.dll", CallingConvention = CallingConvention.Winapi)]
         private static extern int ICC_Reader_Open(StringBuilder devName);
         [DllImport(@"SSSE32.dll", CallingConvention = CallingConvention.Winapi)]
