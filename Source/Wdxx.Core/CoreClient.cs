@@ -221,7 +221,7 @@ namespace Wdxx.Core
         /// 获取接收的数据
         /// </summary>
         /// <returns></returns>
-        private string GetResult(string resultXml)
+        private static string GetResult(string resultXml)
         {
             if (string.IsNullOrEmpty(resultXml)) return string.Empty;
             var doc = new XmlDocument();
@@ -233,7 +233,7 @@ namespace Wdxx.Core
             var response = body.ChildNodes[0];
             if (response == null) return string.Empty;
             var result = response.ChildNodes[0];
-            return result == null ? string.Empty : result.InnerXml.Replace(" xmlns=\"http://tempuri.org/\"", string.Empty); ;
+            return result == null ? string.Empty : result.InnerXml.Replace(" xmlns=\"http://tempuri.org/\"", string.Empty);
         }
 
         /// <summary>
