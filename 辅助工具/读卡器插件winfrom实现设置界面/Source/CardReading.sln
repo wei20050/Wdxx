@@ -9,11 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardReading.HuaXu", "CardRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardReading.LiangBiao", "CardReading.LiangBiao\CardReading.LiangBiao.csproj", "{68A7B239-C8F2-4A11-AB00-D09EE70DEE93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardReading.IdCardReaderCommon", "CardReading.Common\CardReading.IdCardReaderCommon.csproj", "{6415546D-AE58-463D-A432-443F02805F03}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardReading.Service", "CardReading.Service\CardReading.Service.csproj", "{B0915683-1361-41AE-8CF9-1F017175B388}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardReading.ServiceHost", "CardReading.ServiceHost\CardReading.ServiceHost.csproj", "{D296D9AE-463E-485B-8169-000A4B19918C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardReading.IdCardReaderCommon", "CardReading.IdCardReaderCommon\CardReading.IdCardReaderCommon.csproj", "{6415546D-AE58-463D-A432-443F02805F03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,6 @@ Global
 		{68A7B239-C8F2-4A11-AB00-D09EE70DEE93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68A7B239-C8F2-4A11-AB00-D09EE70DEE93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68A7B239-C8F2-4A11-AB00-D09EE70DEE93}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6415546D-AE58-463D-A432-443F02805F03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6415546D-AE58-463D-A432-443F02805F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6415546D-AE58-463D-A432-443F02805F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6415546D-AE58-463D-A432-443F02805F03}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0915683-1361-41AE-8CF9-1F017175B388}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0915683-1361-41AE-8CF9-1F017175B388}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0915683-1361-41AE-8CF9-1F017175B388}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,6 +41,10 @@ Global
 		{D296D9AE-463E-485B-8169-000A4B19918C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D296D9AE-463E-485B-8169-000A4B19918C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D296D9AE-463E-485B-8169-000A4B19918C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6415546D-AE58-463D-A432-443F02805F03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6415546D-AE58-463D-A432-443F02805F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6415546D-AE58-463D-A432-443F02805F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6415546D-AE58-463D-A432-443F02805F03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

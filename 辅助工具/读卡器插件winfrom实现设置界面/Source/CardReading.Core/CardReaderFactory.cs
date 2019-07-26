@@ -14,6 +14,24 @@ namespace CardReading.Core
             {
                 var type = GetBusinessEntityType(Settings.CardReaderType);
                 if (!(Activator.CreateInstance(type) is IReadCard cardReader)) return null;
+                var paths = Environment.GetEnvironmentVariable("PATH")?.Split(';');
+                var dir = Directory.GetParent(type.Assembly.Location).FullName;
+                if (paths == null)
+                {
+                    return null;
+                }
+                var exist = false;
+                foreach (var path in paths)
+                {
+                    if (-1 == string.Compare(path, dir, StringComparison.CurrentCultureIgnoreCase)) continue;
+                    exist = true;
+                    break;
+                }
+                if (!exist)
+                {
+                    Environment.SetEnvironmentVariable("PATH",
+                        Environment.GetEnvironmentVariable("PATH") + ";" + dir);
+                }
                 if (SerialPort.GetPortNames().Length == 1)
                 {
                     Settings.CardReaderComPort = SerialPort.GetPortNames()[0];

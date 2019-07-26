@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using CardReading.Core;
 
-namespace CardReading.Common
+namespace CardReading.IdCardReaderCommon
 {
     [CardReaderInfo(
         "通用读卡器",
@@ -187,7 +187,7 @@ namespace CardReading.Common
         [DllImport("termb.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern int GetStartDate(ref byte strTmp, ref int strLen);
 
-        [DllImport("termb.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        [DllImport("IdCardReader\\IdCardReaderCommon\\termb.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern int GetEndDate(ref byte strTmp, ref int strLen);
 
         [DllImport("termb.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]

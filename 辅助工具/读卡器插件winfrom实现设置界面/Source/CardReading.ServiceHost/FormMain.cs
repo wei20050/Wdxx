@@ -34,6 +34,11 @@ namespace CardReading.ServiceHost
         public FormMain()
         {
             Common.IsStart();
+            if (string.IsNullOrEmpty(Settings.CardReaderType))
+            {
+                //默认给华旭金卡读卡器
+                Settings.CardReaderType = "CardReading.IdCardReaderCommon.CardReadingCommon";
+            }
             InitializeComponent();
             //图标显示在托盘区
             notifyIcon1.Visible = true;
