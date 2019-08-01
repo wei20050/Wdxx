@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Wdxx.Database</RootNamespace>
     <AssemblyName>Wdxx.Database</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -44,7 +44,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.OracleClient" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\dll\System.Data.SQLite.dll</HintPath>
@@ -52,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
+    <Compile Include="KeyAttribute.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sql.cs" />

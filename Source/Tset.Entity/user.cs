@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Tset.Entity
+﻿namespace Tset.Entity
 {
     public class user
     {
-        [Key]
+        [Wdxx.Database.Key]
         public int? id { get; set; }
         public string name { get; set; }
     }

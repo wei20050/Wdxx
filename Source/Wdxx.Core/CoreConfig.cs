@@ -25,8 +25,7 @@ namespace Wdxx.Core
         {
             var exe = Assembly.GetEntryAssembly();
             var appName = exe == null ? "DefaultSettings" : exe.GetName().Name;
-            DefaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                appName, "Config.cfg");
+            DefaultPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),appName), "Config.cfg");
         }
 
         /// <summary>

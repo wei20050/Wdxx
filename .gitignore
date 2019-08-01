@@ -5,3 +5,4 @@ logs
 /Source/HttpService/Web.Debug.config
 /Source/HttpService/Web.Release.config
 *.user
+/Source/Test.Service/Properties/PublishProfiles

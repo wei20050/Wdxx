@@ -18,7 +18,7 @@ namespace Wdxx.Core
         /// 默认ini文件路径
         /// </summary>
         private static readonly string DefaultPath;
-            
+
         /// <summary>
         /// ini配置节大小
         /// </summary>
@@ -33,8 +33,7 @@ namespace Wdxx.Core
         {
             var exe = Assembly.GetEntryAssembly();
             var appName = exe == null ? "DefaultSettings" : exe.GetName().Name;
-            DefaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                appName, "Config.ini");
+            DefaultPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), appName), "Config.ini");
         }
 
         #region API函数声明
@@ -110,11 +109,11 @@ namespace Wdxx.Core
         /// <param name="key">配置键</param>
         /// <param name="configPath">配置文件路径</param>
         /// <returns>配置值</returns>
-        public static T Rini<T>(string key, string configPath )
+        public static T Rini<T>(string key, string configPath)
         {
             return Rini<T>(key, configPath, DefaultEndpoint);
         }
-        
+
         /// <summary>
         /// 读取配置
         /// </summary>
@@ -123,7 +122,7 @@ namespace Wdxx.Core
         /// <param name="configPath">配置文件路径</param>
         /// <param name="endpoint">终结点(默认root)</param>
         /// <returns>配置值</returns>
-        public static T Rini<T>(string key, string configPath , string endpoint)
+        public static T Rini<T>(string key, string configPath, string endpoint)
         {
             return CoreConvert.JsonToObj<T>(Rini(key, configPath, endpoint));
         }
@@ -233,7 +232,7 @@ namespace Wdxx.Core
         {
             return WriteIniData(endpoint, key, value, configPath);
         }
-        
+
         #endregion
     }
 }

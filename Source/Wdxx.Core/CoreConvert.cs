@@ -150,7 +150,7 @@ namespace Wdxx.Core
         /// <returns>转换后的对象</returns>
         public static object JsonToObj(string json ,Type t)
         {
-            return string.IsNullOrEmpty(json) ? null : new JavaScriptSerializer().Deserialize(json, t);
+            return string.IsNullOrEmpty(json) ? null : new JavaScriptSerializer().Deserialize<object>(json);
         }
 
         /// <summary>
