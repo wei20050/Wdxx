@@ -34,6 +34,7 @@ namespace CardReading.Service
 
         public FormMain()
         {
+            Common.Administrator();
             Common.IsStart();
             InitializeComponent();
             //图标显示在托盘区

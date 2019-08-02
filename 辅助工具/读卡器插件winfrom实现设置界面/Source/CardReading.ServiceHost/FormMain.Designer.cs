@@ -36,10 +36,10 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.关闭程序ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkBoxEx1 = new CardReading.ServiceHost.CheckBoxEx();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,23 +57,26 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 312);
+            this.label1.Font = new System.Drawing.Font("宋体", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(12, 316);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(102, 28);
+            this.label1.Size = new System.Drawing.Size(110, 21);
             this.label1.TabIndex = 1;
             this.label1.Text = "服务端口:";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(120, 309);
+            this.textBox1.Font = new System.Drawing.Font("宋体", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox1.Location = new System.Drawing.Point(120, 311);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(78, 35);
+            this.textBox1.Size = new System.Drawing.Size(78, 31);
             this.textBox1.TabIndex = 2;
             this.textBox1.Text = "9876";
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // button1
             // 
+            this.button1.Font = new System.Drawing.Font("宋体", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button1.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.button1.Location = new System.Drawing.Point(204, 304);
             this.button1.Name = "button1";
@@ -85,6 +88,7 @@
             // 
             // button2
             // 
+            this.button2.Font = new System.Drawing.Font("宋体", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button2.ForeColor = System.Drawing.Color.DarkOliveGreen;
             this.button2.Location = new System.Drawing.Point(386, 304);
             this.button2.Name = "button2";
@@ -96,6 +100,7 @@
             // 
             // button3
             // 
+            this.button3.Font = new System.Drawing.Font("宋体", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button3.ForeColor = System.Drawing.Color.DarkGreen;
             this.button3.Location = new System.Drawing.Point(526, 304);
             this.button3.Name = "button3";
@@ -104,18 +109,6 @@
             this.button3.Text = "保存配置";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.ForeColor = System.Drawing.Color.Maroon;
-            this.checkBox1.Location = new System.Drawing.Point(644, 311);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(115, 32);
-            this.checkBox1.TabIndex = 6;
-            this.checkBox1.Text = "开机自启";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // notifyIcon1
             // 
@@ -139,12 +132,26 @@
             this.关闭程序ToolStripMenuItem.Text = "关闭程序";
             this.关闭程序ToolStripMenuItem.Click += new System.EventHandler(this.关闭程序ToolStripMenuItem_Click);
             // 
+            // checkBoxEx1
+            // 
+            this.checkBoxEx1.AutoSize = true;
+            this.checkBoxEx1.BaseColor = System.Drawing.Color.Black;
+            this.checkBoxEx1.Font = new System.Drawing.Font("宋体", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.checkBoxEx1.ForeColor = System.Drawing.Color.Maroon;
+            this.checkBoxEx1.Location = new System.Drawing.Point(644, 313);
+            this.checkBoxEx1.Name = "checkBoxEx1";
+            this.checkBoxEx1.Size = new System.Drawing.Size(117, 25);
+            this.checkBoxEx1.TabIndex = 7;
+            this.checkBoxEx1.Text = "开机自启";
+            this.checkBoxEx1.UseVisualStyleBackColor = true;
+            this.checkBoxEx1.CheckedChanged += new System.EventHandler(this.checkBoxEx1_CheckedChanged);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 28F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 361);
-            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.checkBoxEx1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -173,10 +180,10 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 关闭程序ToolStripMenuItem;
+        private CheckBoxEx checkBoxEx1;
     }
 }
 

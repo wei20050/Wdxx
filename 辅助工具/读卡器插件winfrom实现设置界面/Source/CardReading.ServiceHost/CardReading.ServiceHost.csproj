@@ -38,9 +38,7 @@
   <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <ApplicationIcon>fw.ico</ApplicationIcon>
   </PropertyGroup>
@@ -54,7 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CardRead.cs" />
+    <Compile Include="CheckBoxEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Common.cs" />
+    <Compile Include="ControlState.cs" />
     <Compile Include="CoreClientHost.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
@@ -78,7 +80,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="App.config" />
-    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

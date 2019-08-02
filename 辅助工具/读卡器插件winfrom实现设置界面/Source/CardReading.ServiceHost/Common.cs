@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Security.Principal;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -20,9 +21,28 @@ namespace CardReading.ServiceHost
     {
 
         /// <summary>
+        /// 管理员身份运行程序
+        /// 在界面初始化之前调用此方法程序将以管理员权限运行
+        /// ClickOnce发布仅支持WPF应用程序 WinFrom不支持
+        /// </summary>
+        public static void Administrator()
+        {
+            var wi = WindowsIdentity.GetCurrent();
+            var wp = new WindowsPrincipal(wi);
+            if (wp.IsInRole(WindowsBuiltInRole.Administrator)) return;
+            var exePath = AppDomain.CurrentDomain.BaseDirectory + Path.GetFileName(Application.ExecutablePath);
+            Process.Start(new ProcessStartInfo(exePath)
+            {
+                UseShellExecute = true,
+                Verb = "runas"
+            });
+            Environment.Exit(0);
+        }
+
+        /// <summary>
         /// 当前运行的程序集名称
         /// </summary>
-        
+
         private static readonly string AppName = Assembly.GetEntryAssembly().GetName().Name;
 
         #region 系统操作

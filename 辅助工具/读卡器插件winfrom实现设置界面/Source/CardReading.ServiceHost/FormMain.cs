@@ -33,6 +33,7 @@ namespace CardReading.ServiceHost
 
         public FormMain()
         {
+            Common.Administrator();
             Common.IsStart();
             if (string.IsNullOrEmpty(Settings.CardReaderType))
             {
@@ -42,7 +43,7 @@ namespace CardReading.ServiceHost
             InitializeComponent();
             //图标显示在托盘区
             notifyIcon1.Visible = true;
-            checkBox1.Checked = IsAutoStart;
+            checkBoxEx1.Checked = IsAutoStart;
             OnAutoStart();
             //ip组
             var ips = Common.GetLocalIp();
@@ -111,12 +112,6 @@ namespace CardReading.ServiceHost
             Common.Restart();
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            IsAutoStart = checkBox1.Checked;
-            OnAutoStart();
-        }
-
         private void 关闭程序ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             notifyIcon1.Visible = false;
@@ -135,6 +130,12 @@ namespace CardReading.ServiceHost
             {
                 Show();
             }
+        }
+
+        private void checkBoxEx1_CheckedChanged(object sender, EventArgs e)
+        {
+            IsAutoStart = checkBoxEx1.Checked;
+            OnAutoStart();
         }
     }
 }
