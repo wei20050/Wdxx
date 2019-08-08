@@ -2,7 +2,7 @@
 {
     public class user
     {
-        [Wdxx.Database.Key]
+        [System.Data.Objects.DataClasses.EdmScalarProperty(EntityKeyProperty = true, IsNullable = false)]
         public int? id { get; set; }
         public string name { get; set; }
     }

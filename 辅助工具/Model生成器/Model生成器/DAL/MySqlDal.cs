@@ -114,7 +114,7 @@ namespace Model生成器.DAL
                     break;
                 case "datetime":
                     //dataType = column["notnull"] == "1" ? "DateTime" : "DateTime?";
-                    dataType = "DateTime?";
+                    dataType = "System.DateTime?";
                     break;
                 default:
                     throw new Exception("Model生成器未实现数据库字段类型" + column["data_type"] + "的转换");

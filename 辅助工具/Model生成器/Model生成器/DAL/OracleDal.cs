@@ -141,7 +141,7 @@ namespace Model生成器.DAL
                     break;
                 case "DATE":
                     //dataType = column["notnull"] == "1" ? "DateTime" : "DateTime?";
-                    dataType = "DateTime?";
+                    dataType = "System.DateTime?";
                     break;
                 case "CLOB":
                     dataType = "string";

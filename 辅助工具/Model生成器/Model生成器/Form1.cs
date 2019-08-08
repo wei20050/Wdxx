@@ -46,10 +46,10 @@ namespace Model生成器
                         var columnList = dal.GetAllColumns(table["table_name"]);
 
                         #region 原始Model
-                        sb.Append("using System;\r\n");
+                        //sb.Append("using System;\r\n");
                         //sb.Append("using System.Collections.Generic;\r\n");
-                        sb.Append("using System.ComponentModel.DataAnnotations;");
-                        sb.Append("\r\n");
+                        //sb.Append("using System.ComponentModel.DataAnnotations;");
+                        //sb.Append("\r\n");
                         sb.Append("namespace " + strNamespace + "\r\n");
                         sb.Append("{\r\n");
                         sb.Append("    /// <summary>\r\n");
@@ -69,7 +69,7 @@ namespace Model生成器
 
                             if (column["constraint_type"] == "P")
                             {
-                                sb.Append("        [Key]\r\n");
+                                sb.Append("        [System.Data.Objects.DataClasses.EdmScalarProperty(EntityKeyProperty = true, IsNullable = false)]\r\n");
                             }
 
                             //sb.Append("        [IsDBField]\r\n");

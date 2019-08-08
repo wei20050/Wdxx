@@ -711,34 +711,22 @@ namespace Wdxx.Database
         {
             var sql = new Sql();
             var type = obj.GetType();
-            sql.Add(string.Format("select count(*) as c from {0} where ", type.Name));
+            sql.Add(string.Format("select count(*) from {0} where ", type.Name));
             var propertyInfoList = GetEntityProperties(type);
             foreach (var propertyInfo in propertyInfoList)
             {
-                if (propertyInfo.GetCustomAttributes(typeof(KeyAttribute), true).Length < 1) continue;
+                var attrs = (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute), true);
+                if (attrs.Length < 1 || !attrs[0].EntityKeyProperty) continue;
                 var val = propertyInfo.GetValue(obj, null);
                 sql.AddField(propertyInfo.Name).Equal(val).Or();
             }
-            if (!string.IsNullOrEmpty(sql.ToString()))
-            {
-                sql.Add("1=2");
-            }
             var conditions = sql.ToString();
-            var parameters = new DbParameter[sql.ParamDict.Count];
-            var i = 0;
-            foreach (var p in sql.ParamDict)
+            if (!string.IsNullOrEmpty(conditions))
             {
-                //这里为了匹配多个数据库这里补上参数前缀
-                var parmsKey = GetParameterMark() + p.Key;
-                conditions = conditions.Replace(p.Key, parmsKey);
-                parameters[i] = GetDbParameter(_mParameterMark + p.Key, p.Value);
-                i++;
+                conditions = conditions.Substring(0, conditions.Length - 3);
             }
-            var rd = ExecuteReader(conditions, parameters);
-            rd.Read();
-            var ret = rd["c"].ToString() == "0" ? Insert(obj) : Update(obj);
-            rd.Close();
-            rd.Dispose();
+            var rd = GetSingle(conditions);
+            var ret = rd.ToString() == "0" ? Insert(obj) : Update(obj);
             return ret;
         }
 

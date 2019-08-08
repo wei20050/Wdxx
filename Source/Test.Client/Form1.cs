@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Test.Client.Service;
 using Tset.Entity;
+using Wdxx.Core;
 
 namespace Test.Client
 {
@@ -111,9 +112,7 @@ namespace Test.Client
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            //GlobalVar.TestService = new CoreClient("http://localhost:6600/QueueService.asmx/");
-            //var ret = GlobalVar.TestService.Send<List<queue_call_station>>("GetQueueTakeNoList");
-            //MessageBox.Show(ret.ToString());
+            var i = CoreIni.Rini<double>("a");
         }
     }
     
