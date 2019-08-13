@@ -5,7 +5,7 @@
         
         internal new string Substr(string str, int start, int length)
         {
-            return string.Format("SUBSTRING({0},{1},{2}))", str, start, length);
+            return $"SUBSTRING({str},{start},{length}))";
         }
         
         internal new string Now()

@@ -40,7 +40,7 @@ namespace Wdxx.Core
         /// </summary>
         protected virtual void OnFilePath(string filePath)
         {
-            if (FilePathReceived != null) FilePathReceived.Invoke(filePath);
+            FilePathReceived?.Invoke(filePath);
         }
 
         /// <summary>

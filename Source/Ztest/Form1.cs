@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tset.Entity;
 using Wdxx.Core;
@@ -21,7 +20,7 @@ namespace Ztest
             for (var i = 0; i < xcs; i++)
             {
                 var i1 = i;
-                new Task(() =>
+                new Thread(() =>
                 {
                     CoreLog.Info("xc :" + i1 + " Start");
                     var cc = new CoreClient(textBox1.Text);

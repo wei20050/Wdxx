@@ -13,22 +13,26 @@ namespace Test.Client
         {
             InitializeComponent();
         }
+
         //界面初始化
         private void Form1_Load(object sender, EventArgs e)
         {
         }
+
         //无参返回字符串
         private void button1_Click(object sender, EventArgs e)
         {
             var ret = GlobalVar.TestService.Send("Test");
             listBox1.Items.Add(ret);
         }
+
         //无参返回泛型
         private void button2_Click(object sender, EventArgs e)
         {
             var ret = GlobalVar.TestService.Send<DateTime>("GetTime");
             listBox1.Items.Add(ret.ToString("yyyy-MM-dd HH:mm:ss"));
         }
+
         //带参数返回泛型
         private void button3_Click(object sender, EventArgs e)
         {
@@ -39,7 +43,7 @@ namespace Test.Client
         //新增id=1
         private void button8_Click(object sender, EventArgs e)
         {
-            var user = new user { id = 1, name = "李四" };
+            var user = new user {id = 1, name = "李四"};
             var ret = GlobalVar.TestService.Send<int>("Insert", user);
             listBox1.Items.Add(ret);
         }
@@ -47,7 +51,7 @@ namespace Test.Client
         //新增id根据时间来
         private void button4_Click(object sender, EventArgs e)
         {
-            var user = new user { id = Convert.ToInt32(DateTime.Now.ToString("HHmmssfff")), name = "张三" };
+            var user = new user {id = Convert.ToInt32(DateTime.Now.ToString("HHmmssfff")), name = "张三"};
             var ret = GlobalVar.TestService.Send<int>("Insert", user);
             listBox1.Items.Add(ret);
         }
@@ -55,7 +59,7 @@ namespace Test.Client
         //修改
         private void button9_Click(object sender, EventArgs e)
         {
-            var user = new user { id = 1, name = "山大圣诞礼物" };
+            var user = new user {id = 1, name = "山大圣诞礼物"};
             var ret = GlobalVar.TestService.Send<int>("Update", user);
             listBox1.Items.Add(ret);
         }
@@ -100,7 +104,7 @@ namespace Test.Client
             if (ServiceHelp.ServiceIni(textBox1.Text))
             {
                 Text = @"服务已连接!";
-                MessageBox.Show(@"服务连接成功!" );
+                MessageBox.Show(@"服务连接成功!");
             }
             else
             {
@@ -112,8 +116,9 @@ namespace Test.Client
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            var i = CoreIni.Rini<double>("a");
+            var a1 = CoreConvert.ObjToJsonData(DateTime.Now);
+            var a2 = CoreConvert.JsonDataToObj(a1, typeof(DateTime));
+            MessageBox.Show(a2.ToString());
         }
     }
-    
 }

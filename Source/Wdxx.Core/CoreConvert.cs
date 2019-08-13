@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
@@ -12,7 +14,7 @@ namespace Wdxx.Core
     /// </summary>
     public static class CoreConvert
     {
-        
+
         /// <summary>
         /// XML序列化
         /// </summary>
@@ -40,8 +42,9 @@ namespace Wdxx.Core
                     return serializer.Deserialize(sr);
                 }
             }
-            catch
+            catch (Exception e)
             {
+                CoreLog.Error(e);
                 return null;
             }
         }
@@ -49,19 +52,20 @@ namespace Wdxx.Core
         /// <summary>
         /// XML反序列化
         /// </summary>
-        public static T XmlToObj<T>(string xmlStr) where T : class
+        public static T XmlToObj<T>(string xmlStr) where T : new()
         {
             try
             {
                 using (var sr = new StringReader(xmlStr))
                 {
                     var serializer = new XmlSerializer(typeof(T));
-                    return serializer.Deserialize(sr) as T;
+                    return (T)serializer.Deserialize(sr);
                 }
             }
-            catch
+            catch (Exception e)
             {
-                return null;
+                CoreLog.Error(e);
+                return default(T);
             }
         }
 
@@ -143,17 +147,6 @@ namespace Wdxx.Core
         }
 
         /// <summary>
-        /// 将JSON字符串转化为对应类型的对象
-        /// </summary>
-        /// <param name="json">json字符串</param>
-        /// <param name="t"></param>
-        /// <returns>转换后的对象</returns>
-        public static object JsonToObj(string json ,Type t)
-        {
-            return string.IsNullOrEmpty(json) ? null : new JavaScriptSerializer().Deserialize<object>(json);
-        }
-
-        /// <summary>
         /// 将任意类型对象转化为JSON字符串(时间为无时区的时间戳)
         /// </summary>
         /// <param name="obj">要转换的对象</param>
@@ -172,6 +165,57 @@ namespace Wdxx.Core
         {
             var jsonStr = new JavaScriptSerializer().Serialize(obj);
             return JsonTime(jsonStr);
+        }
+
+        /// <summary>
+        /// 将任意类型对象转化为数据JSON字符串
+        /// </summary>
+        /// <param name="obj">要转换的对象</param>
+        /// <returns>json字符串</returns>
+        public static string ObjToJsonData(object obj)
+        {
+            try
+            {
+                var js = new DataContractJsonSerializer(obj.GetType());
+                var msObj = new MemoryStream();
+                //将序列化之后的Json格式数据写入流中
+                js.WriteObject(msObj, obj);
+                msObj.Position = 0;
+                //从0这个位置开始读取流中的数据
+                var sr = new StreamReader(msObj, Encoding.UTF8);
+                var json = sr.ReadToEnd();
+                sr.Close();
+                msObj.Close();
+                return json;
+            }
+            catch (Exception e)
+            {
+                CoreLog.Error(e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 将JSON字符串转化为对应类型的对象
+        /// </summary>
+        /// <param name="json">json字符串</param>
+        /// <param name="type"></param>
+        /// <returns>转换后的对象</returns>
+        public static object JsonDataToObj(string json, Type type)
+        {
+            try
+            {
+                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+                {
+                    var deseralizer = new DataContractJsonSerializer(type);
+                    return deseralizer.ReadObject(ms);
+                }
+            }
+            catch (Exception e)
+            {
+                CoreLog.Error(e);
+                return null;
+            }
         }
 
         /// <summary>

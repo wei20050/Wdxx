@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Web.Services.Description;
+using Microsoft.CSharp;
 
 namespace Wdxx.Core
 {
@@ -22,38 +23,23 @@ namespace Wdxx.Core
         public string ServiceUrl { get; set; }
 
         /// <summary>
-        /// WSDL信息
-        /// </summary>
-        private readonly string _wsdl;
-
-        /// <summary>
-        /// 默认构造函数
-        /// </summary>
-        public CoreClient()
-        {
-        }
-
-        /// <summary>
         /// 带服务地址构造函数
         /// </summary>
         /// <param name="serviceUrl">服务地址</param>
         public CoreClient(string serviceUrl)
         {
             ServiceUrl = serviceUrl.TrimEnd('/');
-            _wsdl = Wsdl();
         }
 
         /// <summary>
-        /// 发送请求(返回字符串类型)
+        /// 发送请求(返回字符串)
         /// </summary>
         /// <param name="method">请求的方法</param>
         /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
         /// <returns></returns>
         public string Send(string method, params object[] sendData)
         {
-            var retXml = SendCore(method, sendData);
-            var resultXml = GetResult(retXml);
-            return string.IsNullOrEmpty(resultXml) ? string.Empty : resultXml;
+            return SendCore(method, sendData);
         }
 
         /// <summary>
@@ -64,16 +50,8 @@ namespace Wdxx.Core
         /// <returns></returns>
         public T Send<T>(string method, params object[] sendData) where T : new()
         {
-            var retXml = SendCore(method, sendData);
-            var resultXml = GetResult(retXml);
-            if (string.IsNullOrEmpty(resultXml)) return new T();
-            var xmlTmp = ObjectToXml(new T());
-            var docTmp = new XmlDocument();
-            docTmp.LoadXml(xmlTmp);
-            var root = docTmp.DocumentElement;
-            if (root == null) return new T();
-            root.InnerXml = resultXml;
-            return string.IsNullOrEmpty(docTmp.OuterXml) ? new T() : XmlToObject<T>(docTmp.OuterXml);
+            var ret = SendCore(method, sendData);
+            return (T)CoreConvert.JsonDataToObj(ret, typeof(T));
         }
 
         /// <summary>
@@ -82,29 +60,28 @@ namespace Wdxx.Core
         /// <param name="method">请求的方法</param>
         /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
         /// <returns></returns>
-        public string SendCore(string method, params object[] sendData)
+        private string SendCore(string method, params object[] sendData)
         {
             try
             {
+                if (!string.IsNullOrEmpty(CoreHttp.Get(ServiceUrl + "?WSDL")))
+                {
+                    var ret = InvokeWebService(ServiceUrl, method, sendData);
+                    return ret == null ? null : CoreConvert.ObjToJsonData(ret);
+                }
                 string result;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(ServiceUrl);
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(ServiceUrl + "/WebSrviceSoap");
                 httpWebRequest.Method = "POST";
-                httpWebRequest.ContentType = "text/xml; charset=utf-8";
+                httpWebRequest.ContentType = "text;charset=UTF-8";
                 //这个在非GET的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
                 httpWebRequest.ServicePoint.Expect100Continue = false;
-                if (sendData != null)
-                {
-                    var xmlData = GetData(method, sendData);
-                    var data = Encoding.UTF8.GetBytes(xmlData);
-                    httpWebRequest.ContentLength = data.Length;
-                    var outStream = httpWebRequest.GetRequestStream();
-                    outStream.Write(data, 0, data.Length);
-                    outStream.Close();
-                }
-                else
-                {
-                    httpWebRequest.ContentLength = 0;
-                }
+                var datas = sendData == null || sendData.Length == 0 ? string.Empty : CoreConvert.ObjToJsonData(sendData.Select(CoreConvert.ObjToJsonData).ToList());
+                var tmpData = new SendData { Method = method, Datas = datas };
+                var data = Encoding.UTF8.GetBytes(CoreConvert.ObjToJsonData(tmpData));
+                httpWebRequest.ContentLength = data.Length;
+                var outStream = httpWebRequest.GetRequestStream();
+                outStream.Write(data, 0, data.Length);
+                outStream.Close();
                 var webResponse = httpWebRequest.GetResponse();
                 var httpWebResponse = (HttpWebResponse)webResponse;
                 var stream = httpWebResponse.GetResponseStream();
@@ -128,211 +105,85 @@ namespace Wdxx.Core
         }
 
         /// <summary>
-        /// 发送请求(POST)
+        /// 调用WebServices
         /// </summary>
-        /// <param name="serviceUrl">请求地址</param>
-        /// <param name="sendData">请求参数</param>
-        /// <returns></returns>
-        public static string HttpSend(string serviceUrl, string sendData)
+        /// <param name="url">WebServices地址</param>
+        /// <param name="method">调用的方法</param>
+        /// <param name="sendData">把webservices里需要的参数按顺序放到这个object[]里</param>
+        public static object InvokeWebService(string url, string method, params object[] sendData)
         {
             try
             {
-                string result;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(serviceUrl);
-                httpWebRequest.Method = "POST";
-                httpWebRequest.ContentType = "text/xml; charset=utf-8";
-                //这个在非GET的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
-                httpWebRequest.ServicePoint.Expect100Continue = false;
-                if (sendData != null)
+                //获取WSDL
+                var wc = new WebClient();
+                var stream = wc.OpenRead(url + "?WSDL");
+                if (stream == null)
                 {
-                    var data = Encoding.UTF8.GetBytes(sendData);
-                    httpWebRequest.ContentLength = data.Length;
-                    var outStream = httpWebRequest.GetRequestStream();
-                    outStream.Write(data, 0, data.Length);
-                    outStream.Close();
+                    return null;
                 }
-                else
+                var sd = ServiceDescription.Read(stream);
+                var classname = sd.Services[0].Name;
+                var sdi = new ServiceDescriptionImporter();
+                sdi.AddServiceDescription(sd, "", "");
+                var cn = new CodeNamespace();
+                //生成客户端代理类代码
+                var ccu = new CodeCompileUnit();
+                ccu.Namespaces.Add(cn);
+                sdi.Import(cn, ccu);
+                var csc = new CSharpCodeProvider();
+                //设定编译参数
+                var cplist = new CompilerParameters
                 {
-                    httpWebRequest.ContentLength = 0;
-                }
-                var webResponse = httpWebRequest.GetResponse();
-                var httpWebResponse = (HttpWebResponse)webResponse;
-                var stream = httpWebResponse.GetResponseStream();
-                if (stream != null)
+                    GenerateExecutable = false,
+                    GenerateInMemory = true
+                };
+                //动态编译后的程序集不生成可执行文件
+                //动态编译后的程序集只存在于内存中，不在硬盘的文件上
+                cplist.ReferencedAssemblies.Add("System.dll");
+                cplist.ReferencedAssemblies.Add("System.XML.dll");
+                cplist.ReferencedAssemblies.Add("System.Web.Services.dll");
+                cplist.ReferencedAssemblies.Add("System.Data.dll");
+                //编译代理类
+                var cr = csc.CompileAssemblyFromDom(cplist, ccu);
+                if (cr.Errors.HasErrors)
                 {
-                    var streamReader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
-                    result = streamReader.ReadToEnd();
-                    streamReader.Close();
-                    stream.Close();
-                }
-                else
-                {
-                    result = string.Empty;
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("HttpErr" + " uri:" + serviceUrl + " httpData:" + sendData + "err:" + ex);
-            }
-        }
-
-        /// <summary>
-        /// 获取发送的数据
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private string GetData(string method, params object[] data)
-        {
-            var ps = GetParams(method);
-            var xmlData = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine +
-                          "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + Environment.NewLine +
-                             "<soap:Body>" + Environment.NewLine +
-                              "<" + method + " xmlns=\"http://tempuri.org/\">" + Environment.NewLine;
-            for (var i = 0; i < data.Length; i++)
-            {
-                var d = ObjectToXml(data[i]);
-                d = d.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n", string.Empty);
-                if (ps != null)
-                {
-                    var docd = new XmlDocument();
-                    docd.LoadXml(d);
-                    var noded = docd.DocumentElement;
-                    if (noded != null)
+                    var sb = new StringBuilder();
+                    foreach (CompilerError ce in cr.Errors)
                     {
-                        var tmp = "<" + ps[i] + ">";
-                        tmp += noded.InnerXml;
-                        tmp += "</" + ps[i] + ">";
-                        d = tmp;
+                        sb.Append(ce);
+                        sb.Append(Environment.NewLine);
                     }
+                    throw new Exception(sb.ToString());
                 }
-                d = d.Replace(" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", string.Empty);
-                d = d.Replace(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", string.Empty);
-                xmlData += d + Environment.NewLine;
+                //生成代理实例，并调用方法
+                var assembly = cr.CompiledAssembly;
+                var t = assembly.GetType(classname, true, true);
+                var obj = Activator.CreateInstance(t);
+                var mi = t.GetMethod(method);
+                //方法不存在直接返回null
+                if (mi == null)
+                {
+                    return null;
+                }
+                //暂存的xml参数组
+                var sendDataXml = sendData.Select(CoreConvert.ObjToJsonData).ToList();
+                //具体的参数数组声明
+                var objArr = new object[sendDataXml.Count];
+                //获取参数组
+                var ps = mi.GetParameters();
+                for (var i = 0; i < ps.Length; i++)
+                {
+                    //根据参数组中的类型反序列化成需要的类型
+                    objArr[i] = CoreConvert.JsonDataToObj(sendDataXml[i], ps[i].ParameterType);
+                }
+                //执行方法
+                return mi.Invoke(obj, objArr);
             }
-            xmlData += "</" + method + ">" + Environment.NewLine +
-                "</soap:Body>" + Environment.NewLine +
-                  "</soap:Envelope>";
-            return xmlData;
-        }
-
-        /// <summary>
-        /// 获取接收的数据
-        /// </summary>
-        /// <returns></returns>
-        private static string GetResult(string resultXml)
-        {
-            if (string.IsNullOrEmpty(resultXml)) return string.Empty;
-            var doc = new XmlDocument();
-            doc.LoadXml(resultXml);
-            var envelope = doc.DocumentElement;
-            if (envelope == null) return string.Empty;
-            var body = envelope.ChildNodes[0];
-            if (body == null) return string.Empty;
-            var response = body.ChildNodes[0];
-            if (response == null) return string.Empty;
-            var result = response.ChildNodes[0];
-            return result == null ? string.Empty : result.InnerXml.Replace(" xmlns=\"http://tempuri.org/\"", string.Empty);
-        }
-
-        /// <summary>
-        /// 获取参数列表
-        /// </summary>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        private List<string> GetParams(string method)
-        {
-            var retList = new List<string>();
-            if (string.IsNullOrEmpty(_wsdl)) return null;
-            var docWsdl = new XmlDocument();
-            docWsdl.LoadXml(_wsdl);
-            var definitions = docWsdl.DocumentElement;
-            if (definitions == null) return null;
-            var types = definitions.ChildNodes[0];
-            var schema = types.ChildNodes[0];
-            //方法节点
-            var methodNode = schema.ChildNodes.Cast<XmlElement>().FirstOrDefault(node => node.GetAttribute("name") == method);
-            if (methodNode == null)
+            catch (Exception e)
             {
+                CoreLog.Error(e);
                 return null;
             }
-            var complexType = methodNode.ChildNodes[0];
-            var sequence = complexType.ChildNodes[0];
-            if (sequence == null)
-            {
-                return null;
-            }
-            retList.AddRange(from XmlElement x in sequence.ChildNodes select x.GetAttribute("name"));
-            return retList;
         }
-
-        /// <summary>
-        /// 获取WSDL信息
-        /// </summary>
-        /// <returns></returns>
-        private string Wsdl()
-        {
-            try
-            {
-                string result;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(ServiceUrl + "?WSDL");
-                httpWebRequest.Method = "GET";
-                httpWebRequest.ContentType = "text/xml; charset=utf-8";
-                var webResponse = httpWebRequest.GetResponse();
-                var httpWebResponse = (HttpWebResponse)webResponse;
-                var stream = httpWebResponse.GetResponseStream();
-                if (stream != null)
-                {
-                    var streamReader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
-                    result = streamReader.ReadToEnd();
-                    streamReader.Close();
-                    stream.Close();
-                }
-                else
-                {
-                    result = string.Empty;
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("HttpErr uri:" + ServiceUrl + "?WSDL err:" + ex);
-            }
-        }
-
-        /// <summary>
-        /// 反序列化
-        /// </summary>
-        private static T XmlToObject<T>(string xml)
-        {
-            try
-            {
-                using (var sr = new StringReader(xml))
-                {
-                    var serializer = new XmlSerializer(typeof(T));
-                    return (T)serializer.Deserialize(sr);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("反序列化失败 err:" + ex);
-            }
-        }
-
-        /// <summary> 
-        /// 序列化
-        /// </summary>
-        private static string ObjectToXml<T>(T obj)
-        {
-            using (var sw = new StringWriter())
-            {
-                var serializer = new XmlSerializer(obj.GetType());
-                serializer.Serialize(sw, obj);
-                sw.Close();
-                return sw.ToString();
-            }
-        }
-
     }
 }

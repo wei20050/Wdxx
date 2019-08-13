@@ -8,7 +8,7 @@
         
         internal string Substr(string str, int start, int length)
         {
-            return string.Format("SUBSTR({0},{1},{2}))", str, start, length);
+            return $"SUBSTR({str},{start},{length}))";
         }
         
         internal string Now()

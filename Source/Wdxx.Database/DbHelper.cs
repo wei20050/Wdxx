@@ -7,7 +7,7 @@ using System.Data.Common;
 using System.Data.Objects.DataClasses;
 using System.Data.OracleClient;
 using System.Data.SqlClient;
-using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -56,7 +56,17 @@ namespace Wdxx.Database
             var pn = cm.ProviderName;
             if (pn.Contains("System.Data.SQLite"))
             {
-                MDbType = DbTypeEnum.Sqlite;
+                var sqlItePath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
+                if (File.Exists(sqlItePath))
+                {
+                    _sqliteAss = Assembly.LoadFrom(sqlItePath);
+                    MDbType = DbTypeEnum.Sqlite;
+                }
+                else
+                {
+                    Error("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
+                    throw new Exception("未能加载：" + sqlItePath + " 请确认此插件是否存在！");
+                }
             }
             else if (pn.Contains("MySql.Data.MySqlClient"))
             {
@@ -116,6 +126,11 @@ namespace Wdxx.Database
         #region 变量
 
         /// <summary>
+        /// Sqlite程序集
+        /// </summary>
+        private readonly Assembly _sqliteAss;
+
+        /// <summary>
         /// 数据库类型
         /// </summary>
         public readonly DbTypeEnum MDbType;
@@ -156,7 +171,8 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    command = new SQLiteCommand();
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand");
+                    command = (DbCommand)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     command = new MySqlCommand();
@@ -186,7 +202,10 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    command = new SQLiteCommand(sql);
+                    var parameters = new object[1];
+                    parameters[0] = sql;
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand", true, BindingFlags.Default, null, parameters, null, null);
+                    command = (DbCommand)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     command = new MySqlCommand(sql);
@@ -202,6 +221,7 @@ namespace Wdxx.Database
                 default:
                     return null;
             }
+            if (command == null) return null;
             command.Connection = conn;
             return command;
         }
@@ -221,7 +241,10 @@ namespace Wdxx.Database
                 switch (MDbType)
                 {
                     case DbTypeEnum.Sqlite:
-                        conn = new SQLiteConnection(_mConnectionString);
+                        var parameters = new object[1];
+                        parameters[0] = _mConnectionString;
+                        var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteConnection", true, BindingFlags.Default, null, parameters, null, null);
+                        conn = (DbConnection)obj;
                         break;
                     case DbTypeEnum.Mysql:
                         conn = new MySqlConnection(_mConnectionString);
@@ -262,7 +285,8 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    dataAdapter = new SQLiteDataAdapter();
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteDataAdapter");
+                    dataAdapter = (DbDataAdapter)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     dataAdapter = new MySqlDataAdapter();
@@ -278,6 +302,7 @@ namespace Wdxx.Database
                 default:
                     return null;
             }
+            if (dataAdapter == null) return null;
             dataAdapter.SelectCommand = cmd;
             return dataAdapter;
         }
@@ -299,7 +324,11 @@ namespace Wdxx.Database
             switch (MDbType)
             {
                 case DbTypeEnum.Sqlite:
-                    dbParameter = new SQLiteParameter(name, vallue);
+                    var parameters = new object[2];
+                    parameters[0] = name;
+                    parameters[1] = vallue;
+                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteParameter", true, BindingFlags.Default, null, parameters, null, null);
+                    dbParameter = (DbParameter)obj;
                     break;
                 case DbTypeEnum.Mysql:
                     dbParameter = new MySqlParameter(name, vallue);
@@ -711,7 +740,7 @@ namespace Wdxx.Database
         {
             var sql = new Sql();
             var type = obj.GetType();
-            sql.Add(string.Format("select count(*) from {0} where ", type.Name));
+            sql.Add($"select count(*) from {type.Name} where ");
             var propertyInfoList = GetEntityProperties(type);
             foreach (var propertyInfo in propertyInfoList)
             {
@@ -757,9 +786,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public int Delete<T>(Sql sql)
         {
-            string conditions;
-            DbParameter[] parameters;
-            GetSqlAndParms(sql, out conditions, out parameters);
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             if (string.IsNullOrEmpty(conditions)) return 0;
             var type = typeof(T);
             var sbSql = new StringBuilder();
@@ -829,7 +856,7 @@ namespace Wdxx.Database
             {
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
-                if (val == null || string.IsNullOrEmpty(val.ToString())) continue;
+                if (string.IsNullOrEmpty(val?.ToString())) continue;
                 sbPros.Append(string.Format(" `{0}`={1}{0},", propertyInfo.Name, _mParameterMark));
                 var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
@@ -879,9 +906,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public T Select<T>(Sql sql) where T : new()
         {
-            string conditions;
-            DbParameter[] parameters;
-            GetSqlAndParms(sql, out conditions, out parameters);
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
@@ -922,9 +947,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public List<T> SelectAll<T>(Sql sql) where T : new()
         {
-            string conditions;
-            DbParameter[] parameters;
-            GetSqlAndParms(sql, out conditions, out parameters);
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);

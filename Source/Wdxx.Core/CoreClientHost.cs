@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace Wdxx.Core
 {
@@ -120,7 +117,7 @@ namespace Wdxx.Core
         public string Open()
         {
             //定义url及端口号，通常设置为配置文件
-            _httpobj.Prefixes.Add(_uri.TrimEnd('/') + '/');
+            _httpobj.Prefixes.Add(_uri);
             //启动监听器
             _httpobj.Start();
             //异步监听客户端请求，当客户端的网络请求到来时会自动执行Result委托
@@ -166,7 +163,7 @@ namespace Wdxx.Core
             //设置响应的编码格式
             context.Response.ContentEncoding = Encoding.UTF8;
             //处理客户端发送的请求并返回处理信息
-            var retData = HandleRequest(request, response);
+            var retData = HandleRequest(request, response) ?? string.Empty;
             //设置客户端返回信息的编码
             var retByteArr = Encoding.UTF8.GetBytes(retData);
             try
@@ -179,7 +176,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                CoreLog.Error("Network anomaly:" + ex);
+                CoreLog.Error("网络异常:" + ex);
             }
         }
 
@@ -193,8 +190,8 @@ namespace Wdxx.Core
         {
             if (request.HttpMethod.ToUpper() != "POST")
             {
-                CoreLog.Error("Only POST calls are supported");
-                return string.Empty;
+                CoreLog.Error("只支持POST提交");
+                return null;
             }
             if (request.InputStream != null)
             {
@@ -218,57 +215,84 @@ namespace Wdxx.Core
                     } while (readLen != 0);
                     //获取得到数据data
                     var data = Encoding.UTF8.GetString(byteList.ToArray(), 0, len);
-                    //判断是否是WebService  SOAP调用
+                    //判断是否是WebService模式调用
                     object[] objArr;
-                    if (data.Contains("<soap:Body>"))
+                    //url路径
+                    var postSegments = request.Url.Segments;
+                    //根据url路径确定方法名
+                    if (postSegments.Length < 2)
                     {
-                        funName = GetFunName(data).ToUpper();
-                        //获取方法名相同的所有方法
-                        var mis = _serviceFunArr.Where(f => f.Name.ToUpper() == funName).ToList();
-                        //获取参数
-                        var dataObj = GetParams(data);
-                        //这里是参数数组
-                        objArr = new object[dataObj.Count];
-                        foreach (var m in mis)
-                        {
-                            var ps = m.GetParameters();
-                            if (ps.Length != dataObj.Count) continue;
-                            //找到参数数量对应的方法
-                            mi = m;
-                            for (var i = 0; i < ps.Length; i++)
-                            {
-                                //拆分参数字符串 获得方法名和值
-                                try
-                                {
-                                    objArr[i] = XmlToObject(dataObj[i], ps[i].ParameterType);
-                                }
-                                catch (Exception e)
-                                {
-                                    CoreLog.Error("参数错误:" + e);
-                                    response.StatusDescription = "404";
-                                    response.StatusCode = 404;
-                                    return string.Empty;
-                                }
-                            }
-                        }
+                        response.StatusDescription = "404";
+                        response.StatusCode = 404;
+                        CoreLog.Error("找不到服务方法");
+                        return null;
                     }
-                    else
+                    funName = postSegments[1].TrimEnd('/');
+                    //判断是否是WebSrviceSoap模式调用
+                    if (funName == "WebSrviceSoap")
                     {
-                        //url路径
-                        var postSegments = request.Url.Segments;
-                        //根据url路径确定方法名
-                        if (postSegments.Length < 2)
+                        if (string.IsNullOrEmpty(data))
                         {
-                            return "Service method not found";
+                            response.StatusDescription = "404";
+                            response.StatusCode = 404;
+                            CoreLog.Error("找不到服务方法");
+                            return null;
                         }
-                        funName = postSegments[1].TrimEnd('/').ToUpper();
+                        var sendDatas = (SendData)CoreConvert.JsonDataToObj(data, typeof(SendData));
                         //获取方法名相同的所有方法
-                        var mis = _serviceFunArr.Where(f => f.Name.ToUpper() == funName).ToList();
+                        var mis = _serviceFunArr.Where(f =>
+                        string.Equals(f.Name, sendDatas.Method, StringComparison.CurrentCultureIgnoreCase)).ToList();
                         if (mis.Count == 0)
                         {
                             response.StatusDescription = "404";
                             response.StatusCode = 404;
-                            return "Service method not found";
+                            CoreLog.Error("找不到服务方法");
+                            return null;
+                        }
+                        //获取参数
+                        var dataList = (List<string>)CoreConvert.JsonDataToObj(sendDatas.Datas, typeof(List<string>));
+                        //这里为空则没有参数
+                        if (dataList == null)
+                        {
+                            foreach (var m in mis)
+                            {
+                                var ps = m.GetParameters();
+                                if (ps.Length != 0) continue;
+                                //找到没有参数的方法
+                                mi = m;
+                                break;
+                            }
+                            //参数默认值null
+                            objArr = null;
+                        }
+                        else
+                        {
+                            //这里是参数数组
+                            objArr = new object[dataList.Count];
+                            foreach (var m in mis)
+                            {
+                                var ps = m.GetParameters();
+                                if (ps.Length != dataList.Count) continue;
+                                //找到参数数量对应的方法
+                                mi = m;
+                                for (var i = 0; i < ps.Length; i++)
+                                {
+                                    objArr[i] = CoreConvert.JsonDataToObj(dataList[i], ps[i].ParameterType);
+                                }
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        //获取方法名相同的所有方法
+                        var mis = _serviceFunArr.Where(f => string.Equals(f.Name, funName, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                        if (mis.Count == 0)
+                        {
+                            response.StatusDescription = "404";
+                            response.StatusCode = 404;
+                            CoreLog.Error("找不到服务方法");
+                            return null;
                         }
                         //这里为空则没有参数
                         if (string.IsNullOrEmpty(data))
@@ -313,7 +337,7 @@ namespace Wdxx.Core
                                             CoreLog.Error("参数错误:" + e);
                                             response.StatusDescription = "404";
                                             response.StatusCode = 404;
-                                            return string.Empty;
+                                            return null;
                                         }
                                     }
                                 }
@@ -326,14 +350,14 @@ namespace Wdxx.Core
                 {
                     response.StatusDescription = "404";
                     response.StatusCode = 404;
-                    //把服务端错误信息直接返回可能会导致信息不安全，此处仅供参考
-                    CoreLog.Error(string.Format("接收数据时发生错误 Url:{0} Method:{1} err:{2}", request.Url, funName, ex));
-                    return " Err: data cannot be parsed";
+                    CoreLog.Error($"接收数据时发生错误 Url:{request.Url} Method:{funName} err:{ex}");
+                    return null;
                 }
             }
             response.StatusDescription = "404";
             response.StatusCode = 404;
-            return " Err: does not allow empty submission";
+            CoreLog.Error("不允许空提交");
+            return null;
         }
 
         /// <summary>
@@ -342,112 +366,37 @@ namespace Wdxx.Core
         /// <param name="mi">方法</param>
         /// <param name="pos">参数</param>
         /// <returns></returns>
-        private string Fun(MethodInfo mi, object[] pos)
+        private string Fun(MethodBase mi, object[] pos)
         {
             try
             {
                 //创建实例
                 var o = Activator.CreateInstance(_serviceClass);
                 //调用方法
-                if (mi != null) return XmlData(mi.Name, mi.Invoke(o, pos));
-                CoreLog.Error("Number mismatch of parameters"); 
-                return string.Empty;
+                if (mi != null) return CoreConvert.ObjToJsonData(mi.Invoke(o, pos));
+                CoreLog.Error("方法不能为空");
+                return null;
             }
             catch (Exception ex)
             {
-                CoreLog.Error(ex);
+                CoreLog.Error("方法:" + mi?.Name + "执行错误:" + ex);
                 throw new Exception(ex.Message);
             }
         }
+    }
 
+    /// <summary>
+    /// 离线webservice传输数据类
+    /// </summary>
+    public class SendData
+    {
         /// <summary>
-        /// 获取XML参数列表
+        /// 方法名
         /// </summary>
-        /// <param name="xml"></param>
-        /// <returns></returns>
-        private static List<string> GetParams(string xml)
-        {
-            var retList = new List<string>();
-            if (string.IsNullOrEmpty(xml)) return null;
-            var doc = new XmlDocument();
-            doc.LoadXml(xml);
-            var definitions = doc.DocumentElement;
-            if (definitions == null)return null;
-            var types = definitions.ChildNodes[0];
-            var schema = types.ChildNodes[0];
-            retList.AddRange(from XmlElement node in schema.ChildNodes select node.OuterXml.Replace(" xmlns=\"http://tempuri.org/\"", string.Empty));
-            return retList;
-        }
-
+        public string Method;
         /// <summary>
-        /// 获取XML方法名
+        /// 参数数据组
         /// </summary>
-        /// <param name="xml"></param>
-        /// <returns></returns>
-        private static string GetFunName(string xml)
-        {
-            if (string.IsNullOrEmpty(xml)) return null;
-            var doc = new XmlDocument();
-            doc.LoadXml(xml);
-            var definitions = doc.DocumentElement;
-            if (definitions == null) return null;
-            var types = definitions.ChildNodes[0];
-            var schema = types.ChildNodes[0];
-            return schema.Name;
-        }
-
-        /// <summary>
-        /// 数据包装
-        /// </summary>
-        /// <returns></returns>
-        private static string XmlData(string funName, object data)
-        {
-            var retStr = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                            "<soap:Envelope xmlns:soap =\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-                            "<soap:Body>" +
-                            "<" + funName + "Response xmlns =\"http://tempuri.org/\">";
-            if (data != null)
-            {
-                using (var sw = new StringWriter())
-                {
-                    var serializer = new XmlSerializer(data.GetType());
-                    serializer.Serialize(sw, data);
-                    sw.Close();
-                    var dataXml = sw.ToString();
-                    var doc = new XmlDocument();
-                    doc.LoadXml(dataXml);
-                    var root = doc.DocumentElement;
-                    if (root != null)
-                    {
-                        dataXml = dataXml.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n", string.Empty);
-                        dataXml = dataXml.Replace(root.Name, funName + "Result");
-                        retStr += dataXml;
-                    }
-                }
-            }
-            retStr += "</" + funName + "Response> " +
-                            "</soap:Body>" +
-                            "</soap:Envelope> ";
-            return retStr;
-        }
-
-        /// <summary>
-        /// XML反序列化
-        /// </summary>
-        private static object XmlToObject(string xml, Type t)
-        {
-            try
-            {
-                using (var sr = new StringReader(xml))
-                {
-                    var serializer = new XmlSerializer(t);
-                    return serializer.Deserialize(sr);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("反序列化失败 err:" + ex);
-            }
-        }
+        public string Datas;
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace Tset.Entity
+﻿// ReSharper disable InconsistentNaming
+namespace Tset.Entity
 {
     public class user
     {

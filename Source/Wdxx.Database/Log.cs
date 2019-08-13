@@ -105,14 +105,6 @@ namespace Wdxx.Database
         #region 进程与线程保证同步
 
         /// <summary>
-        /// 多线程与多进程间同步操作文件 默认不是递归
-        /// </summary>
-        private static void MutexExec(string filePath, Action action)
-        {
-            MutexExec(filePath, action, false);
-        }
-
-        /// <summary>
         /// 多线程与多进程间同步操作文件
         /// </summary>
         /// <param name="filePath">文件路径
@@ -122,12 +114,12 @@ namespace Wdxx.Database
         /// 如果创建已命名 mutex 时不指定前缀，则它将采用前缀“Local\”。)</param>
         /// <param name="action">同步处理操作</param>
         /// <param name="recursive">指示当前调用是否为递归处理，递归处理时检测到异常则抛出异常，避免进入无限递归</param>
-        private static void MutexExec(string filePath, Action action, bool recursive)
+        private static void MutexExec(string filePath, Action action, bool recursive = false)
         {
             //生成文件对应的同步键，可自定义格式（互斥体名称对特殊字符支持不友好，遂转换为BASE64格式字符串）
-            var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes(string.Format(@"FILE\{0}", filePath)));
+            var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes($@"FILE\{filePath}"));
             //转换为操作系统级的同步键
-            var mutexKey = string.Format(@"Global\{0}", fileKey);
+            var mutexKey = $@"Global\{fileKey}";
             //声明一个已命名的互斥体，实现进程间同步；该命名互斥体不存在则自动创建，已存在则直接获取
             //initiallyOwned: false：默认当前线程并不拥有已存在互斥体的所属权，即默认本线程并非为首次创建该命名互斥体的线程
             //注意：并发声明同名的命名互斥体时，若间隔时间过短，则可能同时声明了多个名称相同的互斥体，并且同名的多个互斥体之间并不同步，高并发用户请另行处理

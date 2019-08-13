@@ -49,12 +49,12 @@ namespace Wdxx.Database
         /// <summary>
         /// 返回当前对象所有产品参数,key:参数数名(包含@),value:参数值
         /// </summary>
-        public Dictionary<string, object> ParamDict { get; private set; }
+        public Dictionary<string, object> ParamDict { get; }
 
         /// <summary>
         /// 返回当前生成Sql文本
         /// </summary>
-        private StringBuilder SqlText { get; set; }
+        private StringBuilder SqlText { get; }
 
         #endregion
 

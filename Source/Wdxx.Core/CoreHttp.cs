@@ -298,15 +298,16 @@ namespace Wdxx.Core
         /// <param name="httpUri">请求地址</param>
         /// <param name="method">请求的方法</param>
         /// <param name="httpData">请求参数 例:{"value": "HttpSend"} C#格式(@"{""value"":""HttpSend""}")</param>
+        /// <param name="contentType">连接类型</param>
         /// <returns></returns>
-        private static string HttpSend(string httpUri, string method, string httpData)
+        private static string HttpSend(string httpUri, string method, string httpData,string contentType = "application/json")
         {
             try
             {
                 string result;
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
                 httpWebRequest.Method = method;
-                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.ContentType = contentType;
                 if (method != "GET")
                 {
                     //这个在非GET的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
