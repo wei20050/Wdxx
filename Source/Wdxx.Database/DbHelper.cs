@@ -419,7 +419,7 @@ namespace Wdxx.Database
         }
 
         #endregion
-        
+
         #region 执行sql 返回是否成功
 
         /// <summary>
@@ -673,7 +673,7 @@ namespace Wdxx.Database
         /// </summary>
         /// <param name="obj">要添加的实体对象</param>
         /// <returns>返回影响的行数 成功为1 失败为0</returns>
-        public int Insert(object obj)
+        public bool Insert(object obj)
         {
             var strSql = new StringBuilder();
             var type = obj.GetType();
@@ -703,7 +703,7 @@ namespace Wdxx.Database
                 var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
             }
-            return ExecuteSql(strSql.ToString(), parameters);
+            return ExecuteSql(strSql.ToString(), parameters) > 0;
         }
 
         /// <summary>
@@ -711,7 +711,7 @@ namespace Wdxx.Database
         /// </summary>
         /// <param name="objList">要批量添加的实体集合</param>
         /// <returns>返回影响的行数 成功为1 失败为0</returns>
-        public bool Inserts(List<object> objList)
+        public bool Inserts<T>(List<T> objList) where T : new()
         {
             try
             {
@@ -736,27 +736,21 @@ namespace Wdxx.Database
         /// </summary>
         /// <param name="obj">要添加的实体对象</param>
         /// <returns>返回影响的行数 成功为1 失败为0</returns>
-        public int InsertOrUpdate(object obj)
+        public bool InsertOrUpdate(object obj)
         {
-            var sql = new Sql();
             var type = obj.GetType();
-            sql.Add($"select count(*) from {type.Name} where ");
+            var sql = $"select count(*) from {type.Name} where ";
             var propertyInfoList = GetEntityProperties(type);
             foreach (var propertyInfo in propertyInfoList)
             {
                 var attrs = (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute), true);
                 if (attrs.Length < 1 || !attrs[0].EntityKeyProperty) continue;
                 var val = propertyInfo.GetValue(obj, null);
-                sql.AddField(propertyInfo.Name).Equal(val).Or();
+                sql += $"`{propertyInfo.Name}`={val} OR ";
             }
-            var conditions = sql.ToString();
-            if (!string.IsNullOrEmpty(conditions))
-            {
-                conditions = conditions.Substring(0, conditions.Length - 3);
-            }
-            var rd = GetSingle(conditions);
-            var ret = rd.ToString() == "0" ? Insert(obj) : Update(obj);
-            return ret;
+            sql = sql.Substring(0, sql.Length - 3);
+            var rd = GetSingle(sql);
+            return rd.ToString() == "0" ? Insert(obj) : Update(obj);
         }
 
         #endregion
@@ -769,7 +763,7 @@ namespace Wdxx.Database
         /// <typeparam name="T">要删除的实体类型</typeparam>
         /// <param name="conditions">删除条件(从where后面开始组装)</param>
         /// <returns></returns>
-        public int Delete<T>(string conditions)
+        public bool Delete<T>(string conditions)
         {
             var st = new Sql();
             st.Add(conditions);
@@ -784,15 +778,15 @@ namespace Wdxx.Database
         /// <typeparam name="T">要删除的实体类型</typeparam>
         /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
-        public int Delete<T>(Sql sql)
+        public bool Delete<T>(Sql sql)
         {
             GetSqlAndParms(sql, out var conditions, out var parameters);
-            if (string.IsNullOrEmpty(conditions)) return 0;
+            if (string.IsNullOrEmpty(conditions)) return false;
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
             sbSql.AppendFormat("delete from {0} where {1}", type.Name, conditions);
-            return ExecuteSql(sbSql.ToString(), parameters);
+            return ExecuteSql(sbSql.ToString(), parameters) > 0;
         }
 
         #endregion
@@ -804,11 +798,11 @@ namespace Wdxx.Database
         /// </summary>
         /// <param name="obj">要修改的实体</param>
         /// <returns></returns>
-        public int Update(object obj)
+        public bool Update(object obj)
         {
             var type = obj.GetType();
             var propertyInfoList = GetEntityProperties(type);
-            if (propertyInfoList.Length == 0) return 0;
+            if (propertyInfoList.Length == 0) return false;
             var pk = propertyInfoList[0];
             var conditions = pk.Name + "='" + pk.GetValue(obj, null) + "'";
             return Update(obj, conditions);
@@ -820,7 +814,7 @@ namespace Wdxx.Database
         /// <param name="obj">要修改的实体</param>
         /// <param name="conditions">修改的条件(从where后面开始组装)</param>
         /// <returns></returns>
-        public int Update(object obj, string conditions)
+        public bool Update(object obj, string conditions)
         {
             var st = new Sql();
             st.Add(conditions);
@@ -835,7 +829,7 @@ namespace Wdxx.Database
         /// <param name="obj">要修改的实体</param>
         /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
-        public int Update(object obj, Sql sql)
+        public bool Update(object obj, Sql sql)
         {
             var strSql = new StringBuilder();
             var type = obj.GetType();
@@ -878,7 +872,7 @@ namespace Wdxx.Database
             //拼接上where语句
             strSql.AppendFormat(" where {0}", conditions);
             //执行
-            return savedCount > 0 ? ExecuteSql(strSql.ToString(), parameters) : 0;
+            return savedCount > 0 && ExecuteSql(strSql.ToString(), parameters) > 0;
         }
 
         #endregion
@@ -1451,29 +1445,29 @@ namespace Wdxx.Database
                 switch (p.DbType)
                 {
                     case DbType.AnsiString:
-                        
+
                     case DbType.Binary:
-                        
+
                     case DbType.Date:
-                        
+
                     case DbType.DateTime:
-                        
+
                     case DbType.Guid:
-                        
+
                     case DbType.Object:
-                        
+
                     case DbType.String:
-                        
+
                     case DbType.Time:
-                        
+
                     case DbType.AnsiStringFixedLength:
-                        
+
                     case DbType.StringFixedLength:
-                        
+
                     case DbType.Xml:
-                        
+
                     case DbType.DateTime2:
-                        
+
                     case DbType.DateTimeOffset:
                         sqlStr = sqlStr.Replace(p.ParameterName, "'" + p.Value + "'");
                         break;

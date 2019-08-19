@@ -9,19 +9,19 @@ namespace Test.Service
     {
 
         [WebMethod]
-        public int Insert(user u)
+        public bool Insert(user u)
         {
             return _db.Insert(u);
         }
 
         [WebMethod]
-        public int Delete(int id)
+        public bool Delete(int id)
         {
             return _db.Delete<user>(new Sql().AddField("id").Equal(id));
         }
 
         [WebMethod]
-        public int Update(user u)
+        public bool Update(user u)
         {
             return _db.Update(u);
         }
