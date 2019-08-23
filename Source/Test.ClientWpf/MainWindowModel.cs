@@ -13,7 +13,7 @@ namespace Test.ClientWpf
         public string LabTxt { get; set; }
         public ICommand BtnClick => new DelegateCommand(o =>
         {
-            LabTxt = "修改后的  显示!";
+            LabTxt = "修改后的显示!";
             OnPropertyChanged(nameof(LabTxt));
             MessageBox.Show("command调用成功!");
         });
