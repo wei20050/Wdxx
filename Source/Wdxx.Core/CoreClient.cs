@@ -97,7 +97,8 @@ namespace Wdxx.Core
         /// <returns></returns>
         public string Send(string method, params object[] sendData)
         {
-            return SendCore(method, sendData);
+            var ret = SendCore(method, sendData);
+            return (string)CoreConvert.JsonDataToObj(ret, typeof(string));
         }
 
         /// <summary>

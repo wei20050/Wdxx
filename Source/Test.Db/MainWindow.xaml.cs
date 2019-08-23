@@ -11,7 +11,7 @@ namespace Test.Db
             InitializeComponent();
         }
 
-        Wdxx.Database.DbHelper _db = new Wdxx.Database.DbHelper();
+        private readonly Wdxx.Database.DbHelper _db = new Wdxx.Database.DbHelper();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var ret = _db.Inserts(new List<user> { new user { id = 1, name = "zhenh" }, new user { id = 2, name = "dafff" } });

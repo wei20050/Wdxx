@@ -116,9 +116,20 @@ namespace Test.Client
         //测试
         private void button7_Click(object sender, EventArgs e)
         {
-            var a1 = CoreConvert.ObjToJsonData(DateTime.Now);
-            var a2 = CoreConvert.JsonDataToObj(a1, typeof(DateTime));
-            MessageBox.Show(a2.ToString());
+            var responseXml = "<PARAS><HM>E001</HM><YWFLBZ>110</YWFLBZ><XM>廖果果</XM><XB>2</XB><CSRQ>2018-9-26</CSRQ><LXDH></LXDH><SFZH></SFZH><KLX>2</KLX><SBKH>31010120181213001</SBKH><QHRQ>2018-12-13</QHRQ><SFCX>0</SFCX><BRLB>0</BRLB><DQLX>1</DQLX><GX>0</GX><JZZH></JZZH><TZSH></TZSH><TZSYXQ></TZSYXQ><GXRXM></GXRXM><GXRNL></GXRNL><GXRSFZH></GXRSFZH></PARAS>";
+            var response =new CoreClient("http://10.240.21.3:3104/queue/QueueService.asmx");
+            var ret = response.Send("Mzjh_His_InsertQueue", responseXml);
         }
+    }
+    public class ResponseXml
+    {
+        public int ResponseCode;
+        public string ResponseMsg;
+        public RegisterResultXml ResultXml;
+    }
+    public class RegisterResultXml
+    {
+        public int RegisterId;
+        public string RegisterName;
     }
 }
