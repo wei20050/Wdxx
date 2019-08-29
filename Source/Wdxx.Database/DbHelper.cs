@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -12,7 +13,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient;
 
 #pragma warning disable 618
 
@@ -221,7 +221,11 @@ namespace Wdxx.Database
                 default:
                     return null;
             }
-            if (command == null) return null;
+            if (command == null)
+            {
+                return null;
+            }
+
             command.Connection = conn;
             return command;
         }
@@ -302,7 +306,11 @@ namespace Wdxx.Database
                 default:
                     return null;
             }
-            if (dataAdapter == null) return null;
+            if (dataAdapter == null)
+            {
+                return null;
+            }
+
             dataAdapter.SelectCommand = cmd;
             return dataAdapter;
         }
@@ -475,7 +483,11 @@ namespace Wdxx.Database
                 {
                     try
                     {
-                        if (conn.State != ConnectionState.Open) conn.Open();
+                        if (conn.State != ConnectionState.Open)
+                        {
+                            conn.Open();
+                        }
+
                         var obj = cmd.ExecuteScalar();
                         if (Equals(obj, null) || Equals(obj, DBNull.Value))
                         {
@@ -532,7 +544,10 @@ namespace Wdxx.Database
                 finally
                 {
                     cmd.Dispose();
-                    if (_mTran == null) conn.Close();
+                    if (_mTran == null)
+                    {
+                        conn.Close();
+                    }
                 }
             }
         }
@@ -622,12 +637,24 @@ namespace Wdxx.Database
         {
             try
             {
-                if (conn.State != ConnectionState.Open) conn.Open();
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+
                 cmd.Connection = conn;
                 cmd.CommandText = cmdText;
-                if (trans != null) cmd.Transaction = trans;
+                if (trans != null)
+                {
+                    cmd.Transaction = trans;
+                }
+
                 cmd.CommandType = CommandType.Text;
-                if (cmdParms == null) return;
+                if (cmdParms == null)
+                {
+                    return;
+                }
+
                 foreach (var parm in cmdParms)
                 {
                     cmd.Parameters.Add(parm);
@@ -699,7 +726,11 @@ namespace Wdxx.Database
             {
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
-                if (val == null) continue;
+                if (val == null)
+                {
+                    continue;
+                }
+
                 var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
             }
@@ -744,7 +775,11 @@ namespace Wdxx.Database
             foreach (var propertyInfo in propertyInfoList)
             {
                 var attrs = (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute), true);
-                if (attrs.Length < 1 || !attrs[0].EntityKeyProperty) continue;
+                if (attrs.Length < 1 || !attrs[0].EntityKeyProperty)
+                {
+                    continue;
+                }
+
                 var val = propertyInfo.GetValue(obj, null);
                 sql += $"`{propertyInfo.Name}`={val} OR ";
             }
@@ -781,7 +816,11 @@ namespace Wdxx.Database
         public bool Delete<T>(Sql sql)
         {
             GetSqlAndParms(sql, out var conditions, out var parameters);
-            if (string.IsNullOrEmpty(conditions)) return false;
+            if (string.IsNullOrEmpty(conditions))
+            {
+                return false;
+            }
+
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
@@ -802,7 +841,11 @@ namespace Wdxx.Database
         {
             var type = obj.GetType();
             var propertyInfoList = GetEntityProperties(type);
-            if (propertyInfoList.Length == 0) return false;
+            if (propertyInfoList.Length == 0)
+            {
+                return false;
+            }
+
             var pk = propertyInfoList[0];
             var conditions = pk.Name + "='" + pk.GetValue(obj, null) + "'";
             return Update(obj, conditions);
@@ -850,7 +893,11 @@ namespace Wdxx.Database
             {
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
-                if (string.IsNullOrEmpty(val?.ToString())) continue;
+                if (string.IsNullOrEmpty(val?.ToString()))
+                {
+                    continue;
+                }
+
                 sbPros.Append(string.Format(" `{0}`={1}{0},", propertyInfo.Name, _mParameterMark));
                 var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
                 parameters[k++] = param;
@@ -1295,31 +1342,49 @@ namespace Wdxx.Database
         private static object GetReaderValue(object rdValue, Type ptype)
         {
             if (ptype == typeof(double))
+            {
                 return Convert.ToDouble(rdValue);
+            }
 
             if (ptype == typeof(decimal))
+            {
                 return Convert.ToDecimal(rdValue);
+            }
 
             if (ptype == typeof(int))
+            {
                 return Convert.ToInt32(rdValue);
+            }
 
             if (ptype == typeof(long))
+            {
                 return Convert.ToInt64(rdValue);
+            }
 
             if (ptype == typeof(DateTime))
+            {
                 return Convert.ToDateTime(rdValue);
+            }
 
             if (ptype == typeof(double?))
+            {
                 return Convert.ToDouble(rdValue);
+            }
 
             if (ptype == typeof(decimal?))
+            {
                 return Convert.ToDecimal(rdValue);
+            }
 
             if (ptype == typeof(int?))
+            {
                 return Convert.ToInt32(rdValue);
+            }
 
             if (ptype == typeof(long?))
+            {
                 return Convert.ToInt64(rdValue);
+            }
 
             return ptype == typeof(DateTime?) ? Convert.ToDateTime(rdValue) : rdValue;
         }
@@ -1366,9 +1431,17 @@ namespace Wdxx.Database
         /// </summary>
         public void BeginTransaction()
         {
-            if (_sqlLog) Info("开始事务");
+            if (_sqlLog)
+            {
+                Info("开始事务");
+            }
+
             var conn = GetConnection();
-            if (conn.State != ConnectionState.Open) conn.Open();
+            if (conn.State != ConnectionState.Open)
+            {
+                conn.Open();
+            }
+
             _mTran = conn.BeginTransaction();
         }
 
@@ -1382,8 +1455,16 @@ namespace Wdxx.Database
         public void CommitTransaction()
         {
             //防止重复提交
-            if (_mTran == null) return;
-            if (_sqlLog) Info("提交事务");
+            if (_mTran == null)
+            {
+                return;
+            }
+
+            if (_sqlLog)
+            {
+                Info("提交事务");
+            }
+
             var conn = _mTran.Connection;
             try
             {
@@ -1396,7 +1477,11 @@ namespace Wdxx.Database
             }
             finally
             {
-                if (conn.State == ConnectionState.Open) conn.Close();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+
                 _mTran.Dispose();
                 _mTran = null;
             }
@@ -1412,8 +1497,16 @@ namespace Wdxx.Database
         public void RollbackTransaction()
         {
             //防止重复回滚
-            if (_mTran == null) return;
-            if (_sqlLog) Info("回滚事务");
+            if (_mTran == null)
+            {
+                return;
+            }
+
+            if (_sqlLog)
+            {
+                Info("回滚事务");
+            }
+
             var conn = _mTran.Connection;
             try
             {
@@ -1423,7 +1516,10 @@ namespace Wdxx.Database
             {
                 Error("回滚事务:" + ex);
             }
-            if (conn.State == ConnectionState.Open) conn.Close();
+            if (conn.State == ConnectionState.Open)
+            {
+                conn.Close();
+            }
         }
 
         #endregion
@@ -1484,7 +1580,11 @@ namespace Wdxx.Database
         /// </summary>
         private static void LogInfo(string sqlString, params DbParameter[] cmdParms)
         {
-            if (!_sqlLog) return;
+            if (!_sqlLog)
+            {
+                return;
+            }
+
             Info("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value)));
             Info("调试查询:" + GetSql(sqlString, cmdParms));
         }

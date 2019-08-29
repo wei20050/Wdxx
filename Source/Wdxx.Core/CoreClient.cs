@@ -98,6 +98,10 @@ namespace Wdxx.Core
         public string Send(string method, params object[] sendData)
         {
             var ret = SendCore(method, sendData);
+            if (string.IsNullOrEmpty(ret))
+            {
+                return string.Empty;
+            }
             return (string)CoreConvert.JsonDataToObj(ret, typeof(string));
         }
 
@@ -127,7 +131,7 @@ namespace Wdxx.Core
                 if (_type != null)
                 {
                     var ret = Fun(method, sendData);
-                    return ret == null ? null : CoreConvert.ObjToJsonData(ret);
+                    return ret == null ? string.Empty : CoreConvert.ObjToJsonData(ret);
                 }
                 string result;
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(ServiceUrl + "/WebSrviceSoap");
