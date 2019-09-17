@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Model生成器.DBUtil;
@@ -33,17 +34,26 @@ namespace Model生成器.DAL
         {
             var sqliteHelper = new SqLiteHelper();
             var dt = sqliteHelper.Query("PRAGMA table_info('" + tableName + "')");
-            return (from DataRow dr in dt.Rows
-                select new Dictionary<string, string>
+            var result = new List<Dictionary<string, string>>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                var dic = new Dictionary<string, string>
                 {
                     {"columns_name", dr["name"].ToString()},
-                    {"notnull", dr["notnull"].ToString() == "1" ? "1" : "0"},
-                    {"comments", ""},
-                    {"data_type", "string"},
-                    {"data_scale", ""},
-                    {"data_precision", ""},
-                    {"constraint_type", dr["pk"].ToString() == "1" ? "P" : ""}
-                }).ToList();
+                    {"notnull", dr["notnull"].ToString() == "NO" ? "1" : "0"},
+                    {"comments", ""}
+                };
+                var dataType = dr["type"].ToString();
+                var pos = dataType.IndexOf("(", StringComparison.Ordinal);
+                if (pos != -1) dataType = dataType.Substring(0, pos);
+                dic.Add("data_type", dataType);
+                dic.Add("data_scale", "");
+                dic.Add("data_precision", "");
+
+                dic.Add("constraint_type", dr["pk"].ToString() != "0" ? "P" : "");
+                result.Add(dic);
+            }
+            return result;
         }
         #endregion
 
@@ -54,7 +64,48 @@ namespace Model生成器.DAL
         /// </summary>
         public string ConvertDataType(Dictionary<string, string> column)
         {
-            return "string";
+            string dataType;
+            switch (column["data_type"])
+            {
+                case "TEXT":
+                    //dataType = column["notnull"] == "1" ? "int" : "int?";
+                    dataType = "string";
+                    break;
+                case "INTEGER":
+                    //dataType = column["notnull"] == "1" ? "int" : "int?";
+                    dataType = "int?";
+                    break;
+                case "bigint":
+                    //dataType = column["notnull"] == "1" ? "long" : "long?";
+                    dataType = "long?";
+                    break;
+                case "decimal":
+                    //dataType = column["notnull"] == "1" ? "decimal" : "decimal?";
+                    dataType = "decimal?";
+                    break;
+                case "nvarchar":
+                    dataType = "string";
+                    break;
+                case "varchar":
+                    dataType = "string";
+                    break;
+                case "text":
+                    dataType = "string";
+                    break;
+                case "ntext":
+                    dataType = "string";
+                    break;
+                case "date":
+                    dataType = "System.DateTime?";
+                    break;
+                case "datetime":
+                    //dataType = column["notnull"] == "1" ? "DateTime" : "DateTime?";
+                    dataType = "System.DateTime?";
+                    break;
+                default:
+                    throw new Exception("Model生成器未实现数据库字段类型" + column["data_type"] + "的转换");
+            }
+            return dataType;
         }
         #endregion
 

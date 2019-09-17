@@ -24,7 +24,7 @@ namespace Model生成器
                     var cm = ConfigurationManager.ConnectionStrings["DbContext"];
                     var dal = DalFactory.CreateDal(cm.ProviderName);
                     var tableList = dal.GetAllTables();
-                    const string strNamespace = "Entity";
+                    var strNamespace = ConfigurationManager.AppSettings["Namespace"];
 
                     #region 操作控件
                     InvokeDelegate invokeDelegate = delegate
@@ -57,7 +57,7 @@ namespace Model生成器
                         sb.Append("    /// </summary>\r\n");
                         //sb.Append("    [Serializable]\r\n");
                         //sb.Append("    public partial class " + table["table_name"] + "\r\n");
-                        sb.Append("    public class " + table["table_name"] + "\r\n");
+                        sb.Append("    public partial class " + table["table_name"] + "\r\n");
                         sb.Append("    {\r\n");
                         foreach (var column in columnList)
                         {
@@ -128,7 +128,7 @@ namespace Model生成器
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            label1.Text += ConfigurationManager.AppSettings["DBType"];
+            //label1.Text += ConfigurationManager.AppSettings["DBType"];
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using Tset.Entity;
+﻿using System.Windows;
 
 namespace Test.Db
 {
@@ -14,8 +12,27 @@ namespace Test.Db
         private readonly Wdxx.Database.DbHelper _db = new Wdxx.Database.DbHelper();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var ret = _db.Inserts(new List<user> { new user { id = 1, name = "zhenh" }, new user { id = 2, name = "dafff" } });
-            MessageBox.Show(ret.ToString());
+            //var ret = _db.Update( new user { id = 1,name = ""});
+            //MessageBox.Show(ret.ToString());
+            var ret = _db.FindListBySql<data>("select * from user join userage on user.aid = userage.id ");
         }
+
+    }
+    public class data
+    {
+        public user user { get; set; }
+        public userage userage { get; set; }
+    }
+    public class user
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public int aid { get; set; }
+    }
+
+    public class userage
+    {
+        public int id { get; set; }
+        public int age { get; set; }
     }
 }

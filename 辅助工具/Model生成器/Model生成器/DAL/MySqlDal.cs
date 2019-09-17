@@ -110,7 +110,7 @@ namespace Model生成器.DAL
                     dataType = "string";
                     break;
                 case "date":
-                    dataType = "string";
+                    dataType = "System.DateTime?";
                     break;
                 case "datetime":
                     //dataType = column["notnull"] == "1" ? "DateTime" : "DateTime?";
