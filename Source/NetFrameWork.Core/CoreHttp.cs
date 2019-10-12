@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
 
     /// <summary>
@@ -93,7 +93,7 @@ namespace Wdxx.Core
         /// <returns></returns>
         public static string Post(string httpUri, string postData)
         {
-            return HttpSend(httpUri,"POST", postData);
+            return HttpSend(httpUri, "POST", postData);
         }
 
         /// <summary>
@@ -299,14 +299,21 @@ namespace Wdxx.Core
         /// <param name="method">请求的方法</param>
         /// <param name="httpData">请求参数 例:{"value": "HttpSend"} C#格式(@"{""value"":""HttpSend""}")</param>
         /// <param name="contentType">连接类型</param>
+        /// <param name="timeOut">超时时间</param>
+        /// <param name="headers">请求头</param>
         /// <returns></returns>
-        private static string HttpSend(string httpUri, string method, string httpData,string contentType = "application/json")
+        public static string HttpSend(string httpUri, string method, string httpData, string contentType = "application/json", int timeOut = 60, WebHeaderCollection headers = null)
         {
             try
             {
                 string result;
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
+                if (headers != null)
+                {
+                    httpWebRequest.Headers = headers;
+                }
                 httpWebRequest.Method = method;
+                httpWebRequest.Timeout = timeOut;
                 httpWebRequest.ContentType = contentType;
                 if (method != "GET")
                 {

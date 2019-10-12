@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Input;
-namespace Wdxx.Core.Mvvm
+
+namespace NetFrameWork.Core.Mvvm
 {
     /// <summary>
     /// 委托命令

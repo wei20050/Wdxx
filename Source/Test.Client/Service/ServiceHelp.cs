@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using Wdxx.Core;
+using NetFrameWork.Core;
 
 namespace Test.Client.Service
 {
@@ -31,7 +31,7 @@ namespace Test.Client.Service
                 //离线服务开启
                 if (DialogResult.Yes != MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo)) return false;
                 IsOnLine = false;
-                var httpUrl = new CoreClientHost(typeof(Test.Service.Ws)).Open();
+                var httpUrl = new CoreClientHost(typeof(Test.Service.Ws),8897).Open();
                 GlobalVar.TestService = new CoreClient(httpUrl);
                 //设置本地数据库
                 LocalDatabaseHelp.SetDatabase();

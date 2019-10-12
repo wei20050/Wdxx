@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
 
     /// <summary>
@@ -52,12 +52,7 @@ namespace Wdxx.Core
             {
                 var keyArray = Encoding.UTF8.GetBytes(key);
                 var toEncryptArray = Encoding.UTF8.GetBytes(text);
-                var rDel = new RijndaelManaged
-                {
-                    Key = keyArray,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
+                var rDel = new RijndaelManaged {Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7};
                 var cTransform = rDel.CreateEncryptor();
                 var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
                 return BytesToHex(resultArray);
@@ -80,12 +75,7 @@ namespace Wdxx.Core
             {
                 var keyArray = Encoding.UTF8.GetBytes(key);
                 var toEncryptArray = HexToBytes(text);
-                var rDel = new RijndaelManaged
-                {
-                    Key = keyArray,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
+                var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
                 var cTransform = rDel.CreateDecryptor();
                 var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
                 return Encoding.UTF8.GetString(resultArray);

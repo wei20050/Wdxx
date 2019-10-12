@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Wdxx.Database
+namespace NetFrameWork.Database
 {
-    
     /// <summary>
     /// SqlTextHelper类 用于组装参数化查询语句
     /// </summary>
@@ -36,7 +35,7 @@ namespace Wdxx.Database
         #endregion
 
         #region 字段
-        
+
         /// <summary>
         /// 上个参数的位置(默认0)
         /// </summary>
@@ -87,11 +86,38 @@ namespace Wdxx.Database
         #region 查询组装
 
         /// <summary>
-        /// 当前Sql文本增加字符, {0}
+        /// 当前Sql文本增加字符前后不带空格, {0}
         /// </summary>
         public virtual Sql Add(string str)
         {
+            SqlText.Append(str);
+            return this;
+        }
+
+        /// <summary>
+        /// 当前Sql文本增加字符前后带空格, {0}
+        /// </summary>
+        public virtual Sql AddBs(string str)
+        {
             SqlText.AppendFormat(" {0} ", str);
+            return this;
+        }
+
+        /// <summary>
+        /// 当前Sql文本增加表名与*, table.*
+        /// </summary>
+        public virtual Sql AddTf(string table)
+        {
+            SqlText.AppendFormat(" {0}.* ", table);
+            return this;
+        }
+
+        /// <summary>
+        /// 当前Sql文本增加表名与字段, table.field
+        /// </summary>
+        public virtual Sql AddTf(string table, string field)
+        {
+            SqlText.AppendFormat(" {0}.{1} ", table, field);
             return this;
         }
 
@@ -114,7 +140,7 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 增加一个*,等于 "*"
+        /// 增加一个*带前后空格,等于 " * "
         /// </summary>
         public virtual Sql All()
         {
@@ -186,7 +212,16 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 比较符,等于 "="
+        /// 比较符,等于
+        /// </summary>
+        public virtual Sql Equal()
+        {
+            SqlText.AppendFormat(" = ");
+            return this;
+        }
+
+        /// <summary>
+        /// 比较符,等于 链接一个字段
         /// </summary>
         public virtual Sql Equal(object v)
         {
@@ -195,7 +230,16 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 比较符,不等于 "!="
+        /// 比较符,不等于
+        /// </summary>
+        public virtual Sql EqualNot()
+        {
+            SqlText.AppendFormat(" <> ");
+            return this;
+        }
+
+        /// <summary>
+        /// 比较符,不等于 链接一个字段
         /// </summary>
         public virtual Sql EqualNot(object v)
         {
@@ -204,7 +248,16 @@ namespace Wdxx.Database
         }
 
         /// <summary>
-        /// 比较符,大于 ">"
+        /// 比较符,大于
+        /// </summary>
+        public virtual Sql GreaterThan()
+        {
+            SqlText.AppendFormat(" > ");
+            return this;
+        }
+
+        /// <summary>
+        /// 比较符,大于 链接一个字段
         /// </summary>
         public virtual Sql GreaterThan(object v)
         {
@@ -215,6 +268,15 @@ namespace Wdxx.Database
         /// <summary>
         /// 比较符,小于
         /// </summary>
+        public virtual Sql LessThan()
+        {
+            SqlText.AppendFormat(" < ");
+            return this;
+        }
+
+        /// <summary>
+        /// 比较符,小于 链接一个字段
+        /// </summary>
         public virtual Sql LessThan(object v)
         {
             SqlText.AppendFormat(" < {0}", AddParam(v));
@@ -224,6 +286,15 @@ namespace Wdxx.Database
         /// <summary>
         /// 比较符,大于等于
         /// </summary>
+        public virtual Sql GreaterThenEqual()
+        {
+            SqlText.AppendFormat(" >= ");
+            return this;
+        }
+
+        /// <summary>
+        /// 比较符,大于等于 链接一个字段
+        /// </summary>
         public virtual Sql GreaterThenEqual(object v)
         {
             SqlText.AppendFormat(" >= {0}", AddParam(v));
@@ -232,6 +303,15 @@ namespace Wdxx.Database
 
         /// <summary>
         /// 比较符,小于等于
+        /// </summary>
+        public virtual Sql LessThanEqual()
+        {
+            SqlText.AppendFormat(" <= ");
+            return this;
+        }
+
+        /// <summary>
+        /// 比较符,小于等于 链接一个字段
         /// </summary>
         public virtual Sql LessThanEqual(object v)
         {
@@ -382,6 +462,15 @@ namespace Wdxx.Database
             return this;
         }
 
+        /// <summary>
+        /// 增加连接符","
+        /// </summary>
+        public virtual Sql Comma()
+        {
+            SqlText.Append(",");
+            return this;
+        }
+
         #endregion
 
         #region 排序
@@ -407,12 +496,12 @@ namespace Wdxx.Database
         /// <summary>
         /// 多个字段排序 Dictionary 排序字段,是否升序
         /// </summary>
-        public virtual Sql Sort(Dictionary<string,bool> strDic)
+        public virtual Sql Sort(Dictionary<string, bool> strDic)
         {
             var str = new StringBuilder();
             foreach (var v in strDic)
             {
-                var sort= v.Value ? " ASC" :" DESC";
+                var sort = v.Value ? " ASC" : " DESC";
                 str.AppendFormat("`{0}` {1},", v.Key, sort);
             }
             str.Remove(str.Length - 1, 1);

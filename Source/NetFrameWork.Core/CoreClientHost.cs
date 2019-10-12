@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
 
     /// <summary>
@@ -39,7 +39,7 @@ namespace Wdxx.Core
         /// <summary>
         /// http协议侦听
         /// </summary>
-        private static HttpListener _httpobj;
+        private static HttpListener _httpObj;
 
         /// <inheritdoc />
         /// <summary>
@@ -66,22 +66,26 @@ namespace Wdxx.Core
         {
             _serviceClass = serviceClass;
             _serviceFunArr = _serviceClass.GetMethods();
+            if (!IsPortAvailable(port))
+            {
+                port = GetPort();
+            }
             _uri = "http://" + ip + ":" + port + "/";
             //提供一个简单的、可通过编程方式控制的 HTTP 协议侦听器。此类不能被继承。
-            _httpobj = new HttpListener();
+            _httpObj = new HttpListener();
             IsOpen = false;
         }
 
         /// <summary>
-        /// 判断端口是否被占用
+        /// 判断端口是否可用
         /// </summary>
         /// <param name="port"></param>
         /// <returns></returns>
-        private static bool IsPortAvailble(int port)
+        private static bool IsPortAvailable(int port)
         {
             var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
             var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
-            return tcpConnInfoArray.All(tcpi => tcpi.LocalEndPoint.Port != port);
+            return tcpConnInfoArray.All(tcp => tcp.LocalEndPoint.Port != port);
         }
 
         /// <summary>
@@ -104,7 +108,7 @@ namespace Wdxx.Core
         private static int GetPort()
         {
             var port = 80;
-            if (IsPortAvailble(80))
+            if (!IsPortAvailable(80))
             {
                 port = GetFreeTcpPort();
             }
@@ -117,12 +121,12 @@ namespace Wdxx.Core
         public string Open()
         {
             //定义url及端口号，通常设置为配置文件
-            _httpobj.Prefixes.Add(_uri);
+            _httpObj.Prefixes.Add(_uri);
             //启动监听器
-            _httpobj.Start();
+            _httpObj.Start();
             //异步监听客户端请求，当客户端的网络请求到来时会自动执行Result委托
             //该委托没有返回值，有一个IAsyncResult接口的参数，可通过该参数获取context对象
-            _httpobj.BeginGetContext(Result, _httpobj);
+            _httpObj.BeginGetContext(Result, _httpObj);
             IsOpen = true;
             return _uri;
         }
@@ -133,7 +137,7 @@ namespace Wdxx.Core
         public void Close()
         {
             //关闭监听器
-            _httpobj.Stop();
+            _httpObj.Stop();
         }
 
         /// <summary>
@@ -144,9 +148,9 @@ namespace Wdxx.Core
         {
             //当接收到请求后程序流会走到这里
             //获得context对象
-            var context = _httpobj.EndGetContext(ar);
+            var context = _httpObj.EndGetContext(ar);
             //继续异步监听
-            _httpobj.BeginGetContext(Result, _httpobj);
+            _httpObj.BeginGetContext(Result, _httpObj);
             var request = context.Request;
             //将发送到客户端的请求响应中的客户端的对象
             var response = context.Response;
@@ -176,7 +180,7 @@ namespace Wdxx.Core
             }
             catch (Exception ex)
             {
-                CoreLog.Error("网络异常:" + ex);
+                CoreLog.Error("网络异常:" + ex, "CORE_");
             }
         }
 
@@ -190,7 +194,6 @@ namespace Wdxx.Core
         {
             if (request.HttpMethod.ToUpper() != "POST")
             {
-                CoreLog.Error("只支持POST提交");
                 return null;
             }
             if (request.InputStream != null)
@@ -224,33 +227,33 @@ namespace Wdxx.Core
                     {
                         response.StatusDescription = "404";
                         response.StatusCode = 404;
-                        CoreLog.Error("找不到服务方法");
+                        CoreLog.Error("找不到服务方法", "CORE_");
                         return null;
                     }
                     funName = postSegments[1].TrimEnd('/');
-                    //判断是否是WebSrviceSoap模式调用
-                    if (funName == "WebSrviceSoap")
+                    //判断是否是WebServiceSoap模式调用
+                    if (funName == "WebServiceSoap")
                     {
                         if (string.IsNullOrEmpty(data))
                         {
                             response.StatusDescription = "404";
                             response.StatusCode = 404;
-                            CoreLog.Error("找不到服务方法");
+                            CoreLog.Error("找不到服务方法", "CORE_");
                             return null;
                         }
-                        var sendDatas = (SendData)CoreConvert.JsonDataToObj(data, typeof(SendData));
+                        var sendDataArr = (SendDataArr)CoreConvert.JsonDataToObj(data, typeof(SendDataArr));
                         //获取方法名相同的所有方法
                         var mis = _serviceFunArr.Where(f =>
-                        string.Equals(f.Name, sendDatas.Method, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                        string.Equals(f.Name, sendDataArr.Method, StringComparison.CurrentCultureIgnoreCase)).ToList();
                         if (mis.Count == 0)
                         {
                             response.StatusDescription = "404";
                             response.StatusCode = 404;
-                            CoreLog.Error("找不到服务方法");
+                            CoreLog.Error("找不到服务方法", "CORE_");
                             return null;
                         }
                         //获取参数
-                        var dataList = (List<string>)CoreConvert.JsonDataToObj(sendDatas.Datas, typeof(List<string>));
+                        var dataList = (List<string>)CoreConvert.JsonDataToObj(sendDataArr.DataArr, typeof(List<string>));
                         //这里为空则没有参数
                         if (dataList == null)
                         {
@@ -291,7 +294,7 @@ namespace Wdxx.Core
                         {
                             response.StatusDescription = "404";
                             response.StatusCode = 404;
-                            CoreLog.Error("找不到服务方法");
+                            CoreLog.Error("找不到服务方法", "CORE_");
                             return null;
                         }
                         //这里为空则没有参数
@@ -334,7 +337,7 @@ namespace Wdxx.Core
                                         }
                                         catch (Exception e)
                                         {
-                                            CoreLog.Error("参数错误:" + e);
+                                            CoreLog.Error("参数错误:" + e, "CORE_");
                                             response.StatusDescription = "404";
                                             response.StatusCode = 404;
                                             return null;
@@ -350,13 +353,13 @@ namespace Wdxx.Core
                 {
                     response.StatusDescription = "404";
                     response.StatusCode = 404;
-                    CoreLog.Error($"接收数据时发生错误 Url:{request.Url} Method:{funName} err:{ex}");
+                    CoreLog.Error($"接收数据时发生错误 Url:{request.Url} Method:{funName} err:{ex}", "CORE_");
                     return null;
                 }
             }
             response.StatusDescription = "404";
             response.StatusCode = 404;
-            CoreLog.Error("不允许空提交");
+            CoreLog.Error("不允许空提交", "CORE_");
             return null;
         }
 
@@ -373,13 +376,11 @@ namespace Wdxx.Core
                 //创建实例
                 var o = Activator.CreateInstance(_serviceClass);
                 //调用方法
-                if (mi != null) return CoreConvert.ObjToJsonData(mi.Invoke(o, pos));
-                CoreLog.Error("方法不能为空");
-                return null;
+                return mi != null ? CoreConvert.ObjToJson(mi.Invoke(o, pos)) : null;
             }
             catch (Exception ex)
             {
-                CoreLog.Error("方法:" + mi?.Name + "执行错误:" + ex);
+                CoreLog.Error("方法:" + mi?.Name + "执行错误:" + ex, "CORE_");
                 throw new Exception(ex.Message);
             }
         }
@@ -388,7 +389,7 @@ namespace Wdxx.Core
     /// <summary>
     /// 离线webservice传输数据类
     /// </summary>
-    public class SendData
+    public class SendDataArr
     {
         /// <summary>
         /// 方法名
@@ -397,6 +398,6 @@ namespace Wdxx.Core
         /// <summary>
         /// 参数数据组
         /// </summary>
-        public string Datas;
+        public string DataArr;
     }
 }

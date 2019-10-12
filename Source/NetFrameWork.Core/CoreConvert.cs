@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -6,14 +8,141 @@ using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
-
     /// <summary>
     /// 转换核心
     /// </summary>
     public static class CoreConvert
     {
+        /// <summary>
+        /// 自动转换配置
+        /// </summary>
+        public class MapConfig
+        {
+            /// <summary>
+            /// 从 字段
+            /// </summary>
+            public string MapFrom { get; set; }
+
+            /// <summary>
+            /// 到 字段
+            /// </summary>
+            public string MapTo { get; set; }
+        }
+
+        /// <summary>
+        /// 自动转换类
+        /// </summary>
+        /// <typeparam name="T">转换后的类型</typeparam>
+        /// <param name="objFrom">从 数据源</param>
+        /// <param name="isVague">字段是否模糊匹配(不区分大小写去掉下划线)</param>
+        /// <param name="mapConfigs">字段转换配置</param>
+        /// <returns></returns>
+        public static T Map<T>(object objFrom, bool isVague = false, params MapConfig[] mapConfigs) where T : new()
+        {
+            return MapCore(objFrom, new T(), isVague, mapConfigs);
+        }
+
+        /// <summary>
+        /// 自动转换类
+        /// </summary>
+        /// <param name="objFrom">从 数据源</param>
+        /// <param name="objTo">到 数据源</param>
+        /// <param name="isVague">字段是否模糊匹配(不区分大小写去掉下划线)</param>
+        /// <param name="mapConfigs">字段转换配置</param>
+        /// <returns></returns>
+        public static T Map<T>(object objFrom, T objTo, bool isVague = false, params MapConfig[] mapConfigs)
+        {
+            var tmpObj = MapCore(objFrom, objTo, isVague, mapConfigs);
+            if (tmpObj == null || objTo == null)
+            {
+                return default(T);
+            }
+            var type = tmpObj.GetType();
+            var properties = type.GetProperties();
+            foreach (var t in properties)
+            {
+                var tmp = t.GetValue(tmpObj, null);
+                if (tmp == null || tmp is DateTime time && time == default(DateTime) ||
+                    tmp is int i && i == default(int))
+                {
+                    continue;
+                }
+
+                t.SetValue(objTo, tmp, null);
+            }
+            return objTo;
+        }
+
+
+        /// <summary>
+        /// 自动转换类
+        /// </summary>
+        /// <param name="objFrom">从 数据源</param>
+        /// <param name="objTo">到 数据源</param>
+        /// <param name="isVague">字段是否模糊匹配(不区分大小写去掉下划线)</param>
+        /// <param name="mapConfigs">字段转换配置</param>
+        /// <returns></returns>
+        private static T MapCore<T>(object objFrom, T objTo, bool isVague = false, params MapConfig[] mapConfigs)
+        {
+            try
+            {
+                var jsonStr = ObjToJson(objFrom);
+                jsonStr = JsonNull(jsonStr);
+                jsonStr = JsonMember(jsonStr, mapConfigs);
+                if (isVague)
+                {
+                    var regexs = Regex.Matches(jsonStr, "\"\\w+\":");
+                    foreach (Match regex in regexs)
+                    {
+                        foreach (var p in objTo.GetType().GetProperties())
+                        {
+                            var tmp = $"\"{p.Name}\":";
+                            if (regex.Value.ToUpper().Replace("_", string.Empty) != tmp.ToUpper().Replace("_", string.Empty)) continue;
+                            jsonStr = jsonStr.Replace(regex.Value, tmp);
+                            break;
+                        }
+                    }
+                }
+                objTo = JsonToObj<T>(jsonStr);
+                return objTo;
+            }
+            catch (Exception e)
+            {
+                CoreLog.Error(e, "CORE_");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 排除json 字段为Null的值
+        /// </summary>
+        /// <param name="jsonStr"></param>
+        /// <returns></returns>
+        public static string JsonNull(string jsonStr)
+        {
+            var json = Regex.Replace(jsonStr, "\"\\w+\":null,*", match => string.Empty);
+            return json.Replace(",}", "}");
+        }
+
+        /// <summary>
+        /// json 字段转换为对应的字段
+        /// </summary>
+        /// <returns></returns>
+        public static string JsonMember(string jsonStr, params MapConfig[] mapConfigs)
+        {
+            var json = jsonStr;
+            foreach (var m in mapConfigs)
+            {
+                if (m == null || string.IsNullOrEmpty(m.MapFrom) || string.IsNullOrEmpty(m.MapTo))
+                {
+                    continue;
+                }
+                json = jsonStr.Replace($"\"{m.MapFrom}\":", $"\"{m.MapTo}\":");
+            }
+            return json;
+        }
 
         /// <summary>
         /// XML序列化
@@ -44,7 +173,7 @@ namespace Wdxx.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e);
+                CoreLog.Error(e, "CORE_");
                 return null;
             }
         }
@@ -64,7 +193,7 @@ namespace Wdxx.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e);
+                CoreLog.Error(e, "CORE_");
                 return default(T);
             }
         }
@@ -143,7 +272,24 @@ namespace Wdxx.Core
         /// <returns>转换后的对象</returns>
         public static T JsonToObj<T>(string json)
         {
-            return string.IsNullOrEmpty(json) ? default(T) : new JavaScriptSerializer().Deserialize<T>(json);
+            var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            return string.IsNullOrEmpty(json) ? default(T) : js.Deserialize<T>(json);
+        }
+
+        /// <summary>
+        /// 将JSON字符串转化为对应类型的对象
+        /// </summary>
+        /// <param name="json">json字符串</param>
+        /// <param name="type">要转化的类型</param>
+        /// <returns>转换后的对象</returns>
+        public static object JsonToObj(string json, Type type)
+        {
+            if (type == typeof(string))
+            {
+                return json;
+            }
+            var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            return string.IsNullOrEmpty(json) ? default(object) : js.Deserialize(json, type);
         }
 
         /// <summary>
@@ -153,7 +299,19 @@ namespace Wdxx.Core
         /// <returns>json字符串</returns>
         public static string ObjToJsonTime(object obj)
         {
-            return new JavaScriptSerializer().Serialize(obj);
+            var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            return obj is string ? obj.ToString() : js.Serialize(obj);
+        }
+
+        /// <summary>
+        /// 将任意类型对象转化为JSON字符串(排除null字段)
+        /// </summary>
+        /// <param name="obj">要转换的对象</param>
+        /// <returns>json字符串</returns>
+        public static string ObjToJsonNull(object obj)
+        {
+            var jsonStr = ObjToJson(obj);
+            return JsonNull(jsonStr);
         }
 
         /// <summary>
@@ -163,7 +321,7 @@ namespace Wdxx.Core
         /// <returns>json字符串</returns>
         public static string ObjToJson(object obj)
         {
-            var jsonStr = new JavaScriptSerializer().Serialize(obj);
+            var jsonStr = ObjToJsonTime(obj);
             return JsonTime(jsonStr);
         }
 
@@ -176,6 +334,10 @@ namespace Wdxx.Core
         {
             try
             {
+                if (obj is string)
+                {
+                    return obj.ToString();
+                }
                 var js = new DataContractJsonSerializer(obj.GetType());
                 var msObj = new MemoryStream();
                 //将序列化之后的Json格式数据写入流中
@@ -190,7 +352,7 @@ namespace Wdxx.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e);
+                CoreLog.Error(e, "CORE_");
                 return null;
             }
         }
@@ -205,15 +367,23 @@ namespace Wdxx.Core
         {
             try
             {
+                if (string.IsNullOrEmpty(json))
+                {
+                    return null;
+                }
+                if (type == typeof(string))
+                {
+                    return json;
+                }
                 using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(json)))
                 {
-                    var deseralizer = new DataContractJsonSerializer(type);
-                    return deseralizer.ReadObject(ms);
+                    var deserializer = new DataContractJsonSerializer(type);
+                    return deserializer.ReadObject(ms);
                 }
             }
             catch (Exception e)
             {
-                CoreLog.Error(e);
+                CoreLog.Error(e + " 异常json=>" + json + " 异常类型=>" + type.FullName, "CORE_");
                 return null;
             }
         }
@@ -246,6 +416,27 @@ namespace Wdxx.Core
                 fs.Write(contents, 0, contents.Length);
                 fs.Flush();
             }
+        }
+
+        /// <summary>
+        /// 将DataTable对象转化为JSON字符串
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public static string DataTableToJson(DataTable table)
+        {
+            var jsSerializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var parentRow = new List<Dictionary<string, object>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var childRow = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                {
+                    childRow.Add(col.ColumnName, row[col]);
+                }
+                parentRow.Add(childRow);
+            }
+            return jsSerializer.Serialize(parentRow);
         }
     }
 }

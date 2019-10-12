@@ -1,6 +1,6 @@
-﻿using Wdxx.Database.SqlFunction;
+﻿using NetFrameWork.Database.SqlFunction;
 
-namespace Wdxx.Database
+namespace NetFrameWork.Database
 {
 
     /// <summary>

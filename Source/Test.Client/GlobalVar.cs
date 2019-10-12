@@ -1,4 +1,4 @@
-﻿using Wdxx.Core;
+﻿using NetFrameWork.Core;
 
 namespace Test.Client
 {

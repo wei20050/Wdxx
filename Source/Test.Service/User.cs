@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using NetFrameWork.Database;
+using System.Collections.Generic;
 using System.Web.Services;
 using Tset.Entity;
-using Wdxx.Database;
 
 namespace Test.Service
 {

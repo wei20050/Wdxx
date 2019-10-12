@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
     /// <summary>
     /// 配置核心类
-    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName或DefaultSettings\Config.ini
+    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName\Config.cfg或当前目录下\Config.cfg
     /// </summary>
     public class CoreConfig
     {
@@ -24,51 +24,10 @@ namespace Wdxx.Core
         static CoreConfig()
         {
             var exe = Assembly.GetEntryAssembly();
-            var appName = exe == null ? "DefaultSettings" : exe.GetName().Name;
-            DefaultPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),appName), "Config.cfg");
+            var defPath = exe == null ? AppDomain.CurrentDomain.BaseDirectory : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), exe.GetName().Name);
+            DefaultPath = Path.Combine(defPath, "Config.cfg");
         }
 
-        /// <summary>
-        /// 读取配置
-        /// </summary>
-        /// <param name="key">配置键</param>
-        /// <returns></returns>
-        public static string Rcfg(string key)
-        {
-            return ReadCfg(key, DefaultPath);
-        }
-
-        /// <summary>
-        /// 写入配置
-        /// </summary>
-        /// <param name="key">配置键</param>
-        /// <param name="value">配置值</param>
-        /// <returns></returns>
-        public static bool Wcfg(string key, string value)
-        {
-            return WriteCfg(key, value, DefaultPath);
-        }
-
-        /// <summary>
-        /// 读取配置
-        /// </summary>
-        /// <param name="key">配置键</param>
-        /// <returns>配置值</returns>
-        public static T ReadCfg<T>(string key)
-        {
-            return ReadCfg<T>(key,DefaultPath);
-        }
-
-        /// <summary>
-        /// 写入配置
-        /// </summary>
-        /// <param name="key">配置键</param>
-        /// <param name="value">配置值</param>
-        /// <returns></returns>
-        public static bool WriteCfg(string key, object value)
-        {
-            return WriteCfg(key, value, DefaultPath);
-        }
 
         /// <summary>
         /// 读取配置
@@ -76,8 +35,12 @@ namespace Wdxx.Core
         /// <param name="key">配置键</param>
         /// <param name="path">配置文件路径</param>
         /// <returns>配置值</returns>
-        public static T ReadCfg<T>(string key, string path)
+        public static T ReadCfg<T>(string key, string path = "")
         {
+            if (path == "")
+            {
+                path = DefaultPath;
+            }
             return CoreConvert.JsonToObj<T>(ReadCfg(key, path));
         }
 
@@ -88,8 +51,12 @@ namespace Wdxx.Core
         /// <param name="value">配置值</param>
         /// <param name="path">配置文件路径</param>
         /// <returns></returns>
-        public static bool WriteCfg(string key, object value, string path)
+        public static bool WriteCfg(string key, object value, string path = "")
         {
+            if (path == "")
+            {
+                path = DefaultPath;
+            }
             return WriteCfg(key, CoreConvert.ObjToJson(value), path);
         }
 
@@ -99,8 +66,12 @@ namespace Wdxx.Core
         /// <param name="key">配置键</param>
         /// <param name="path">配置文件路径</param>
         /// <returns>配置值</returns>
-        public static string ReadCfg(string key, string path)
+        public static string ReadCfg(string key, string path = "")
         {
+            if (path == "")
+            {
+                path = DefaultPath;
+            }
             var ret = string.Empty;
             MutexExec(path, () =>
             {
@@ -130,13 +101,22 @@ namespace Wdxx.Core
         /// <param name="value">配置值</param>
         /// <param name="path">配置文件路径</param>
         /// <returns></returns>
-        public static bool WriteCfg(string key, string value, string path)
+        public static bool WriteCfg(string key, string value, string path = "")
         {
+            if (path == "")
+            {
+                path = DefaultPath;
+            }
             var ret = false;
             try
             {
                 MutexExec(path, () =>
                 {
+                    var dir = Path.GetDirectoryName(path);
+                    if (!Directory.Exists(dir) && !string.IsNullOrEmpty(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
                     if (File.Exists(path))
                     {
                         var res = File.ReadAllText(path);
@@ -192,14 +172,6 @@ namespace Wdxx.Core
         #region 进程与线程保证同步
 
         /// <summary>
-        /// 多线程与多进程间同步操作文件 默认不是递归
-        /// </summary>
-        private static void MutexExec(string filePath, Action action)
-        {
-            MutexExec(filePath, action, false);
-        }
-
-        /// <summary>
         /// 多线程与多进程间同步操作文件
         /// </summary>
         /// <param name="filePath">文件路径
@@ -209,12 +181,12 @@ namespace Wdxx.Core
         /// 如果创建已命名 mutex 时不指定前缀，则它将采用前缀“Local\”。)</param>
         /// <param name="action">同步处理操作</param>
         /// <param name="recursive">指示当前调用是否为递归处理，递归处理时检测到异常则抛出异常，避免进入无限递归</param>
-        private static void MutexExec(string filePath, Action action, bool recursive)
+        private static void MutexExec(string filePath, Action action, bool recursive = false)
         {
             //生成文件对应的同步键，可自定义格式（互斥体名称对特殊字符支持不友好，遂转换为BASE64格式字符串）
-            var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes("FILE\\" + filePath));
+            var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes(Path.Combine("FILE", filePath)));
             //转换为操作系统级的同步键
-            var mutexKey = "Global\\" + fileKey;
+            var mutexKey = Path.Combine("Global", fileKey);
             //声明一个已命名的互斥体，实现进程间同步；该命名互斥体不存在则自动创建，已存在则直接获取
             //initiallyOwned: false：默认当前线程并不拥有已存在互斥体的所属权，即默认本线程并非为首次创建该命名互斥体的线程
             //注意：并发声明同名的命名互斥体时，若间隔时间过短，则可能同时声明了多个名称相同的互斥体，并且同名的多个互斥体之间并不同步，高并发用户请另行处理

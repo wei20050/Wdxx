@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
 
-namespace Wdxx.Core.Mvvm
+namespace NetFrameWork.Core.Mvvm
 {
-    /// <inheritdoc />
     /// <summary>
     /// ViewModelBase类
     /// </summary>

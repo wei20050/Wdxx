@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Test.Service</RootNamespace>
     <AssemblyName>Test.Service</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort />
@@ -42,14 +42,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
@@ -85,13 +86,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetFrameWork.Database\NetFrameWork.Database.csproj">
+      <Project>{08535C08-E1D5-43C9-B5CC-4F7F5958E00F}</Project>
+      <Name>NetFrameWork.Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tset.Entity\Tset.Entity.csproj">
       <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
       <Name>Tset.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Wdxx.Database\Wdxx.Database.csproj">
-      <Project>{08535c08-e1d5-43c9-b5cc-4f7f5958e00f}</Project>
-      <Name>Wdxx.Database</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

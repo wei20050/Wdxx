@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Ztest</RootNamespace>
     <AssemblyName>Ztest</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -79,13 +79,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetFrameWork.Core\NetFrameWork.Core.csproj">
+      <Project>{085779A7-1A49-437D-ABB7-B5C1AED8FB50}</Project>
+      <Name>NetFrameWork.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tset.Entity\Tset.Entity.csproj">
       <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
       <Name>Tset.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Wdxx.Core\Wdxx.Core.csproj">
-      <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>
-      <Name>Wdxx.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

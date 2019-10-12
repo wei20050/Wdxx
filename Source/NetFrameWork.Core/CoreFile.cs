@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
 
     /// <summary>
@@ -66,12 +66,12 @@ namespace Wdxx.Core
         /// 封装的委托
         /// </summary>
         /// <param name="filePath"></param>
-        public delegate void DeleFilePathReceived(string filePath);
+        public delegate void DelegateFilePathReceived(string filePath);
 
         /// <summary>
         /// 新的的数据返回事件
         /// </summary>
-        public event DeleFilePathReceived FilePathReceived;
+        public event DelegateFilePathReceived FilePathReceived;
 
         /// <summary>
         /// 开启文件监控

@@ -1,4 +1,4 @@
-﻿namespace Wdxx.Database.SqlFunction
+﻿namespace NetFrameWork.Database.SqlFunction
 {
     /// <summary>
     /// 基于Mysql的sql函数基类

@@ -1,6 +1,6 @@
 ﻿using System.Web.Services;
+using NetFrameWork.Database;
 using Tset.Entity;
-using Wdxx.Database;
 
 namespace Test.Service
 {

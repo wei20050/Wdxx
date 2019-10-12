@@ -1,10 +1,9 @@
-﻿using System;
+﻿using NetFrameWork.Core;
+using System;
 using System.Collections.Generic;
-using System.Media;
 using System.Windows.Forms;
 using Test.Client.Service;
 using Tset.Entity;
-using Wdxx.Core;
 
 namespace Test.Client
 {

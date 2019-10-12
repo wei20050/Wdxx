@@ -3,17 +3,22 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
     /// <summary>
-    /// 日志核心 (路径:根目录logs文件夹)
+    /// 日志核心 (默认路径:根目录logs文件夹)
     /// </summary>
     public static class CoreLog
     {
         /// <summary>
+        /// 日志文件夹路径
+        /// </summary>
+        public static string FileFolderPath { private get; set; }
+
+        /// <summary>
         /// 日志文件夹默认根目录logs文件夹
         /// </summary>
-        private static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+        private static string FilePath => string.IsNullOrEmpty(FileFolderPath) ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs") : Path.Combine(FileFolderPath, "logs");
 
         /// <summary>
         /// 日志分隔文件大小 10M
@@ -41,7 +46,7 @@ namespace Wdxx.Core
         /// </summary>
         public static void Error(object log, string prefix)
         {
-            WriteFile("[Error] " + log, CreateLogPath(prefix));
+            WriteFile("[Error] " + log + Environment.NewLine, CreateLogPath(prefix));
         }
 
         /// <summary>
@@ -49,7 +54,7 @@ namespace Wdxx.Core
         /// </summary>
         public static void Info(object log, string prefix)
         {
-            WriteFile("[Info] " + log, CreateLogPath(prefix));
+            WriteFile("[Info] " + log + Environment.NewLine, CreateLogPath(prefix));
         }
 
         /// <summary>
@@ -116,9 +121,9 @@ namespace Wdxx.Core
         private static void MutexExec(string filePath, Action action, bool recursive = false)
         {
             //生成文件对应的同步键，可自定义格式（互斥体名称对特殊字符支持不友好，遂转换为BASE64格式字符串）
-            var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes($@"FILE\{filePath}"));
+            var fileKey = Convert.ToBase64String(Encoding.Default.GetBytes(Path.Combine("FILE", filePath)));
             //转换为操作系统级的同步键
-            var mutexKey = $@"Global\{fileKey}";
+            var mutexKey = Path.Combine("Global", fileKey);
             //声明一个已命名的互斥体，实现进程间同步；该命名互斥体不存在则自动创建，已存在则直接获取
             //initiallyOwned: false：默认当前线程并不拥有已存在互斥体的所属权，即默认本线程并非为首次创建该命名互斥体的线程
             //注意：并发声明同名的命名互斥体时，若间隔时间过短，则可能同时声明了多个名称相同的互斥体，并且同名的多个互斥体之间并不同步，高并发用户请另行处理

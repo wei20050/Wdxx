@@ -1,5 +1,4 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -8,15 +7,18 @@ using System.Data.Common;
 using System.Data.Objects.DataClasses;
 using System.Data.OracleClient;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using MySql.Data.MySqlClient;
+using NetFrameWork.Core;
 
 #pragma warning disable 618
 
-namespace Wdxx.Database
+namespace NetFrameWork.Database
 {
 
     /// <summary>
@@ -718,8 +720,10 @@ namespace Wdxx.Database
                 propertyNameList.Add(propertyInfo.Name);
                 savedCount++;
             }
-
-            strSql.AppendFormat("{0}) values ({1})", string.Join(",", propertyNameList.ConvertAll(a => "`" + a + "`").ToArray()), string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a).ToArray()));
+            var index = 0;
+            strSql.AppendFormat("{0}) values ({1})",
+                string.Join(",", propertyNameList.ConvertAll(a => "`" + a + "`").ToArray()),
+                string.Join(",", propertyNameList.ConvertAll(a => _mParameterMark + a + index++).ToArray()));
             var parameters = new DbParameter[savedCount];
             var k = 0;
             for (var i = 0; i < propertyInfoList.Length && savedCount > 0; i++)
@@ -731,7 +735,7 @@ namespace Wdxx.Database
                     continue;
                 }
 
-                var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
+                var param = GetDbParameter(_mParameterMark + propertyInfo.Name + k, val);
                 parameters[k++] = param;
             }
             return ExecuteSql(strSql.ToString(), parameters) > 0;
@@ -763,6 +767,28 @@ namespace Wdxx.Database
         }
 
         /// <summary>
+        /// 批量添加(不带事物)
+        /// </summary>
+        /// <param name="objList">要批量添加的实体集合</param>
+        /// <returns>返回是否成功</returns>
+        public bool InsertsWithoutTran<T>(List<T> objList) where T : new()
+        {
+            try
+            {
+                foreach (var obj in objList)
+                {
+                    Insert(obj);
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Error("批量添加发生异常:" + e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 添加或修改
         /// </summary>
         /// <param name="obj">要添加的实体对象</param>
@@ -781,9 +807,9 @@ namespace Wdxx.Database
                 }
 
                 var val = propertyInfo.GetValue(obj, null);
-                sql += $"`{propertyInfo.Name}`={val} OR ";
+                sql += $"`{propertyInfo.Name}`={val} AND ";
             }
-            sql = sql.Substring(0, sql.Length - 3);
+            sql = sql.Substring(0, sql.Length - 4);
             var rd = GetSingle(sql);
             return rd.ToString() == "0" ? Insert(obj) : Update(obj);
         }
@@ -828,42 +854,52 @@ namespace Wdxx.Database
             return ExecuteSql(sbSql.ToString(), parameters) > 0;
         }
 
+        /// <summary>
+        /// 删除表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool Delete<T>()
+        {
+            try
+            {
+                ExecuteSql($"delete from {typeof(T).Name} ");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Error("批量删除所有数据发生异常:" + ex);
+                throw;
+            }
+
+        }
+
         #endregion
 
         #region 修改
 
         /// <summary>
-        /// 根据实体第一个字段修改(适用于第一个字段是主键的实体)
+        /// 根据实体修改(适用于有主键的实体)
         /// </summary>
         /// <param name="obj">要修改的实体</param>
         /// <returns></returns>
         public bool Update(object obj)
         {
             var type = obj.GetType();
+            var sql = new Sql();
             var propertyInfoList = GetEntityProperties(type);
-            if (propertyInfoList.Length == 0)
+            foreach (var propertyInfo in propertyInfoList)
             {
-                return false;
+                var attrs = (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute), true);
+                if (attrs.Length < 1 || !attrs[0].EntityKeyProperty)
+                {
+                    continue;
+                }
+
+                var val = propertyInfo.GetValue(obj, null);
+                sql.And(propertyInfo.Name).Equal(val);
             }
-
-            var pk = propertyInfoList[0];
-            var conditions = pk.Name + "='" + pk.GetValue(obj, null) + "'";
-            return Update(obj, conditions);
-        }
-
-        /// <summary>
-        /// 根据条件修改
-        /// </summary>
-        /// <param name="obj">要修改的实体</param>
-        /// <param name="conditions">修改的条件(从where后面开始组装)</param>
-        /// <returns></returns>
-        public bool Update(object obj, string conditions)
-        {
-            var st = new Sql();
-            st.Add(conditions);
-            var ret = Update(obj, st);
-            st.Clear();
-            return ret;
+            return Update(obj, sql);
         }
 
         /// <summary>
@@ -879,8 +915,13 @@ namespace Wdxx.Database
             strSql.AppendFormat("update {0} ", type.Name);
             //获取要修改的字段数
             var propertyInfoList = GetEntityProperties(type);
-            var savedCount = propertyInfoList.Select(propertyInfo => propertyInfo.GetValue(obj, null))
-                .Count(val => val != null);
+            var savedCount = (from propertyInfo in propertyInfoList
+                              let val = propertyInfo.GetValue(obj, null)
+                              let attrs =
+                                  (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute),
+                                      true)
+                              where attrs.Length <= 0 || !attrs[0].EntityKeyProperty
+                              select val).Count(val => val != null);
             //这里定义参数化数组 长度加上where中的参数
             var parameters = new DbParameter[savedCount + sql.ParamDict.Count];
             //开始拼接写入字段
@@ -889,18 +930,24 @@ namespace Wdxx.Database
             var k = 0;
             //写入字段拼接字符串
             var sbPros = new StringBuilder();
+            var index = 0;
             for (var i = 0; i < propertyInfoList.Length && savedCount > 0; i++)
             {
                 var propertyInfo = propertyInfoList[i];
                 var val = propertyInfo.GetValue(obj, null);
-                if (string.IsNullOrEmpty(val?.ToString()))
+                var attrs = (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute), true);
+                if (attrs.Length > 0 && attrs[0].EntityKeyProperty)
                 {
                     continue;
                 }
-
-                sbPros.Append(string.Format(" `{0}`={1}{0},", propertyInfo.Name, _mParameterMark));
-                var param = GetDbParameter(_mParameterMark + propertyInfo.Name, val);
+                if (val == null)
+                {
+                    continue;
+                }
+                sbPros.Append(string.Format(" `{0}`={1}{0}{2},", propertyInfo.Name, _mParameterMark, index));
+                var param = GetDbParameter(_mParameterMark + propertyInfo.Name + index, val);
                 parameters[k++] = param;
+                index++;
             }
             //写入字段存在 去掉最后的逗号加到sql中
             if (sbPros.Length > 0)
@@ -997,6 +1044,17 @@ namespace Wdxx.Database
             return FindList<T>(sbSql.ToString(), parameters);
         }
 
+        /// <summary>
+        /// 查询直接返回dataset
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public DataSet DataSetQuery(Sql sql)
+        {
+            GetSqlAndParms(sql, out var conditions, out var parameters);
+            return ExecuteSet(conditions, parameters);
+        }
+
         #endregion
 
         #region 获取实体
@@ -1023,18 +1081,38 @@ namespace Wdxx.Database
                     fileds.Add(rd.GetName(i).ToUpper());
                 }
 
-                while (rd.Read())
+                if (rd.Read())
                 {
                     IDataRecord record = rd;
-
+                    var index = 0;
                     foreach (var pro in propertyInfoList)
                     {
-                        if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
+                        switch (pro.PropertyType.Namespace)
                         {
-                            continue;
+                            case "System":
+                                if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
+                                {
+                                    continue;
+                                }
+                                pro.SetValue(result, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
+                                break;
+                            default:
+                                var proInfoList = GetEntityProperties(pro.PropertyType);
+                                var tmpp = Activator.CreateInstance(pro.PropertyType);
+                                foreach (var p in proInfoList)
+                                {
+                                    if (!fileds.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                    {
+                                        index++;
+                                        continue;
+                                    }
+                                    var v = GetReaderValue(record[index], p.PropertyType);
+                                    p.SetValue(tmpp, v, null);
+                                    index++;
+                                }
+                                pro.SetValue(result, tmpp, null);
+                                break;
                         }
-
-                        pro.SetValue(result, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
                     }
                 }
             }
@@ -1073,14 +1151,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public T FindBySql<T>(Sql sql) where T : new()
         {
-            var conditions = sql.ToString();
-            var parameters = new DbParameter[sql.ParamDict.Count];
-            var i = 0;
-            foreach (var p in sql.ParamDict)
-            {
-                parameters[i] = GetDbParameter(p.Key, p.Value);
-                i++;
-            }
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             return Find<T>(conditions, parameters);
         }
 
@@ -1129,10 +1200,36 @@ namespace Wdxx.Database
                     {
                         IDataRecord record = rd;
                         object obj = new T();
-
-
+                        var index = 0;
                         foreach (var pro in propertyInfoList)
                         {
+
+                            switch (pro.PropertyType.Namespace)
+                            {
+                                case "System":
+                                    if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
+                                    {
+                                        continue;
+                                    }
+                                    pro.SetValue(obj, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
+                                    break;
+                                default:
+                                    var proInfoList = GetEntityProperties(pro.PropertyType);
+                                    var tmpp = Activator.CreateInstance(pro.PropertyType);
+                                    foreach (var p in proInfoList)
+                                    {
+                                        if (!fileds.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                        {
+                                            continue;
+                                        }
+                                        var v = GetReaderValue(record[index], p.PropertyType);
+                                        p.SetValue(tmpp, v, null);
+                                        index++;
+                                    }
+                                    pro.SetValue(obj, tmpp, null);
+                                    break;
+                            }
+
                             if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
                             {
                                 continue;
@@ -1178,14 +1275,7 @@ namespace Wdxx.Database
         /// <returns></returns>
         public List<T> FindListBySql<T>(Sql sql) where T : new()
         {
-            var conditions = sql.ToString();
-            var parameters = new DbParameter[sql.ParamDict.Count];
-            var i = 0;
-            foreach (var p in sql.ParamDict)
-            {
-                parameters[i] = GetDbParameter(p.Key, p.Value);
-                i++;
-            }
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             return FindList<T>(conditions, parameters);
         }
 
@@ -1201,15 +1291,16 @@ namespace Wdxx.Database
         /// 分页(任意entity，尽量少的字段)
         /// </summary>
         /// <returns></returns>
-        public List<T> FindPageBySql<T>(string sql, string orderby, int pageSize, int currentPage, out int rows, params DbParameter[] cmdParms) where T : new()
+        public List<T> FindPageBySql<T>(Sql sql, string orderby, int pageSize, int currentPage, out int rows) where T : new()
         {
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             using (var connection = GetConnection())
             {
                 connection.Open();
                 var commandText = "select count(*) from (" + sql + ") T";
                 IDbCommand cmd = GetCommand(commandText, connection);
                 rows = int.Parse(cmd.ExecuteScalar().ToString());
-                return FindList<T>(GetPageSql(sql, orderby, pageSize, currentPage), cmdParms);
+                return FindList<T>(GetPageSql(conditions, orderby, pageSize, currentPage), parameters);
             }
         }
 
@@ -1220,8 +1311,9 @@ namespace Wdxx.Database
         /// <summary>
         /// 分页(任意entity，尽量少的字段)
         /// </summary>
-        public DataSet FindPageBySql(string sql, string orderby, int pageSize, int currentPage, out int totalCount, params DbParameter[] cmdParms)
+        public DataSet FindPageBySql(Sql sql, string orderby, int pageSize, int currentPage, out int totalCount)
         {
+            GetSqlAndParms(sql, out var conditions, out var parameters);
             DataSet ds;
             using (var connection = GetConnection())
             {
@@ -1229,7 +1321,7 @@ namespace Wdxx.Database
                 var commandText = "select count(*) from (" + sql + ") T";
                 IDbCommand cmd = GetCommand(commandText, connection);
                 totalCount = int.Parse(cmd.ExecuteScalar().ToString());
-                ds = ExecuteSet(GetPageSql(sql, orderby, pageSize, currentPage), cmdParms);
+                ds = ExecuteSet(GetPageSql(conditions, orderby, pageSize, currentPage), parameters);
             }
             return ds;
         }
@@ -1580,12 +1672,19 @@ namespace Wdxx.Database
         /// </summary>
         private static void LogInfo(string sqlString, params DbParameter[] cmdParms)
         {
+            if (Debugger.IsAttached)
+            {
+                Debug.WriteLine("----------------正常查询-------------");
+                Debug.WriteLine(GetSql(sqlString, cmdParms));
+                Debug.WriteLine("-------------------结束-------------");
+            }
+
             if (!_sqlLog)
             {
                 return;
             }
 
-            Info("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value)));
+            Info("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
             Info("调试查询:" + GetSql(sqlString, cmdParms));
         }
 
@@ -1594,18 +1693,24 @@ namespace Wdxx.Database
         /// </summary>
         private static void LogErr(string sqlString, params DbParameter[] cmdParms)
         {
-            Error("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value)));
+            if (Debugger.IsAttached)
+            {
+                Debug.WriteLine("----------------异常查询-------------");
+                Debug.WriteLine(GetSql(sqlString, cmdParms));
+                Debug.WriteLine("-------------------结束-------------");
+            }
+            Error("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
             Error("调试查询:" + GetSql(sqlString, cmdParms));
         }
 
         private static void Info(object o)
         {
-            Log.Info(o, "DB_");
+            CoreLog.Info(o, "DB_");
         }
 
         private static void Error(object o)
         {
-            Log.Error(o, "DB_");
+            CoreLog.Error(o, "DB_");
         }
 
         #endregion

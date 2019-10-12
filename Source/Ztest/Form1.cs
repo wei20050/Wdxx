@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NetFrameWork.Core;
+using System;
 using System.Threading;
 using System.Windows.Forms;
 using Tset.Entity;
-using Wdxx.Core;
 
 namespace Ztest
 {

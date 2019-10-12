@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Timers;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
     
     /// <summary>
@@ -15,6 +15,37 @@ namespace Wdxx.Core
         /// 串行端口资源对象
         /// </summary>
         public  SerialPort Sp { get; set; }
+
+        /// <summary>
+        /// 封装的委托
+        /// </summary>
+        /// <param name="b"></param>
+        public delegate void DelegateDataReceived(byte[] b);
+
+        /// <summary>
+        /// 新的的数据返回事件
+        /// </summary>
+        public event DelegateDataReceived DataReceivedEx;
+
+        /// <summary>
+        /// 数据返回间隔 单位毫秒 若多次传输间隔少于这个事件不触发新的数据返回事件
+        /// </summary>
+        public int DataReceivedDelay { get; set; }
+
+        /// <summary>
+        /// 封装返回的定时器
+        /// </summary>
+        private readonly Timer _t = new Timer();
+
+        /// <summary>
+        /// 封装返回定时器计数
+        /// </summary>
+        private int _i;
+
+        /// <summary>
+        /// 封装后返回的数据
+        /// </summary>
+        private byte[] _bytes;
 
         /// <inheritdoc />
         /// <summary>
@@ -39,37 +70,6 @@ namespace Wdxx.Core
                 _bytes = null;
             };
         }
-
-        /// <summary>
-        /// 封装的委托
-        /// </summary>
-        /// <param name="b"></param>
-        public delegate void DeleDataReceived(byte[] b);
-
-        /// <summary>
-        /// 新的的数据返回事件
-        /// </summary>
-        public event DeleDataReceived DataReceivedEx;
-
-        /// <summary>
-        /// 数据返回间隔 单位毫秒 若多次传输间隔少于这个事件不触发新的数据返回事件
-        /// </summary>
-        public int DataReceivedDelay { get; set; }
-
-        /// <summary>
-        /// 封装返回的定时器
-        /// </summary>
-        private readonly Timer _t = new Timer();
-
-        /// <summary>
-        /// 封装返回定时器计数
-        /// </summary>
-        private int _i;
-
-        /// <summary>
-        /// 封装后返回的数据
-        /// </summary>
-        private byte[] _bytes;
 
         /// <summary>
         /// 封装前的事件触发

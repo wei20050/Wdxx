@@ -1,4 +1,4 @@
-﻿namespace Wdxx.Database.SqlFunction
+﻿namespace NetFrameWork.Database.SqlFunction
 {
     internal class MsSqlFunction : SqlFunBase
     {

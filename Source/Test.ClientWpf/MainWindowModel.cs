@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using NetFrameWork.Core.Mvvm;
+using System.Windows;
 using System.Windows.Input;
-using Wdxx.Core.Mvvm;
 
 namespace Test.ClientWpf
 {

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using NetFrameWork.Database;
+using System.Windows;
 
 namespace Test.Db
 {
@@ -9,7 +10,7 @@ namespace Test.Db
             InitializeComponent();
         }
 
-        private readonly Wdxx.Database.DbHelper _db = new Wdxx.Database.DbHelper();
+        private readonly DbHelper _db = new DbHelper();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             //var ret = _db.Update( new user { id = 1,name = ""});

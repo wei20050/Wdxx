@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-namespace Wdxx.Core
+namespace NetFrameWork.Core
 {
 
     /// <summary>
@@ -14,7 +17,17 @@ namespace Wdxx.Core
     /// </summary>
     public static class CorePublic
     {
+
         #region 系统相关
+
+        /// <summary>
+        /// 重启程序
+        /// </summary>
+        public static void Restart()
+        {
+            Application.Restart();
+            Environment.Exit(0);
+        }
 
         /// <summary>
         /// 管理员身份运行程序
@@ -52,6 +65,90 @@ namespace Wdxx.Core
             return true;
         }
 
+        /// <summary>  
+        /// 获取当前首个IPV4地址
+        /// </summary>  
+        /// <returns></returns>  
+        public static string GetLocalIp()
+        {
+            try
+            {
+                //本机名
+                var hostName = Dns.GetHostName();
+                //本机ip组
+                var ips = Dns.GetHostAddresses(hostName);
+                foreach (var ip in ips)
+                {
+                    var ipStr = ip.ToString();
+                    var ipArr = ipStr.Split('.');
+                    if (ipArr.Length == 4)
+                    {
+                        return ipStr;
+                    }
+                }
+                return "127.0.0.1";
+            }
+            catch (Exception)
+            {
+                return "127.0.0.1";
+            }
+        }
+
+        /// <summary>
+        /// 获取当前所有IPV4地址
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetLocalIps()
+        {
+            try
+            {
+                //本机名
+                var hostName = Dns.GetHostName();
+                //本机ip组
+                var ips = Dns.GetHostAddresses(hostName);
+                var strArr = (from ip in ips select ip.ToString() into ipStr let ipArr = ipStr.Split('.') where ipArr.Length == 4 select ipStr).ToList();
+                return strArr.Count == 0
+                    ? new List<string> { "127.0.0.1" }
+                    : strArr;
+            }
+            catch
+            {
+                return new List<string> { "127.0.0.1" };
+            }
+        }
+
+        /// <summary>
+        /// 执行cmd命令
+        /// </summary>
+        /// <param name="cmd"></param>
+        public static void ExecuteCommand(string cmd)
+        {
+            try
+            {
+                var p = new Process
+                {
+                    StartInfo =
+                    {
+                        Verb = "runas",
+                        FileName = cmd,
+                        Arguments = "",
+                        UseShellExecute = false,
+                        RedirectStandardInput = false,
+                        RedirectStandardOutput = false,
+                        RedirectStandardError = false,
+                        CreateNoWindow = true
+                    }
+                };
+                p.Start();
+                p.WaitForExit();
+                p.Close();
+            }
+            catch (Exception ex)
+            {
+                CoreLog.Error(ex, "CORE_");
+            }
+        }
+
         #endregion
 
         #region 注册表添加与删除开机启动
@@ -61,7 +158,7 @@ namespace Wdxx.Core
         /// </summary>
         public static void AutoStart()
         {
-            AutoStart(AppDomain.CurrentDomain.BaseDirectory +  Path.GetFileName(Application.ExecutablePath));
+            AutoStart(AppDomain.CurrentDomain.BaseDirectory + Path.GetFileName(Application.ExecutablePath));
         }
 
         /// <summary>
@@ -238,7 +335,7 @@ namespace Wdxx.Core
         /// 返回在指定范围内的任意整数
         /// </summary>
         /// <returns></returns>
-        public static double Random(int minValue, int maxValue)
+        public static int Random(int minValue, int maxValue)
         {
             var rd = new Random(GenerateId());
             return rd.Next(minValue, maxValue);
