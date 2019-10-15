@@ -8,13 +8,16 @@ using System.Data.Objects.DataClasses;
 using System.Data.OracleClient;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 using NetFrameWork.Core;
+using NetFrameWork.Database.Expression;
 
 #pragma warning disable 618
 
@@ -61,8 +64,8 @@ namespace NetFrameWork.Database
                 var sqlItePath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
                 if (File.Exists(sqlItePath))
                 {
-                    _sqliteAss = Assembly.LoadFrom(sqlItePath);
-                    MDbType = DbTypeEnum.Sqlite;
+                    _sqlIteAss = Assembly.LoadFrom(sqlItePath);
+                    MDbType = DbTypeEnum.SqlIte;
                 }
                 else
                 {
@@ -102,9 +105,9 @@ namespace NetFrameWork.Database
         public enum DbTypeEnum
         {
             /// <summary>
-            /// Sqlite数据库
+            /// SqlIte数据库
             /// </summary>
-            Sqlite = 0,
+            SqlIte = 0,
             /// <summary>
             /// Mysql数据库
             /// </summary>
@@ -128,9 +131,9 @@ namespace NetFrameWork.Database
         #region 变量
 
         /// <summary>
-        /// Sqlite程序集
+        /// SqlIte程序集
         /// </summary>
-        private readonly Assembly _sqliteAss;
+        private readonly Assembly _sqlIteAss;
 
         /// <summary>
         /// 数据库类型
@@ -172,8 +175,8 @@ namespace NetFrameWork.Database
             DbCommand command;
             switch (MDbType)
             {
-                case DbTypeEnum.Sqlite:
-                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand");
+                case DbTypeEnum.SqlIte:
+                    var obj = _sqlIteAss.CreateInstance("System.Data.SQLite.SQLiteCommand");
                     command = (DbCommand)obj;
                     break;
                 case DbTypeEnum.Mysql:
@@ -203,10 +206,10 @@ namespace NetFrameWork.Database
             DbCommand command;
             switch (MDbType)
             {
-                case DbTypeEnum.Sqlite:
+                case DbTypeEnum.SqlIte:
                     var parameters = new object[1];
                     parameters[0] = sql;
-                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteCommand", true, BindingFlags.Default, null, parameters, null, null);
+                    var obj = _sqlIteAss.CreateInstance("System.Data.SQLite.SQLiteCommand", true, BindingFlags.Default, null, parameters, null, null);
                     command = (DbCommand)obj;
                     break;
                 case DbTypeEnum.Mysql:
@@ -246,10 +249,10 @@ namespace NetFrameWork.Database
             {
                 switch (MDbType)
                 {
-                    case DbTypeEnum.Sqlite:
+                    case DbTypeEnum.SqlIte:
                         var parameters = new object[1];
                         parameters[0] = _mConnectionString;
-                        var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteConnection", true, BindingFlags.Default, null, parameters, null, null);
+                        var obj = _sqlIteAss.CreateInstance("System.Data.SQLite.SQLiteConnection", true, BindingFlags.Default, null, parameters, null, null);
                         conn = (DbConnection)obj;
                         break;
                     case DbTypeEnum.Mysql:
@@ -290,8 +293,8 @@ namespace NetFrameWork.Database
 
             switch (MDbType)
             {
-                case DbTypeEnum.Sqlite:
-                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteDataAdapter");
+                case DbTypeEnum.SqlIte:
+                    var obj = _sqlIteAss.CreateInstance("System.Data.SQLite.SQLiteDataAdapter");
                     dataAdapter = (DbDataAdapter)obj;
                     break;
                 case DbTypeEnum.Mysql:
@@ -325,29 +328,29 @@ namespace NetFrameWork.Database
         /// 生成 DbParameter
         /// </summary>
         /// <param name="name">参数名</param>
-        /// <param name="vallue">参数值</param>
+        /// <param name="value">参数值</param>
         /// <returns></returns>
-        private DbParameter GetDbParameter(string name, object vallue)
+        private DbParameter GetDbParameter(string name, object value)
         {
             DbParameter dbParameter;
 
             switch (MDbType)
             {
-                case DbTypeEnum.Sqlite:
+                case DbTypeEnum.SqlIte:
                     var parameters = new object[2];
                     parameters[0] = name;
-                    parameters[1] = vallue;
-                    var obj = _sqliteAss.CreateInstance("System.Data.SQLite.SQLiteParameter", true, BindingFlags.Default, null, parameters, null, null);
+                    parameters[1] = value;
+                    var obj = _sqlIteAss.CreateInstance("System.Data.SQLite.SQLiteParameter", true, BindingFlags.Default, null, parameters, null, null);
                     dbParameter = (DbParameter)obj;
                     break;
                 case DbTypeEnum.Mysql:
-                    dbParameter = new MySqlParameter(name, vallue);
+                    dbParameter = new MySqlParameter(name, value);
                     break;
                 case DbTypeEnum.Mssql:
-                    dbParameter = new SqlParameter(name, vallue);
+                    dbParameter = new SqlParameter(name, value);
                     break;
                 case DbTypeEnum.Oracle:
-                    dbParameter = new OracleParameter(name, vallue);
+                    dbParameter = new OracleParameter(name, value);
                     break;
                 case DbTypeEnum.None:
                     dbParameter = null;
@@ -370,7 +373,7 @@ namespace NetFrameWork.Database
         {
             switch (MDbType)
             {
-                case DbTypeEnum.Sqlite:
+                case DbTypeEnum.SqlIte:
                     return ":";
                 case DbTypeEnum.Mysql:
                     return "@";
@@ -401,8 +404,10 @@ namespace NetFrameWork.Database
         {
             var keywordList = new List<string>
             {
+                // ReSharper disable once StringLiteralTypo
                 "net localgroup",
                 "net user",
+                // ReSharper disable once StringLiteralTypo
                 "xp_cmdshell",
                 "exec",
                 "execute",
@@ -522,24 +527,24 @@ namespace NetFrameWork.Database
         /// 执行SQL语句，返回影响的记录数
         /// </summary>
         /// <param name="sqlString">SQL语句</param>
-        /// <param name="cmdParms">参数</param>
+        /// <param name="cmdParamArr">参数</param>
         /// <returns>影响的记录数</returns>
-        public int ExecuteSql(string sqlString, params DbParameter[] cmdParms)
+        public int ExecuteSql(string sqlString, params DbParameter[] cmdParamArr)
         {
-            LogInfo(sqlString, cmdParms);
+            LogInfo(sqlString, cmdParamArr);
             var conn = _mTran == null ? GetConnection() : _mTran.Connection;
             using (var cmd = GetCommand())
             {
                 try
                 {
-                    PrepareCommand(cmd, conn, _mTran, sqlString, cmdParms);
+                    PrepareCommand(cmd, conn, _mTran, sqlString, cmdParamArr);
                     var rows = cmd.ExecuteNonQuery();
                     cmd.Parameters.Clear();
                     return rows;
                 }
                 catch (Exception ex)
                 {
-                    LogErr(sqlString, cmdParms);
+                    LogErr(sqlString, cmdParamArr);
                     Error(ex);
                     return 0;
                 }
@@ -562,23 +567,23 @@ namespace NetFrameWork.Database
         /// 执行查询语句，返回IDataReader ( 注意：调用该方法后，一定要对IDataReader进行Close )
         /// </summary>
         /// <param name="sqlString">查询语句</param>
-        /// <param name="cmdParms">参数</param>
+        /// <param name="cmdParamArr">参数</param>
         /// <returns>IDataReader</returns>
-        public DbDataReader ExecuteReader(string sqlString, params DbParameter[] cmdParms)
+        public DbDataReader ExecuteReader(string sqlString, params DbParameter[] cmdParamArr)
         {
-            LogInfo(sqlString, cmdParms);
+            LogInfo(sqlString, cmdParamArr);
             var conn = GetConnection();
             var cmd = GetCommand();
             try
             {
-                PrepareCommand(cmd, conn, null, sqlString, cmdParms);
+                PrepareCommand(cmd, conn, null, sqlString, cmdParamArr);
                 var myReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 cmd.Parameters.Clear();
                 return myReader;
             }
             catch (Exception ex)
             {
-                LogErr(sqlString, cmdParms);
+                LogErr(sqlString, cmdParamArr);
                 Error(ex);
                 return null;
             }
@@ -593,14 +598,14 @@ namespace NetFrameWork.Database
         /// 执行查询语句，返回DataSet
         /// </summary>
         /// <param name="sqlString">查询语句</param>
-        /// <param name="cmdParms">参数</param>
+        /// <param name="cmdParamArr">参数</param>
         /// <returns>DataSet</returns>
-        public DataSet ExecuteSet(string sqlString, params DbParameter[] cmdParms)
+        public DataSet ExecuteSet(string sqlString, params DbParameter[] cmdParamArr)
         {
-            LogInfo(sqlString, cmdParms);
+            LogInfo(sqlString, cmdParamArr);
             var conn = GetConnection();
             var cmd = GetCommand();
-            PrepareCommand(cmd, conn, null, sqlString, cmdParms);
+            PrepareCommand(cmd, conn, null, sqlString, cmdParamArr);
             using (var da = GetDataAdapter(cmd))
             {
                 var ds = new DataSet();
@@ -611,7 +616,7 @@ namespace NetFrameWork.Database
                 }
                 catch (Exception ex)
                 {
-                    LogErr(sqlString, cmdParms);
+                    LogErr(sqlString, cmdParamArr);
                     Error(ex);
                     return null;
                 }
@@ -634,8 +639,8 @@ namespace NetFrameWork.Database
         /// <param name="conn">数据库连接对象</param>
         /// <param name="trans">事物对象</param>
         /// <param name="cmdText">运行的文本</param>
-        /// <param name="cmdParms">DbCommand参数</param>
-        private static void PrepareCommand(DbCommand cmd, DbConnection conn, DbTransaction trans, string cmdText, DbParameter[] cmdParms)
+        /// <param name="cmdParamArr">DbCommand参数</param>
+        private static void PrepareCommand(DbCommand cmd, DbConnection conn, DbTransaction trans, string cmdText, DbParameter[] cmdParamArr)
         {
             try
             {
@@ -652,14 +657,14 @@ namespace NetFrameWork.Database
                 }
 
                 cmd.CommandType = CommandType.Text;
-                if (cmdParms == null)
+                if (cmdParamArr == null)
                 {
                     return;
                 }
 
-                foreach (var parm in cmdParms)
+                foreach (var param in cmdParamArr)
                 {
-                    cmd.Parameters.Add(parm);
+                    cmd.Parameters.Add(param);
                 }
             }
             catch (Exception e)
@@ -669,22 +674,22 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 从sql中 获取sqlstr与DbParameter[]
+        /// 从sql中 获取sqlStr与DbParameter[]
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="sqlstr"></param>
-        /// <param name="parms"></param>
-        private void GetSqlAndParms(Sql sql, out string sqlstr, out DbParameter[] parms)
+        /// <param name="sqlStr"></param>
+        /// <param name="paramArr"></param>
+        private void GetSqlAndParamArr(Sql sql, out string sqlStr, out DbParameter[] paramArr)
         {
-            sqlstr = sql.ToString();
-            parms = new DbParameter[sql.ParamDict.Count];
+            sqlStr = sql.ToString();
+            paramArr = new DbParameter[sql.ParamDict.Count];
             var i = 0;
             foreach (var p in sql.ParamDict)
             {
                 //这里参数化为了匹配不同的数据库 在这里补充下参数化的参数前缀
-                var parmsKey = GetParameterMark() + p.Key;
-                sqlstr = sqlstr.Replace(p.Key, parmsKey);
-                parms[i] = GetDbParameter(parmsKey, p.Value);
+                var paramKey = GetParameterMark() + p.Key;
+                sqlStr = sqlStr.Replace(p.Key, paramKey);
+                paramArr[i] = GetDbParameter(paramKey, p.Value);
                 i++;
             }
         }
@@ -841,7 +846,7 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public bool Delete<T>(Sql sql)
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
             if (string.IsNullOrEmpty(conditions))
             {
                 return false;
@@ -852,6 +857,18 @@ namespace NetFrameWork.Database
             SqlFilter(ref conditions);
             sbSql.AppendFormat("delete from {0} where {1}", type.Name, conditions);
             return ExecuteSql(sbSql.ToString(), parameters) > 0;
+        }
+
+        /// <summary>
+        /// 根据条件删除
+        /// </summary>
+        /// <typeparam name="T">要删除的实体类型</typeparam>
+        /// <param name="lambdaWhere">拉姆达表达式</param>
+        /// <returns></returns>
+        public bool Delete<T>(Expression<Func<T, bool>> lambdaWhere)
+        {
+            var sql = Where.ToSql(lambdaWhere);
+            return Delete<T>(sql);
         }
 
         /// <summary>
@@ -868,7 +885,7 @@ namespace NetFrameWork.Database
             }
             catch (Exception ex)
             {
-                Error("批量删除所有数据发生异常:" + ex);
+                Error("删除表数据发生异常:" + ex);
                 throw;
             }
 
@@ -959,14 +976,26 @@ namespace NetFrameWork.Database
             foreach (var p in sql.ParamDict)
             {
                 //这里参数化为了匹配不同的数据库 在这里补充下参数化的参数前缀
-                var parmsKey = GetParameterMark() + p.Key;
-                conditions = conditions.Replace(p.Key, parmsKey);
+                var paramKey = GetParameterMark() + p.Key;
+                conditions = conditions.Replace(p.Key, paramKey);
                 parameters[k++] = GetDbParameter(GetParameterMark() + p.Key, p.Value);
             }
             //拼接上where语句
             strSql.AppendFormat(" where {0}", conditions);
             //执行
             return savedCount > 0 && ExecuteSql(strSql.ToString(), parameters) > 0;
+        }
+
+        /// <summary>
+        /// 根据条件修改
+        /// </summary>
+        /// <param name="t">要修改的实体</param>
+        /// <param name="lambdaWhere">拉姆达表达式</param>
+        /// <returns></returns>
+        public bool Update<T>(T t, Expression<Func<T, bool>> lambdaWhere)
+        {
+            var sql = Where.ToSql(lambdaWhere);
+            return Update(t, sql);
         }
 
         #endregion
@@ -978,7 +1007,7 @@ namespace NetFrameWork.Database
         /// </summary>
         /// <param name="conditions">查询条件(从where后面开始组装)</param>
         /// <returns></returns>
-        public T Select<T>(string conditions) where T : new()
+        public T Select<T>(string conditions = "") where T : new()
         {
             var st = new Sql();
             st.Add(conditions);
@@ -990,16 +1019,28 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 根据条件查询单条数据
         /// </summary>
+        /// <param name="lambdaWhere">拉姆达表达式</param>
+        /// <returns></returns>
+        public T Select<T>(Expression<Func<T, bool>> lambdaWhere) where T : new()
+        {
+            var sql = Where.ToSql(lambdaWhere);
+            return Select<T>(sql);
+        }
+
+        /// <summary>
+        /// 根据条件查询单条数据
+        /// </summary>
         /// <param name="sql">sql对象(从where后面开始组装)</param>
         /// <returns></returns>
         public T Select<T>(Sql sql) where T : new()
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
-            sbSql.AppendFormat("select * from {0} where {1}", type.Name, conditions);
-            return Find<T>(sbSql.ToString(), parameters);
+            var where = conditions == "" ? "" : " where " + conditions;
+            sbSql.AppendFormat("select * from {0} {1}", type.Name, where);
+            return FindBySql<T>(sbSql.ToString(), parameters);
         }
 
         /// <summary>
@@ -1007,25 +1048,24 @@ namespace NetFrameWork.Database
         /// </summary>
         /// <param name="conditions">修改的条件(从where后面开始组装)</param>
         /// <returns></returns>
-        public List<T> SelectAll<T>(string conditions) where T : new()
+        public List<T> SelectAll<T>(string conditions = "") where T : new()
         {
             var st = new Sql();
-            st.Add(conditions == "" ? "1=1" : conditions);
+            st.Add(conditions);
             var ret = SelectAll<T>(st);
             st.Clear();
             return ret;
         }
 
         /// <summary>
-        /// 查询列表
+        /// 根据条件查询列表
         /// </summary>
+        /// <param name="lambdaWhere">拉姆达表达式</param>
         /// <returns></returns>
-        public List<T> SelectAll<T>() where T : new()
+        public List<T> SelectAll<T>(Expression<Func<T, bool>> lambdaWhere) where T : new()
         {
-            var type = typeof(T);
-            var sbSql = new StringBuilder();
-            sbSql.AppendFormat("select * from {0}", type.Name);
-            return FindList<T>(sbSql.ToString());
+            var sql = Where.ToSql(lambdaWhere);
+            return SelectAll<T>(sql);
         }
 
         /// <summary>
@@ -1035,23 +1075,23 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public List<T> SelectAll<T>(Sql sql) where T : new()
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
             var type = typeof(T);
             var sbSql = new StringBuilder();
             SqlFilter(ref conditions);
             var where = conditions == "" ? "" : " where " + conditions;
             sbSql.AppendFormat("select * from {0} {1}", type.Name, where);
-            return FindList<T>(sbSql.ToString(), parameters);
+            return FindListBySql<T>(sbSql.ToString(), parameters);
         }
 
         /// <summary>
-        /// 查询直接返回dataset
+        /// 查询直接返回DataSet
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
         public DataSet DataSetQuery(Sql sql)
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
             return ExecuteSet(conditions, parameters);
         }
 
@@ -1062,7 +1102,7 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 根据sql获取实体
         /// </summary>
-        private T Find<T>(string sqlString, params DbParameter[] cmdParms) where T : new()
+        public T FindBySql<T>(string sqlString, params DbParameter[] cmdParamArr) where T : new()
         {
             var type = typeof(T);
             var result = (T)Activator.CreateInstance(type);
@@ -1070,15 +1110,15 @@ namespace NetFrameWork.Database
 
             try
             {
-                rd = ExecuteReader(sqlString, cmdParms);
+                rd = ExecuteReader(sqlString, cmdParamArr);
 
                 var propertyInfoList = GetEntityProperties(type);
 
-                var fcnt = rd.FieldCount;
-                var fileds = new List<string>();
-                for (var i = 0; i < fcnt; i++)
+                var fieldCount = rd.FieldCount;
+                var filedArr = new List<string>();
+                for (var i = 0; i < fieldCount; i++)
                 {
-                    fileds.Add(rd.GetName(i).ToUpper());
+                    filedArr.Add(rd.GetName(i).ToUpper());
                 }
 
                 if (rd.Read())
@@ -1090,7 +1130,7 @@ namespace NetFrameWork.Database
                         switch (pro.PropertyType.Namespace)
                         {
                             case "System":
-                                if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
+                                if (!filedArr.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
                                 {
                                     continue;
                                 }
@@ -1098,19 +1138,19 @@ namespace NetFrameWork.Database
                                 break;
                             default:
                                 var proInfoList = GetEntityProperties(pro.PropertyType);
-                                var tmpp = Activator.CreateInstance(pro.PropertyType);
+                                var tmp = Activator.CreateInstance(pro.PropertyType);
                                 foreach (var p in proInfoList)
                                 {
-                                    if (!fileds.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                    if (!filedArr.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
                                     {
                                         index++;
                                         continue;
                                     }
                                     var v = GetReaderValue(record[index], p.PropertyType);
-                                    p.SetValue(tmpp, v, null);
+                                    p.SetValue(tmp, v, null);
                                     index++;
                                 }
-                                pro.SetValue(result, tmpp, null);
+                                pro.SetValue(result, tmp, null);
                                 break;
                         }
                     }
@@ -1133,17 +1173,6 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 根据sql获取实体
-        /// </summary>
-        /// <typeparam name="T">要查询的实体类型</typeparam>
-        /// <param name="sql">SQL语句(全SQL)</param>
-        /// <returns></returns>
-        public T FindBySql<T>(string sql) where T : new()
-        {
-            return Find<T>(sql);
-        }
-
-        /// <summary>
         /// 根据sql获取实体(参数化)
         /// </summary>
         /// <typeparam name="T">要查询的实体类型</typeparam>
@@ -1151,8 +1180,8 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public T FindBySql<T>(Sql sql) where T : new()
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
-            return Find<T>(conditions, parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
+            return FindBySql<T>(conditions, parameters);
         }
 
         #endregion
@@ -1160,16 +1189,20 @@ namespace NetFrameWork.Database
         #region 获取实体集合
 
         /// <summary>
-        /// 根据参数化sql获取列表
+        /// 根据sql获取列表
         /// </summary>
-        private List<T> FindList<T>(string sqlString, params DbParameter[] cmdParms) where T : new()
+        /// <typeparam name="T">要查询的列表实体类型</typeparam>
+        /// <param name="sql">SQL语句(全SQL)</param>
+        /// <param name="cmdParamArr">参数</param>
+        /// <returns></returns>
+        public List<T> FindListBySql<T>(string sql, params DbParameter[] cmdParamArr) where T : new()
         {
             var list = new List<T>();
             IDataReader rd = null;
 
             try
             {
-                rd = ExecuteReader(sqlString, cmdParms);
+                rd = ExecuteReader(sql, cmdParamArr);
 
                 if (typeof(T) == typeof(int))
                 {
@@ -1189,11 +1222,11 @@ namespace NetFrameWork.Database
                 {
                     var propertyInfoList = typeof(T).GetProperties();
 
-                    var fcnt = rd.FieldCount;
-                    var fileds = new List<string>();
-                    for (var i = 0; i < fcnt; i++)
+                    var fieldCount = rd.FieldCount;
+                    var filedArr = new List<string>();
+                    for (var i = 0; i < fieldCount; i++)
                     {
-                        fileds.Add(rd.GetName(i).ToUpper());
+                        filedArr.Add(rd.GetName(i).ToUpper());
                     }
 
                     while (rd.Read())
@@ -1207,7 +1240,7 @@ namespace NetFrameWork.Database
                             switch (pro.PropertyType.Namespace)
                             {
                                 case "System":
-                                    if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
+                                    if (!filedArr.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
                                     {
                                         continue;
                                     }
@@ -1215,22 +1248,22 @@ namespace NetFrameWork.Database
                                     break;
                                 default:
                                     var proInfoList = GetEntityProperties(pro.PropertyType);
-                                    var tmpp = Activator.CreateInstance(pro.PropertyType);
+                                    var tmp = Activator.CreateInstance(pro.PropertyType);
                                     foreach (var p in proInfoList)
                                     {
-                                        if (!fileds.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                        if (!filedArr.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
                                         {
                                             continue;
                                         }
                                         var v = GetReaderValue(record[index], p.PropertyType);
-                                        p.SetValue(tmpp, v, null);
+                                        p.SetValue(tmp, v, null);
                                         index++;
                                     }
-                                    pro.SetValue(obj, tmpp, null);
+                                    pro.SetValue(obj, tmp, null);
                                     break;
                             }
 
-                            if (!fileds.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
+                            if (!filedArr.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
                             {
                                 continue;
                             }
@@ -1256,27 +1289,17 @@ namespace NetFrameWork.Database
             return list;
         }
 
-        /// <summary>
-        /// 根据sql获取列表
-        /// </summary>
-        /// <typeparam name="T">要查询的列表实体类型</typeparam>
-        /// <param name="sql">SQL语句(全SQL)</param>
-        /// <returns></returns>
-        public List<T> FindListBySql<T>(string sql) where T : new()
-        {
-            return FindList<T>(sql);
-        }
 
         /// <summary>
-        /// 根据sql获取实体
+        /// 根据sql获取列表
         /// </summary>
         /// <typeparam name="T">要查询的实体类型</typeparam>
         /// <param name="sql">sql对象(全SQL)</param>
         /// <returns></returns>
         public List<T> FindListBySql<T>(Sql sql) where T : new()
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
-            return FindList<T>(conditions, parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
+            return FindListBySql<T>(conditions, parameters);
         }
 
         #endregion
@@ -1291,16 +1314,16 @@ namespace NetFrameWork.Database
         /// 分页(任意entity，尽量少的字段)
         /// </summary>
         /// <returns></returns>
-        public List<T> FindPageBySql<T>(Sql sql, string orderby, int pageSize, int currentPage, out int rows) where T : new()
+        public List<T> FindPageBySql<T>(Sql sql, string orderBy, int pageSize, int currentPage, out int rows) where T : new()
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
             using (var connection = GetConnection())
             {
                 connection.Open();
                 var commandText = "select count(*) from (" + sql + ") T";
                 IDbCommand cmd = GetCommand(commandText, connection);
                 rows = int.Parse(cmd.ExecuteScalar().ToString());
-                return FindList<T>(GetPageSql(conditions, orderby, pageSize, currentPage), parameters);
+                return FindListBySql<T>(GetPageSql(conditions, orderBy, pageSize, currentPage), parameters);
             }
         }
 
@@ -1313,7 +1336,7 @@ namespace NetFrameWork.Database
         /// </summary>
         public DataSet FindPageBySql(Sql sql, string orderby, int pageSize, int currentPage, out int totalCount)
         {
-            GetSqlAndParms(sql, out var conditions, out var parameters);
+            GetSqlAndParamArr(sql, out var conditions, out var parameters);
             DataSet ds;
             using (var connection = GetConnection())
             {
@@ -1329,7 +1352,8 @@ namespace NetFrameWork.Database
         #endregion
 
         #region 分页语句拼接
-        private string GetPageSql(string sql, string orderby, int pageSize, int currentPage)
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        private string GetPageSql(string sql, string orderBy, int pageSize, int currentPage)
         {
             var sb = new StringBuilder();
             int startRow;
@@ -1345,10 +1369,10 @@ namespace NetFrameWork.Database
 
                     sb.Append("select * from ( select row_limit.*, rownum rownum_ from (");
                     sb.Append(sql);
-                    if (!string.IsNullOrEmpty(orderby))
+                    if (!string.IsNullOrEmpty(orderBy))
                     {
                         sb.Append(" ");
-                        sb.Append(orderby);
+                        sb.Append(orderBy);
                     }
                     sb.Append(" ) row_limit where rownum <= ");
                     sb.Append(endRow);
@@ -1368,7 +1392,7 @@ namespace NetFrameWork.Database
                     sb.AppendFormat(@"
                             select * from
                             (select ROW_NUMBER() over({1}) as rowNumber, t.* from ({0}) t) tempTable
-                            where rowNumber between {2} and {3} ", sql, orderby, startRow, endRow);
+                            where rowNumber between {2} and {3} ", sql, orderBy, startRow, endRow);
 
                     #endregion
 
@@ -1380,26 +1404,26 @@ namespace NetFrameWork.Database
                     startRow = pageSize * (currentPage - 1);
 
                     sb.Append(sql);
-                    if (!string.IsNullOrEmpty(orderby))
+                    if (!string.IsNullOrEmpty(orderBy))
                     {
                         sb.Append(" ");
-                        sb.Append(orderby);
+                        sb.Append(orderBy);
                     }
                     sb.AppendFormat(" limit {0},{1}", startRow, pageSize);
 
                     #endregion
 
                     break;
-                case DbTypeEnum.Sqlite:
+                case DbTypeEnum.SqlIte:
                     #region 分页查询语句
 
                     startRow = pageSize * (currentPage - 1);
 
                     sb.Append(sql);
-                    if (!string.IsNullOrEmpty(orderby))
+                    if (!string.IsNullOrEmpty(orderBy))
                     {
                         sb.Append(" ");
-                        sb.Append(orderby);
+                        sb.Append(orderBy);
                     }
                     sb.AppendFormat(" limit {0} offset {1}", pageSize, startRow);
 
@@ -1411,10 +1435,10 @@ namespace NetFrameWork.Database
                     startRow = pageSize * (currentPage - 1);
 
                     sb.Append(sql);
-                    if (!string.IsNullOrEmpty(orderby))
+                    if (!string.IsNullOrEmpty(orderBy))
                     {
                         sb.Append(" ");
-                        sb.Append(orderby);
+                        sb.Append(orderBy);
                     }
                     sb.AppendFormat(" limit {0} offset {1}", pageSize, startRow);
 
@@ -1431,54 +1455,54 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 转换数据
         /// </summary>
-        private static object GetReaderValue(object rdValue, Type ptype)
+        private static object GetReaderValue(object rdValue, Type pType)
         {
-            if (ptype == typeof(double))
+            if (pType == typeof(double))
             {
                 return Convert.ToDouble(rdValue);
             }
 
-            if (ptype == typeof(decimal))
+            if (pType == typeof(decimal))
             {
                 return Convert.ToDecimal(rdValue);
             }
 
-            if (ptype == typeof(int))
+            if (pType == typeof(int))
             {
                 return Convert.ToInt32(rdValue);
             }
 
-            if (ptype == typeof(long))
+            if (pType == typeof(long))
             {
                 return Convert.ToInt64(rdValue);
             }
 
-            if (ptype == typeof(DateTime))
+            if (pType == typeof(DateTime))
             {
                 return Convert.ToDateTime(rdValue);
             }
 
-            if (ptype == typeof(double?))
+            if (pType == typeof(double?))
             {
                 return Convert.ToDouble(rdValue);
             }
 
-            if (ptype == typeof(decimal?))
+            if (pType == typeof(decimal?))
             {
                 return Convert.ToDecimal(rdValue);
             }
 
-            if (ptype == typeof(int?))
+            if (pType == typeof(int?))
             {
                 return Convert.ToInt32(rdValue);
             }
 
-            if (ptype == typeof(long?))
+            if (pType == typeof(long?))
             {
                 return Convert.ToInt64(rdValue);
             }
 
-            return ptype == typeof(DateTime?) ? Convert.ToDateTime(rdValue) : rdValue;
+            return pType == typeof(DateTime?) ? Convert.ToDateTime(rdValue) : rdValue;
         }
 
         #endregion
@@ -1624,10 +1648,10 @@ namespace NetFrameWork.Database
         /// 获取具体执行的SQL
         /// </summary>
         /// <returns></returns>
-        private static string GetSql(string sqlString, params DbParameter[] cmdParms)
+        private static string GetSql(string sqlString, params DbParameter[] cmdParamArr)
         {
             var sqlStr = sqlString;
-            foreach (var p in cmdParms)
+            foreach (var p in cmdParamArr)
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (p.DbType)
@@ -1670,12 +1694,12 @@ namespace NetFrameWork.Database
         /// <summary>
         /// SQL记录日志
         /// </summary>
-        private static void LogInfo(string sqlString, params DbParameter[] cmdParms)
+        private static void LogInfo(string sqlString, params DbParameter[] cmdParamArr)
         {
             if (Debugger.IsAttached)
             {
                 Debug.WriteLine("----------------正常查询-------------");
-                Debug.WriteLine(GetSql(sqlString, cmdParms));
+                Debug.WriteLine(GetSql(sqlString, cmdParamArr));
                 Debug.WriteLine("-------------------结束-------------");
             }
 
@@ -1684,23 +1708,23 @@ namespace NetFrameWork.Database
                 return;
             }
 
-            Info("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
-            Info("调试查询:" + GetSql(sqlString, cmdParms));
+            Info("原查询:" + sqlString + string.Concat(cmdParamArr.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
+            Info("调试查询:" + GetSql(sqlString, cmdParamArr));
         }
 
         /// <summary>
         /// SQL错误日志
         /// </summary>
-        private static void LogErr(string sqlString, params DbParameter[] cmdParms)
+        private static void LogErr(string sqlString, params DbParameter[] cmdParamArr)
         {
             if (Debugger.IsAttached)
             {
                 Debug.WriteLine("----------------异常查询-------------");
-                Debug.WriteLine(GetSql(sqlString, cmdParms));
+                Debug.WriteLine(GetSql(sqlString, cmdParamArr));
                 Debug.WriteLine("-------------------结束-------------");
             }
-            Error("原查询:" + sqlString + string.Concat(cmdParms.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
-            Error("调试查询:" + GetSql(sqlString, cmdParms));
+            Error("原查询:" + sqlString + string.Concat(cmdParamArr.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
+            Error("调试查询:" + GetSql(sqlString, cmdParamArr));
         }
 
         private static void Info(object o)

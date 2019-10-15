@@ -42,7 +42,7 @@ namespace NetFrameWork.Database
                 case DbHelper.DbTypeEnum.Mysql:
                     sqlFun = new SqlFunBase();
                     break;
-                case DbHelper.DbTypeEnum.Sqlite:
+                case DbHelper.DbTypeEnum.SqlIte:
                     sqlFun = new SqLiteFunction();
                     break;
                 case DbHelper.DbTypeEnum.Mssql:

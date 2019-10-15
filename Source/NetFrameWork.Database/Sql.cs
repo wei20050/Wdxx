@@ -46,7 +46,7 @@ namespace NetFrameWork.Database
         #region 属性
 
         /// <summary>
-        /// 返回当前对象所有产品参数,key:参数数名(包含@),value:参数值
+        /// 返回当前对象所有产品参数,key:参数名,value:参数值
         /// </summary>
         public Dictionary<string, object> ParamDict { get; }
 
