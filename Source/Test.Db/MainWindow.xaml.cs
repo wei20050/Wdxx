@@ -1,4 +1,5 @@
-﻿using NetFrameWork.Database;
+﻿using System.Collections.Generic;
+using NetFrameWork.Database;
 using System.Windows;
 
 namespace Test.Db
@@ -15,7 +16,11 @@ namespace Test.Db
         {
             //var ret = _db.Update( new user { id = 1,name = ""});
             //MessageBox.Show(ret.ToString());
-            var ret = _db.FindListBySql<data>("select * from user join userage on user.aid = userage.id ");
+            //var ret = _db.FindListBySql<data>("select * from user join userage on user.aid = userage.id ");
+            var s = 12345;
+            _db.Delete<user>(p=>p.name==s.ToString() && p.id==2 &&(p.id !=3 || p.name == "李四"));
+
+            _db.Select<user>();
         }
 
     }
