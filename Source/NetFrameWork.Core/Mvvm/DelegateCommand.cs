@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Input;
 
+// ReSharper disable once IdentifierTypo
 namespace NetFrameWork.Core.Mvvm
 {
     /// <summary>

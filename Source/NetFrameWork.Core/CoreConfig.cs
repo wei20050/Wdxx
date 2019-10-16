@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {

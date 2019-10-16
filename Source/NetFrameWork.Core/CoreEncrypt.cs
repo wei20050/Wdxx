@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {
@@ -41,7 +42,7 @@ namespace NetFrameWork.Core
         }
 
         /// <summary>
-        /// AES加密(加密模式ECB,填充模式pkcs5padding,数据块128位,偏移量无,输出16进制,字符集UTF8)
+        /// AES加密(加密模式ECB,填充模式pk-cs5padding,数据块128位,偏移量无,输出16进制,字符集UTF8)
         /// </summary>
         /// <param name="text">加密字符</param>
         /// <param name="key">加密的key(必须是16的整数倍)</param>
@@ -64,7 +65,7 @@ namespace NetFrameWork.Core
         }
 
         /// <summary>
-        /// AES解密(加密模式ECB,填充模式pkcs5padding,数据块128位,偏移量无,输出16进制,字符集UTF8)
+        /// AES解密(加密模式ECB,填充模式pk-cs5padding,数据块128位,偏移量无,输出16进制,字符集UTF8)
         /// </summary>
         /// <param name="text">解密字符</param>
         /// <param name="key">解密的key(必须是16的整数倍)</param>

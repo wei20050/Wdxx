@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 
+// ReSharper disable once IdentifierTypo
 namespace NetFrameWork.Core.Mvvm
 {
     /// <summary>

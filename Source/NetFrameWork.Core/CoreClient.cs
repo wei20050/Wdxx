@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Web.Services.Description;
 using Microsoft.CSharp;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {
@@ -130,7 +131,7 @@ namespace NetFrameWork.Core
         public T Send<T>(string method, params object[] sendData) where T : new()
         {
             var ret = SendCore(method, 60, sendData);
-            return CoreConvert.JsonToObj<T>(ret);
+            return CoreConvert.JsonDataToObj<T>(ret);
         }
 
         /// <summary>
@@ -148,7 +149,7 @@ namespace NetFrameWork.Core
                 if (_isWebService)
                 {
                     var ret = Fun(method, sendData);
-                    return ret == null ? string.Empty : CoreConvert.ObjToJson(ret);
+                    return ret == null ? string.Empty : CoreConvert.ObjToJsonData(ret);
                 }
                 string result;
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(_serviceUrl + "/WebServiceSoap");

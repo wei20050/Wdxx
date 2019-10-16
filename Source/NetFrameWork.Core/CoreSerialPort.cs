@@ -1,6 +1,7 @@
 ﻿using System.IO.Ports;
 using System.Linq;
 using System.Timers;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {

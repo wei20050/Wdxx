@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {
@@ -355,6 +356,16 @@ namespace NetFrameWork.Core
                 CoreLog.Error(e, "CORE_");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 将JSON字符串转化为对应类型的对象
+        /// </summary>
+        /// <param name="json">json字符串</param>
+        /// <returns>转换后的对象</returns>
+        public static T JsonDataToObj<T>(string json)
+        {
+            return (T)JsonDataToObj(json, typeof(T));
         }
 
         /// <summary>

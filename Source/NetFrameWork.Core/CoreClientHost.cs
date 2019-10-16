@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {
@@ -376,7 +377,7 @@ namespace NetFrameWork.Core
                 //创建实例
                 var o = Activator.CreateInstance(_serviceClass);
                 //调用方法
-                return mi != null ? CoreConvert.ObjToJson(mi.Invoke(o, pos)) : null;
+                return mi != null ? CoreConvert.ObjToJsonData(mi.Invoke(o, pos)) : null;
             }
             catch (Exception ex)
             {

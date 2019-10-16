@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {

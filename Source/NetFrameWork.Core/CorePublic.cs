@@ -8,6 +8,7 @@ using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Core
 {

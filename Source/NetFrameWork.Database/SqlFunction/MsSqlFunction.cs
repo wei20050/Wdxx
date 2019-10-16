@@ -10,6 +10,7 @@
         
         internal new string Now()
         {
+            // ReSharper disable once StringLiteralTypo
             return "GETDATE()";
         }
 
