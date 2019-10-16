@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
+using NetFrameWork.Database.WhereExpression;
 
 namespace NetFrameWork.Database
 {
@@ -67,7 +70,7 @@ namespace NetFrameWork.Database
         private string AddParam(object v)
         {
             //这里用完 _lastParamIndex 立即加一 防止下个参数错误
-            var paramName = "SQL_P_" + _lastParamIndex++;
+            var paramName = $"Sql{_lastParamIndex++}Param";
             ParamDict.Add(paramName, v);
             return paramName;
         }
@@ -79,6 +82,23 @@ namespace NetFrameWork.Database
         {
             ParamDict.Clear();
             SqlText.Remove(0, SqlText.Length);
+        }
+
+        /// <summary>
+        /// 拉姆达转换Sql
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public Sql ToSql<T>(Expression<Func<T, bool>> e)
+        {
+            var w = new Where().ToWhere(e.Body);
+            var s = new Sql();
+            s.Add(w.ToString());
+            foreach (var p in w.ParamDict)
+            {
+                s.ParamDict.Add(p.Key, p.Value);
+            }
+            return s;
         }
 
         #endregion

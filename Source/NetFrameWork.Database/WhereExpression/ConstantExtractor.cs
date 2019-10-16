@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace NetFrameWork.Database.Expression
+namespace NetFrameWork.Database.WhereExpression
 {
     /// <summary>
     /// 
@@ -15,7 +15,7 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        public List<object> Extract(System.Linq.Expressions.Expression exp)
+        public List<object> Extract(Expression exp)
         {
             _mConstants = new List<object>();
             Visit(exp);
@@ -27,7 +27,7 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        protected override System.Linq.Expressions.Expression VisitConstant(ConstantExpression c)
+        protected override Expression VisitConstant(ConstantExpression c)
         {
             _mConstants.Add(c.Value);
             return c;

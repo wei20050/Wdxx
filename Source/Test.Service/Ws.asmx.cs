@@ -7,7 +7,7 @@ namespace Test.Service
     [WebService]
     public partial class Ws : WebService
     {
-        private readonly DbHelper _db = new DbHelper();
+        private readonly ORM _db = new ORM();
 
         [WebMethod]
         public string Test()

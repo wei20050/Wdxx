@@ -17,7 +17,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 using NetFrameWork.Core;
-using NetFrameWork.Database.Expression;
+// ReSharper disable UnusedMember.Global
 
 #pragma warning disable 618
 
@@ -27,7 +27,8 @@ namespace NetFrameWork.Database
     /// <summary>
     /// 数据库操作类
     /// </summary>
-    public class DbHelper
+    // ReSharper disable once InconsistentNaming
+    public class ORM
     {
         #region 构造
 
@@ -35,13 +36,13 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 无参构造(默认数据库连接字符串名称:DbContext)
         /// </summary>
-        public DbHelper() : this("DbContext") { }
+        public ORM() : this("DbContext") { }
 
         /// <summary>
         /// 带连接字符串名称构造
         /// </summary>
         /// <param name="dbConnectionName">数据库连接字符串Name</param>
-        public DbHelper(string dbConnectionName)
+        public ORM(string dbConnectionName)
         {
             var sqlLogCm = ConfigurationManager.ConnectionStrings["SqlLog"];
             if (sqlLogCm == null)
@@ -867,7 +868,7 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public bool Delete<T>(Expression<Func<T, bool>> lambdaWhere)
         {
-            var sql = Where.ToSql(lambdaWhere);
+            var sql = new Sql().ToSql(lambdaWhere);
             return Delete<T>(sql);
         }
 
@@ -961,8 +962,8 @@ namespace NetFrameWork.Database
                 {
                     continue;
                 }
-                sbPros.Append(string.Format(" `{0}`={1}{0}{2},", propertyInfo.Name, _mParameterMark, index));
-                var param = GetDbParameter(_mParameterMark + propertyInfo.Name + index, val);
+                sbPros.Append(string.Format(" `{0}`={1}{0}{2}Param,", propertyInfo.Name, _mParameterMark, index));
+                var param = GetDbParameter(_mParameterMark + propertyInfo.Name + index + "Param", val);
                 parameters[k++] = param;
                 index++;
             }
@@ -994,7 +995,7 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public bool Update<T>(T t, Expression<Func<T, bool>> lambdaWhere)
         {
-            var sql = Where.ToSql(lambdaWhere);
+            var sql = new Sql().ToSql(lambdaWhere);
             return Update(t, sql);
         }
 
@@ -1023,7 +1024,7 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public T Select<T>(Expression<Func<T, bool>> lambdaWhere) where T : new()
         {
-            var sql = Where.ToSql(lambdaWhere);
+            var sql = new Sql().ToSql(lambdaWhere);
             return Select<T>(sql);
         }
 
@@ -1064,7 +1065,7 @@ namespace NetFrameWork.Database
         /// <returns></returns>
         public List<T> SelectAll<T>(Expression<Func<T, bool>> lambdaWhere) where T : new()
         {
-            var sql = Where.ToSql(lambdaWhere);
+            var sql = new Sql().ToSql(lambdaWhere);
             return SelectAll<T>(sql);
         }
 
@@ -1334,7 +1335,7 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 分页(任意entity，尽量少的字段)
         /// </summary>
-        public DataSet FindPageBySql(Sql sql, string orderby, int pageSize, int currentPage, out int totalCount)
+        public DataSet FindPageBySql(Sql sql, string orderBy, int pageSize, int currentPage, out int totalCount)
         {
             GetSqlAndParamArr(sql, out var conditions, out var parameters);
             DataSet ds;
@@ -1344,7 +1345,7 @@ namespace NetFrameWork.Database
                 var commandText = "select count(*) from (" + sql + ") T";
                 IDbCommand cmd = GetCommand(commandText, connection);
                 totalCount = int.Parse(cmd.ExecuteScalar().ToString());
-                ds = ExecuteSet(GetPageSql(conditions, orderby, pageSize, currentPage), parameters);
+                ds = ExecuteSet(GetPageSql(conditions, orderBy, pageSize, currentPage), parameters);
             }
             return ds;
         }

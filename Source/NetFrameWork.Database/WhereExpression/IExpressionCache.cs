@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetFrameWork.Database.Expression
+namespace NetFrameWork.Database.WhereExpression
 {
     /// <summary>
     /// 

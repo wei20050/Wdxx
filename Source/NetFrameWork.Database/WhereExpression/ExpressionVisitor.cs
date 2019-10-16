@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
-namespace NetFrameWork.Database.Expression
+namespace NetFrameWork.Database.WhereExpression
 {
     /// <summary>
     /// 
@@ -13,7 +13,7 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression Visit(System.Linq.Expressions.Expression exp)
+        protected virtual Expression Visit(Expression exp)
         {
             if (exp == null)
                 return null;
@@ -105,10 +105,10 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         protected virtual ElementInit VisitElementInitializer(ElementInit initializer)
         {
-            ReadOnlyCollection<System.Linq.Expressions.Expression> arguments = VisitExpressionList(initializer.Arguments);
+            ReadOnlyCollection<Expression> arguments = VisitExpressionList(initializer.Arguments);
             if (arguments != initializer.Arguments)
             {
-                return System.Linq.Expressions.Expression.ElementInit(initializer.AddMethod, arguments);
+                return Expression.ElementInit(initializer.AddMethod, arguments);
             }
             return initializer;
         }
@@ -116,12 +116,12 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitUnary(UnaryExpression u)
+        protected virtual Expression VisitUnary(UnaryExpression u)
         {
-            System.Linq.Expressions.Expression operand = Visit(u.Operand);
+            Expression operand = Visit(u.Operand);
             if (operand != u.Operand)
             {
-                return System.Linq.Expressions.Expression.MakeUnary(u.NodeType, operand, u.Type, u.Method);
+                return Expression.MakeUnary(u.NodeType, operand, u.Type, u.Method);
             }
             return u;
         }
@@ -129,17 +129,17 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitBinary(BinaryExpression b)
+        protected virtual Expression VisitBinary(BinaryExpression b)
         {
-            System.Linq.Expressions.Expression left = Visit(b.Left);
-            System.Linq.Expressions.Expression right = Visit(b.Right);
-            System.Linq.Expressions.Expression conversion = Visit(b.Conversion);
+            Expression left = Visit(b.Left);
+            Expression right = Visit(b.Right);
+            Expression conversion = Visit(b.Conversion);
             if (left != b.Left || right != b.Right || conversion != b.Conversion)
             {
                 if (b.NodeType == ExpressionType.Coalesce && b.Conversion != null)
-                    return System.Linq.Expressions.Expression.Coalesce(left, right, conversion as LambdaExpression);
+                    return Expression.Coalesce(left, right, conversion as LambdaExpression);
                 else
-                    return System.Linq.Expressions.Expression.MakeBinary(b.NodeType, left, right, b.IsLiftedToNull, b.Method);
+                    return Expression.MakeBinary(b.NodeType, left, right, b.IsLiftedToNull, b.Method);
             }
             return b;
         }
@@ -147,12 +147,12 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitTypeIs(TypeBinaryExpression b)
+        protected virtual Expression VisitTypeIs(TypeBinaryExpression b)
         {
-            System.Linq.Expressions.Expression expr = Visit(b.Expression);
+            Expression expr = Visit(b.Expression);
             if (expr != b.Expression)
             {
-                return System.Linq.Expressions.Expression.TypeIs(expr, b.TypeOperand);
+                return Expression.TypeIs(expr, b.TypeOperand);
             }
             return b;
         }
@@ -160,7 +160,7 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitConstant(ConstantExpression c)
+        protected virtual Expression VisitConstant(ConstantExpression c)
         {
             return c;
         }
@@ -168,14 +168,14 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitConditional(ConditionalExpression c)
+        protected virtual Expression VisitConditional(ConditionalExpression c)
         {
-            System.Linq.Expressions.Expression test = Visit(c.Test);
-            System.Linq.Expressions.Expression ifTrue = Visit(c.IfTrue);
-            System.Linq.Expressions.Expression ifFalse = Visit(c.IfFalse);
+            Expression test = Visit(c.Test);
+            Expression ifTrue = Visit(c.IfTrue);
+            Expression ifFalse = Visit(c.IfFalse);
             if (test != c.Test || ifTrue != c.IfTrue || ifFalse != c.IfFalse)
             {
-                return System.Linq.Expressions.Expression.Condition(test, ifTrue, ifFalse);
+                return Expression.Condition(test, ifTrue, ifFalse);
             }
             return c;
         }
@@ -183,7 +183,7 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitParameter(ParameterExpression p)
+        protected virtual Expression VisitParameter(ParameterExpression p)
         {
             return p;
         }
@@ -191,12 +191,12 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitMemberAccess(MemberExpression m)
+        protected virtual Expression VisitMemberAccess(MemberExpression m)
         {
-            System.Linq.Expressions.Expression exp = Visit(m.Expression);
+            Expression exp = Visit(m.Expression);
             if (exp != m.Expression)
             {
-                return System.Linq.Expressions.Expression.MakeMemberAccess(exp, m.Member);
+                return Expression.MakeMemberAccess(exp, m.Member);
             }
             return m;
         }
@@ -204,13 +204,13 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitMethodCall(MethodCallExpression m)
+        protected virtual Expression VisitMethodCall(MethodCallExpression m)
         {
-            System.Linq.Expressions.Expression obj = Visit(m.Object);
-            IEnumerable<System.Linq.Expressions.Expression> args = VisitExpressionList(m.Arguments);
+            Expression obj = Visit(m.Object);
+            IEnumerable<Expression> args = VisitExpressionList(m.Arguments);
             if (obj != m.Object || args != m.Arguments)
             {
-                return System.Linq.Expressions.Expression.Call(obj, m.Method, args);
+                return Expression.Call(obj, m.Method, args);
             }
             return m;
         }
@@ -218,19 +218,19 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual ReadOnlyCollection<System.Linq.Expressions.Expression> VisitExpressionList(ReadOnlyCollection<System.Linq.Expressions.Expression> original)
+        protected virtual ReadOnlyCollection<Expression> VisitExpressionList(ReadOnlyCollection<Expression> original)
         {
-            List<System.Linq.Expressions.Expression> list = null;
+            List<Expression> list = null;
             for (int i = 0, n = original.Count; i < n; i++)
             {
-                System.Linq.Expressions.Expression p = Visit(original[i]);
+                Expression p = Visit(original[i]);
                 if (list != null)
                 {
                     list.Add(p);
                 }
                 else if (p != original[i])
                 {
-                    list = new List<System.Linq.Expressions.Expression>(n);
+                    list = new List<Expression>(n);
                     for (int j = 0; j < i; j++)
                     {
                         list.Add(original[j]);
@@ -250,10 +250,10 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assignment)
         {
-            System.Linq.Expressions.Expression e = Visit(assignment.Expression);
+            Expression e = Visit(assignment.Expression);
             if (e != assignment.Expression)
             {
-                return System.Linq.Expressions.Expression.Bind(assignment.Member, e);
+                return Expression.Bind(assignment.Member, e);
             }
             return assignment;
         }
@@ -266,7 +266,7 @@ namespace NetFrameWork.Database.Expression
             IEnumerable<MemberBinding> bindings = VisitBindingList(binding.Bindings);
             if (bindings != binding.Bindings)
             {
-                return System.Linq.Expressions.Expression.MemberBind(binding.Member, bindings);
+                return Expression.MemberBind(binding.Member, bindings);
             }
             return binding;
         }
@@ -279,7 +279,7 @@ namespace NetFrameWork.Database.Expression
             IEnumerable<ElementInit> initializerArr = VisitElementInitializerList(binding.Initializers);
             if (initializerArr != binding.Initializers)
             {
-                return System.Linq.Expressions.Expression.ListBind(binding.Member, initializerArr);
+                return Expression.ListBind(binding.Member, initializerArr);
             }
             return binding;
         }
@@ -343,12 +343,12 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitLambda(LambdaExpression lambda)
+        protected virtual Expression VisitLambda(LambdaExpression lambda)
         {
-            System.Linq.Expressions.Expression body = Visit(lambda.Body);
+            Expression body = Visit(lambda.Body);
             if (body != lambda.Body)
             {
-                return System.Linq.Expressions.Expression.Lambda(lambda.Type, body, lambda.Parameters);
+                return Expression.Lambda(lambda.Type, body, lambda.Parameters);
             }
             return lambda;
         }
@@ -358,13 +358,13 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         protected virtual NewExpression VisitNew(NewExpression nex)
         {
-            IEnumerable<System.Linq.Expressions.Expression> args = VisitExpressionList(nex.Arguments);
+            IEnumerable<Expression> args = VisitExpressionList(nex.Arguments);
             if (args != nex.Arguments)
             {
                 if (nex.Members != null)
-                    return System.Linq.Expressions.Expression.New(nex.Constructor, args, nex.Members);
+                    return Expression.New(nex.Constructor, args, nex.Members);
                 else
-                    return System.Linq.Expressions.Expression.New(nex.Constructor, args);
+                    return Expression.New(nex.Constructor, args);
             }
             return nex;
         }
@@ -372,13 +372,13 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitMemberInit(MemberInitExpression init)
+        protected virtual Expression VisitMemberInit(MemberInitExpression init)
         {
             NewExpression n = VisitNew(init.NewExpression);
             IEnumerable<MemberBinding> bindings = VisitBindingList(init.Bindings);
             if (n != init.NewExpression || bindings != init.Bindings)
             {
-                return System.Linq.Expressions.Expression.MemberInit(n, bindings);
+                return Expression.MemberInit(n, bindings);
             }
             return init;
         }
@@ -386,13 +386,13 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitListInit(ListInitExpression init)
+        protected virtual Expression VisitListInit(ListInitExpression init)
         {
             NewExpression n = VisitNew(init.NewExpression);
             IEnumerable<ElementInit> initializerArr = VisitElementInitializerList(init.Initializers);
             if (n != init.NewExpression || initializerArr != init.Initializers)
             {
-                return System.Linq.Expressions.Expression.ListInit(n, initializerArr);
+                return Expression.ListInit(n, initializerArr);
             }
             return init;
         }
@@ -400,18 +400,18 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitNewArray(NewArrayExpression na)
+        protected virtual Expression VisitNewArray(NewArrayExpression na)
         {
-            IEnumerable<System.Linq.Expressions.Expression> exprArr = VisitExpressionList(na.Expressions);
+            IEnumerable<Expression> exprArr = VisitExpressionList(na.Expressions);
             if (exprArr != na.Expressions)
             {
                 if (na.NodeType == ExpressionType.NewArrayInit)
                 {
-                    return System.Linq.Expressions.Expression.NewArrayInit(na.Type.GetElementType() ?? throw new InvalidOperationException(), exprArr);
+                    return Expression.NewArrayInit(na.Type.GetElementType() ?? throw new InvalidOperationException(), exprArr);
                 }
                 else
                 {
-                    return System.Linq.Expressions.Expression.NewArrayBounds(na.Type.GetElementType() ?? throw new InvalidOperationException(), exprArr);
+                    return Expression.NewArrayBounds(na.Type.GetElementType() ?? throw new InvalidOperationException(), exprArr);
                 }
             }
             return na;
@@ -420,13 +420,13 @@ namespace NetFrameWork.Database.Expression
         /// <summary>
         /// 
         /// </summary>
-        protected virtual System.Linq.Expressions.Expression VisitInvocation(InvocationExpression iv)
+        protected virtual Expression VisitInvocation(InvocationExpression iv)
         {
-            IEnumerable<System.Linq.Expressions.Expression> args = VisitExpressionList(iv.Arguments);
-            System.Linq.Expressions.Expression expr = Visit(iv.Expression);
+            IEnumerable<Expression> args = VisitExpressionList(iv.Arguments);
+            Expression expr = Visit(iv.Expression);
             if (args != iv.Arguments || expr != iv.Expression)
             {
-                return System.Linq.Expressions.Expression.Invoke(expr, args);
+                return Expression.Invoke(expr, args);
             }
             return iv;
         }

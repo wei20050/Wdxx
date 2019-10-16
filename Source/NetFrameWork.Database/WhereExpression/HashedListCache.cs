@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 
-namespace NetFrameWork.Database.Expression
+namespace NetFrameWork.Database.WhereExpression
 {
     /// <summary>
     /// 
     /// </summary>
     public class HashedListCache<T> : IExpressionCache<T> where T : class
     {
-        private readonly Dictionary<int, SortedList<System.Linq.Expressions.Expression, T>> _mStorage =
-            new Dictionary<int, SortedList<System.Linq.Expressions.Expression, T>>();
+        private readonly Dictionary<int, SortedList<Expression, T>> _mStorage =
+            new Dictionary<int, SortedList<Expression, T>>();
         private readonly ReaderWriterLockSlim _mRwLock = new ReaderWriterLockSlim();
 
         /// <summary>
         /// 
         /// </summary>
-        public T Get(System.Linq.Expressions.Expression key, Func<System.Linq.Expressions.Expression, T> creator)
+        public T Get(Expression key, Func<Expression, T> creator)
         {
-            SortedList<System.Linq.Expressions.Expression, T> sortedList;
+            SortedList<Expression, T> sortedList;
             T value;
 
             int hash = new Hasher().Hash(key);
@@ -42,7 +42,7 @@ namespace NetFrameWork.Database.Expression
             {
                 if (!_mStorage.TryGetValue(hash, out sortedList))
                 {
-                    sortedList = new SortedList<System.Linq.Expressions.Expression, T>(new Comparer());
+                    sortedList = new SortedList<Expression, T>(new Comparer());
                     _mStorage.Add(hash, sortedList);
                 }
 
@@ -65,7 +65,7 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         private class Hasher : ExpressionHasher
         {
-            protected override System.Linq.Expressions.Expression VisitConstant(ConstantExpression c)
+            protected override Expression VisitConstant(ConstantExpression c)
             {
                 return c;
             }

@@ -14,18 +14,18 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public static DbHelper.DbTypeEnum MDbType;
+        public static ORM.DbTypeEnum MDbType;
 
         /// <inheritdoc />
         /// <summary>
         /// 默认构造 Mysql数据库
         /// </summary>
-        public SqlFun() : this(DbHelper.DbTypeEnum.Mysql) { }
+        public SqlFun() : this(ORM.DbTypeEnum.Mysql) { }
 
         /// <summary>
         /// 构造函数 初始化sql语句与参数
         /// </summary>
-        public SqlFun(DbHelper.DbTypeEnum dbType)
+        public SqlFun(ORM.DbTypeEnum dbType)
         {
             MDbType = dbType;
         }
@@ -39,19 +39,19 @@ namespace NetFrameWork.Database
             SqlFunBase sqlFun;
             switch (MDbType)
             {
-                case DbHelper.DbTypeEnum.Mysql:
+                case ORM.DbTypeEnum.Mysql:
                     sqlFun = new SqlFunBase();
                     break;
-                case DbHelper.DbTypeEnum.SqlIte:
+                case ORM.DbTypeEnum.SqlIte:
                     sqlFun = new SqLiteFunction();
                     break;
-                case DbHelper.DbTypeEnum.Mssql:
+                case ORM.DbTypeEnum.Mssql:
                     sqlFun = new MsSqlFunction();
                     break;
-                case DbHelper.DbTypeEnum.Oracle:
+                case ORM.DbTypeEnum.Oracle:
                     sqlFun = new OracleFunction();
                     break;
-                case DbHelper.DbTypeEnum.None:
+                case ORM.DbTypeEnum.None:
                     sqlFun = new SqlFunBase();
                     break;
                 default:

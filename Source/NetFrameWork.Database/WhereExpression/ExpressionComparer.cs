@@ -5,12 +5,12 @@ using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace NetFrameWork.Database.Expression
+namespace NetFrameWork.Database.WhereExpression
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ExpressionComparer : IComparer<System.Linq.Expressions.Expression>
+    public class ExpressionComparer : IComparer<Expression>
     {
         /// <summary>
         /// 
@@ -96,7 +96,7 @@ namespace NetFrameWork.Database.Expression
         /// <param name="y"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public virtual int Compare(System.Linq.Expressions.Expression x, System.Linq.Expressions.Expression y)
+        public virtual int Compare(Expression x, Expression y)
         {
             if (CompareNull(x, y, out var result)) return result;
             if (x==null || y==null)
@@ -363,7 +363,7 @@ namespace NetFrameWork.Database.Expression
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        protected virtual int CompareExpressionList(ReadOnlyCollection<System.Linq.Expressions.Expression> x, ReadOnlyCollection<System.Linq.Expressions.Expression> y)
+        protected virtual int CompareExpressionList(ReadOnlyCollection<Expression> x, ReadOnlyCollection<Expression> y)
         {
             int result = x.Count - y.Count;
             if (result != 0) return result;

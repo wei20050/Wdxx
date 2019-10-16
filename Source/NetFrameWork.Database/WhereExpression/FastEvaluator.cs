@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace NetFrameWork.Database.Expression
+namespace NetFrameWork.Database.WhereExpression
 {
     /// <summary>
     /// 
@@ -13,7 +13,7 @@ namespace NetFrameWork.Database.Expression
             new HashedListCache<Func<List<object>, object>>();
 
         private readonly IExpressionCache<Func<List<object>, object>> _mCache;
-        private readonly Func<System.Linq.Expressions.Expression, Func<List<object>, object>> _mCreatorDelegate;
+        private readonly Func<Expression, Func<List<object>, object>> _mCreatorDelegate;
 
         /// <summary>
         /// 
@@ -37,7 +37,7 @@ namespace NetFrameWork.Database.Expression
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        public object Eval(System.Linq.Expressions.Expression exp)
+        public object Eval(Expression exp)
         {
             if (exp.NodeType == ExpressionType.Constant)
             {
