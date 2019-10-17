@@ -35,7 +35,7 @@ namespace Test.Db
             //var i2 = _db.Insert(user);
             //var b1 = _db.Delete<userage>(p=>p.id== "1d7dbc46-a013-4a80-b568-d59bb8762892");
             //var b2 = _db.Delete<user>(p => p.id == "13d66624-d96c-4f46-8d98-59fba59933ca");
-            var s = _db.SelectAll<user>(p=>p.id.EndsWith("9"));
+            var s = _db.SelectAll<user>(p=>p.name==null);
         }
 
     }

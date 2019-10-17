@@ -1685,7 +1685,7 @@ namespace NetFrameWork.Database
                         sqlStr = sqlStr.Replace(p.ParameterName, "'" + p.Value + "'");
                         break;
                     default:
-                        sqlStr = sqlStr.Replace(p.ParameterName, p.Value.ToString());
+                        sqlStr = sqlStr.Replace(p.ParameterName, p.Value?.ToString());
                         break;
                 }
             }
@@ -1709,7 +1709,7 @@ namespace NetFrameWork.Database
                 return;
             }
 
-            Info("原查询:" + sqlString + string.Concat(cmdParamArr.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
+            Info("原查询:" + sqlString + string.Concat(cmdParamArr.Select(m => " " + m.ParameterName + ":" + m.Value?.ToString())));
             Info("调试查询:" + GetSql(sqlString, cmdParamArr));
         }
 
@@ -1724,7 +1724,7 @@ namespace NetFrameWork.Database
                 Debug.WriteLine(GetSql(sqlString, cmdParamArr));
                 Debug.WriteLine("-------------------结束-------------");
             }
-            Error("原查询:" + sqlString + string.Concat(cmdParamArr.Select(m => " " + m.ParameterName + ":" + m.Value.ToString())));
+            Error("原查询:" + sqlString + string.Concat(cmdParamArr.Select(m => " " + m.ParameterName + ":" + m.Value?.ToString())));
             Error("调试查询:" + GetSql(sqlString, cmdParamArr));
         }
 
