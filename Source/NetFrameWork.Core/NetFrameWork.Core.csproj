@@ -54,7 +54,6 @@
     <Compile Include="CoreConfig.cs" />
     <Compile Include="CoreEncrypt.cs" />
     <Compile Include="CoreFile.cs" />
-    <Compile Include="CoreClientHost1.cs" />
     <Compile Include="CoreWebService.cs" />
     <Compile Include="CorePublic.cs" />
     <Compile Include="CoreHttp.cs" />
