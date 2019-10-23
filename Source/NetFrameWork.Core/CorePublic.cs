@@ -89,7 +89,7 @@ namespace NetFrameWork.Core
                 }
                 return "127.0.0.1";
             }
-            catch (Exception)
+            catch
             {
                 return "127.0.0.1";
             }
@@ -144,9 +144,9 @@ namespace NetFrameWork.Core
                 p.WaitForExit();
                 p.Close();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                CoreLog.Error(ex, "CORE_");
+                throw new Exception("CorePublic.ExecuteCommand Err", e);
             }
         }
 
@@ -174,7 +174,7 @@ namespace NetFrameWork.Core
                 var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
                 if (rKey == null)
                 {
-                    throw new Exception(@"添加开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
+                    throw new Exception("CorePublic.AutoStart", new Exception(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run  Not found"));
                 }
                 var reg = rKey.GetValue(name);
                 if (reg != null)
@@ -186,7 +186,7 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                throw new Exception("添加开机自启注册表异常:" + e);
+                throw new Exception("CorePublic.AutoStart Err", e);
             }
         }
 
@@ -209,13 +209,13 @@ namespace NetFrameWork.Core
                 var rKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
                 if (rKey == null)
                 {
-                    throw new Exception(@"删除开机自启注册表异常: 注册表项 SOFTWARE\Microsoft\Windows\CurrentVersion\Run 未找到");
+                    throw new Exception("CorePublic.UnAutoStart", new Exception(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run  Not found"));
                 }
                 rKey.DeleteValue(appName, false);
             }
             catch (Exception e)
             {
-                throw new Exception("删除开机自启注册表异常:" + e);
+                throw new Exception("CorePublic.UnAutoStart Err", e);
             }
         }
 
@@ -312,9 +312,9 @@ namespace NetFrameWork.Core
                 // 如果外部程序没有结束运行则强行终止之。
                 if (!proc.HasExited) proc.Kill();
             }
-            catch (ArgumentException ex)
+            catch (Exception e)
             {
-                throw new ArgumentException("运行外部应用等待退出异常:" + ex);
+                throw new Exception("CorePublic.RunAppWaitForExit Err", e);
             }
         }
 

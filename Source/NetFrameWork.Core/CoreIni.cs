@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
 using System.Text;
 // ReSharper disable UnusedMember.Global
 
@@ -9,7 +10,7 @@ namespace NetFrameWork.Core
 {
     /// <summary>
     /// INI文件操作核心
-    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName\Config.ini或或当前目录下\Config.ini
+    /// 配置默认路径 C:\Users\{用户名}\AppData\Local\AppName\Config.ini 或当前目录下\Config.ini
     /// </summary>
     public static class CoreIni
     {
@@ -54,9 +55,9 @@ namespace NetFrameWork.Core
             var defValue = string.Empty;
             if (defaultValue != null)
             {
-                defValue = CoreConvert.ObjToJson(defaultValue);
+                defValue = ObjToJsonData(defaultValue);
             }
-            return CoreConvert.JsonToObj<T>(ReadIni(key, defValue, configPath, endpoint));
+            return JsonDataToObj<T>(ReadIni(key, defValue, configPath, endpoint));
         }
 
         /// <summary>
@@ -102,10 +103,9 @@ namespace NetFrameWork.Core
             {
                 File.Create(configPath).Dispose();
             }
-            if (WritePrivateProfileString(endpoint, key, CoreConvert.ObjToJson(value), configPath)) return true;
+            if (WritePrivateProfileString(endpoint, key, ObjToJsonData(value), configPath)) return true;
             var errorCode = Marshal.GetLastWin32Error();
-            throw new Exception("ini写入 section:" + endpoint + " key:" + key + " value:" + value + " iniFilePath:" +
-                                configPath + " 失败,错误:" + errorCode);
+            throw new Exception("CoreIni.WriteIni Err", new Exception($"endpoint=>{endpoint} key=>{key} value=>{value} configPath=>{configPath}errorCode=>{errorCode}"));
         }
 
 
@@ -122,5 +122,67 @@ namespace NetFrameWork.Core
             StringBuilder lpReturnedString,
             uint nSize,
             string lpFileName);
+
+        #region 序列化反序列化
+
+        /// <summary>
+        /// 将任意类型对象转化为数据JsonData字符串
+        /// </summary>
+        /// <param name="obj">要转换的对象</param>
+        /// <returns>json字符串</returns>
+        public static string ObjToJsonData(object obj)
+        {
+            if (obj is string)
+            {
+                return obj.ToString();
+            }
+            var js = new DataContractJsonSerializer(obj.GetType());
+            var msObj = new MemoryStream();
+            //将序列化之后的Json格式数据写入流中
+            js.WriteObject(msObj, obj);
+            msObj.Position = 0;
+            //从0这个位置开始读取流中的数据
+            var sr = new StreamReader(msObj, Encoding.UTF8);
+            var json = sr.ReadToEnd();
+            sr.Close();
+            msObj.Close();
+            return json;
+        }
+
+        /// <summary>
+        /// 将JsonData字符串转化为对应类型的对象
+        /// </summary>
+        /// <param name="jsonData">json字符串</param>
+        /// <returns>转换后的对象</returns>
+        public static T JsonDataToObj<T>(string jsonData)
+        {
+            return (T)JsonDataToObj(jsonData, typeof(T));
+        }
+
+        /// <summary>
+        /// 将JsonData字符串转化为对应类型的对象
+        /// </summary>
+        /// <param name="jsonData">json字符串</param>
+        /// <param name="type"></param>
+        /// <returns>转换后的对象</returns>
+        public static object JsonDataToObj(string jsonData, Type type)
+        {
+            if (string.IsNullOrEmpty(jsonData))
+            {
+                return null;
+            }
+            if (type == typeof(string))
+            {
+                return jsonData;
+            }
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonData)))
+            {
+                var deserializer = new DataContractJsonSerializer(type);
+                return deserializer.ReadObject(ms);
+            }
+        }
+
+        #endregion
+
     }
 }

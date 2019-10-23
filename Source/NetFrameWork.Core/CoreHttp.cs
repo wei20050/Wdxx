@@ -14,308 +14,58 @@ namespace NetFrameWork.Core
     {
 
         /// <summary>
-        /// Get请求(返回泛型)
+        /// Http发送参数
         /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static T Get<T>(string httpUri)
+        public class SendParam
         {
-            return HttpSend<T>(httpUri, "GET");
+
+            /// <summary>
+            /// 超时时间(单位:毫秒)
+            /// </summary>
+            public int TimeOut { get; set; } = 60000;
+
+            /// <summary>
+            /// 协议标头
+            /// </summary>
+            public WebHeaderCollection Headers { get; set; }
+
+            /// <summary>
+            /// 编码
+            /// </summary>
+            public string Encoding { get; set; } = "UTF-8";
+
+            /// <summary>
+            /// 内容类型(例:text/xml   application/json)
+            /// </summary>
+            public string ContentType { get; set; } = "text/xml";
+
         }
 
         /// <summary>
-        /// Get请求(返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static string Get(string httpUri)
-        {
-            return HttpSend(httpUri, "GET");
-        }
-
-        /// <summary>
-        /// Post请求(返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static T Post<T>(string httpUri)
-        {
-            return HttpSend<T>(httpUri, "POST");
-        }
-
-        /// <summary>
-        /// Post请求(返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static string Post(string httpUri)
-        {
-            return HttpSend(httpUri, "POST");
-        }
-
-        /// <summary>
-        /// Post请求(匿名对象 返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="postData">请求参数 匿名类型代替的JSON对象 例:var postData = new {参数名1 = 参数值1,参数名2 = 参数值2};</param>
-        /// <returns></returns>
-        public static T Post<T>(string httpUri, object postData)
-        {
-            return HttpSend<T>(httpUri, "POST", postData);
-        }
-
-        /// <summary>
-        /// Post请求(匿名对象 返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="postData">请求参数 匿名类型代替的JSON对象 例:var postData = new {参数名1 = 参数值1,参数名2 = 参数值2};</param>
-        /// <returns></returns>
-        public static string Post(string httpUri, object postData)
-        {
-            return HttpSend(httpUri, "POST", postData);
-        }
-
-        /// <summary>
-        /// Post请求(字符串数据 返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="postData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
-        /// <returns></returns>
-        public static T Post<T>(string httpUri, string postData)
-        {
-            return HttpSend<T>(httpUri, "POST", postData);
-        }
-
-        /// <summary>
-        /// Post请求(字符串数据 返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="postData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
-        /// <returns></returns>
-        public static string Post(string httpUri, string postData)
-        {
-            return HttpSend(httpUri, "POST", postData);
-        }
-
-        /// <summary>
-        /// Delete请求(返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static T Delete<T>(string httpUri)
-        {
-            return HttpSend<T>(httpUri, "DELETE");
-        }
-
-        /// <summary>
-        /// Delete请求(返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static string Delete(string httpUri)
-        {
-            return HttpSend(httpUri, "DELETE");
-        }
-
-        /// <summary>
-        /// Delete请求(匿名对象 返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 匿名类型代替的JSON对象 例:var PutData = new {参数名1 = 参数值1,参数名2 = 参数值2};</param>
-        /// <returns></returns>
-        public static T Delete<T>(string httpUri, object putData)
-        {
-            return HttpSend<T>(httpUri, "DELETE", putData);
-        }
-
-        /// <summary>
-        /// Delete请求(匿名对象 返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 匿名类型代替的JSON对象 例:var PutData = new {参数名1 = 参数值1,参数名2 = 参数值2};</param>
-        /// <returns></returns>
-        public static string Delete(string httpUri, object putData)
-        {
-            return HttpSend(httpUri, "DELETE", putData);
-        }
-
-        /// <summary>
-        /// Delete请求(字符串数据 返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
-        /// <returns></returns>
-        public static T Delete<T>(string httpUri, string putData)
-        {
-            return HttpSend<T>(httpUri, "DELETE", putData);
-        }
-
-        /// <summary>
-        /// Delete请求(字符串数据 返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
-        /// <returns></returns>
-        public static string Delete(string httpUri, string putData)
-        {
-            return HttpSend(httpUri, "DELETE", putData);
-        }
-
-        /// <summary>
-        /// Put请求(返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static T Put<T>(string httpUri)
-        {
-            return HttpSend<T>(httpUri, "PUT");
-        }
-
-        /// <summary>
-        /// Put请求(返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <returns></returns>
-        public static string Put(string httpUri)
-        {
-            return HttpSend(httpUri, "PUT");
-        }
-
-        /// <summary>
-        /// Put请求(匿名对象 返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 匿名类型代替的JSON对象 例:var PutData = new {参数名1 = 参数值1,参数名2 = 参数值2};</param>
-        /// <returns></returns>
-        public static T Put<T>(string httpUri, object putData)
-        {
-            return HttpSend<T>(httpUri, "PUT", putData);
-        }
-
-        /// <summary>
-        /// Put请求(匿名对象 返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 匿名类型代替的JSON对象 例:var PutData = new {参数名1 = 参数值1,参数名2 = 参数值2};</param>
-        /// <returns></returns>
-        public static string Put(string httpUri, object putData)
-        {
-            return HttpSend(httpUri, "PUT", putData);
-        }
-
-        /// <summary>
-        /// Put请求(字符串数据 返回泛型)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
-        /// <returns></returns>
-        public static T Put<T>(string httpUri, string putData)
-        {
-            return HttpSend<T>(httpUri, "PUT", putData);
-        }
-
-        /// <summary>
-        /// Put请求(字符串数据 返回字符串)
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="putData">请求参数 例:{"参数名": "参数值"} C#格式(@"{""参数名"":""参数值""}")</param>
-        /// <returns></returns>
-        public static string Put(string httpUri, string putData)
-        {
-            return HttpSend(httpUri, "PUT", putData);
-        }
-
-        /// <summary>
-        /// Http发送请求 返回泛型
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="method">请求的方法</param>
-        /// <returns></returns>
-        public static T HttpSend<T>(string httpUri, string method)
-        {
-            return HttpSend<T>(httpUri, method, null);
-        }
-
-        /// <summary>
-        /// Http发送请求 返回字符串
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="method">请求的方法</param>
-        /// <returns></returns>
-        public static string HttpSend(string httpUri, string method)
-        {
-            return HttpSend(httpUri, method, null);
-        }
-
-        /// <summary>
-        /// Http发送请求 字符串参数 返回泛型
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="method">请求的方法</param>
-        /// <param name="httpData">请求参数 例:{"value": "http"} C#格式(@"{""value"":""http""}")</param>
-        /// <returns></returns>
-        public static T HttpSend<T>(string httpUri, string method, string httpData)
-        {
-            if (typeof(T) == typeof(string))
-            {
-                return (T)(object)HttpSend(httpUri, method, httpData);
-            }
-            return CoreConvert.JsonToObj<T>(HttpSend(httpUri, method, httpData));
-        }
-
-        /// <summary>
-        /// Http发送请求 匿名类型参数 返回字符串
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="method">请求的方法</param>
-        /// <param name="httpData">请求参数 匿名类型代替的JSON对象 例:var httpData = new {参数名1 = 参数值1,参数名2 = 参数值2}</param>
-        /// <returns></returns>
-        public static string HttpSend(string httpUri, string method, object httpData)
-        {
-            var data = CoreConvert.ObjToJson(httpData);
-            return HttpSend(httpUri, method, data);
-        }
-
-        /// <summary>
-        /// Http发送请求 匿名类型参数 返回泛型
-        /// </summary>
-        /// <param name="httpUri">请求地址</param>
-        /// <param name="method">请求的方法</param>
-        /// <param name="httpData">请求参数 匿名类型代替的JSON对象 例:var httpData = new {参数名1 = 参数值1,参数名2 = 参数值2}</param>
-        /// <returns></returns>
-        public static T HttpSend<T>(string httpUri, string method, object httpData)
-        {
-            var data = CoreConvert.ObjToJson(httpData);
-            if (typeof(T) == typeof(string))
-            {
-                return (T)(object)HttpSend(httpUri, method, data);
-            }
-            return CoreConvert.JsonToObj<T>(HttpSend(httpUri, method, data));
-        }
-
-        /// <summary>
-        /// Http发送请求(核心)
+        /// 发送请求
         /// </summary>
         /// <param name="httpUri">请求地址</param>
         /// <param name="method">请求的方法</param>
         /// <param name="httpData">请求参数 例:{"value": "HttpSend"} C#格式(@"{""value"":""HttpSend""}")</param>
-        /// <param name="contentType">连接类型</param>
-        /// <param name="timeOut">超时时间</param>
-        /// <param name="headers">请求头</param>
+        /// <param name="sendParam">发送参数</param>
         /// <returns></returns>
-        public static string HttpSend(string httpUri, string method, string httpData, string contentType = "application/json", int timeOut = 60, WebHeaderCollection headers = null)
+        public static string Send(string httpUri, string method, string httpData, SendParam sendParam = null)
         {
             try
             {
+                if (sendParam == null)
+                {
+                    sendParam = new SendParam();
+                }
                 string result;
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
-                if (headers != null)
+                if (sendParam.Headers != null)
                 {
-                    httpWebRequest.Headers = headers;
+                    httpWebRequest.Headers = sendParam.Headers;
                 }
                 httpWebRequest.Method = method;
-                httpWebRequest.Timeout = timeOut;
-                httpWebRequest.ContentType = contentType;
+                httpWebRequest.Timeout = sendParam.TimeOut;
+                httpWebRequest.ContentType = sendParam.ContentType;
                 if (method != "GET")
                 {
                     //这个在非GET的时候，一定要加上，如果服务器返回错误，他还会继续再去请求，不会使用之前的错误数据做返回数据
@@ -338,7 +88,7 @@ namespace NetFrameWork.Core
                 var stream = httpWebResponse.GetResponseStream();
                 if (stream != null)
                 {
-                    var streamReader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
+                    var streamReader = new StreamReader(stream, Encoding.GetEncoding(sendParam.Encoding));
                     result = streamReader.ReadToEnd();
                     streamReader.Close();
                     stream.Close();
@@ -351,7 +101,7 @@ namespace NetFrameWork.Core
             }
             catch (Exception ex)
             {
-                throw new Exception("HttpErr method:" + method + " uri:" + httpUri + " httpData:" + httpData + "err:" + ex);
+                throw new Exception("CoreHttp.HttpSend Err: method=>" + method + " uri=>" + httpUri + " httpData=>" + httpData + "err=>" + ex);
             }
         }
     }

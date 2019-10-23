@@ -5,7 +5,7 @@ using System.Timers;
 
 namespace NetFrameWork.Core
 {
-    
+
     /// <summary>
     /// 串口核心
     /// </summary>
@@ -15,7 +15,7 @@ namespace NetFrameWork.Core
         /// <summary>
         /// 串行端口资源对象
         /// </summary>
-        public  SerialPort Sp { get; set; }
+        public SerialPort Sp { get; set; }
 
         /// <summary>
         /// 封装的委托
@@ -62,7 +62,7 @@ namespace NetFrameWork.Core
             DataReceivedDelay = 168;
             Sp.DataReceived += CallDataReceived;
             _t.Interval = 1;
-            _t.Elapsed += (o,e) =>
+            _t.Elapsed += (o, e) =>
             {
                 if (_i++ <= DataReceivedDelay) return;
                 _t.Stop();

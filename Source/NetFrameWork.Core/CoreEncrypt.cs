@@ -21,7 +21,7 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static string Core(string strText)
         {
-            return Md5(AesEncrypt(Md5(strText),Md5("252819980E064F819D3C2860C65F7B05"))).Substring(8,18);
+            return Md5(AesEncrypt(Md5(strText), Md5("252819980E064F819D3C2860C65F7B05"))).Substring(8, 18);
         }
 
         /// <summary>
@@ -53,14 +53,14 @@ namespace NetFrameWork.Core
             {
                 var keyArray = Encoding.UTF8.GetBytes(key);
                 var toEncryptArray = Encoding.UTF8.GetBytes(text);
-                var rDel = new RijndaelManaged {Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7};
+                var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
                 var cTransform = rDel.CreateEncryptor();
                 var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
                 return BytesToHex(resultArray);
             }
             catch (Exception e)
             {
-                throw new Exception("AES加密异常:" + e);
+                throw new Exception("CoreEncrypt.AesEncrypt Err", e);
             }
         }
 
@@ -83,9 +83,9 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                throw new Exception("AES解密异常:" + e);
+                throw new Exception("CoreEncrypt.AesDecrypt Err", e);
             }
-           
+
         }
 
         /// <summary>

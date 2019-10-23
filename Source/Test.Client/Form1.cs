@@ -1,9 +1,8 @@
 ﻿using NetFrameWork.Core;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using Test.Client.Service;
-using Tset.Entity;
+using Test.Client.ServiceReference1;
 
 namespace Test.Client
 {
@@ -22,73 +21,80 @@ namespace Test.Client
         //无参返回字符串
         private void button1_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send("Test");
-            listBox1.Items.Add(ret);
+            try
+            {
+                var ret = GlobalVar.TestService.Test(TestEnum.c, new ArrayOfDateTime { DateTime.Now, DateTime.MaxValue, DateTime.MinValue });
+                listBox1.Items.Add(ret);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
 
         //无参返回泛型
         private void button2_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send<DateTime>("GetTime");
+            var ret = GlobalVar.TestService.GetTime();
             listBox1.Items.Add(ret.ToString("yyyy-MM-dd HH:mm:ss"));
         }
 
         //带参数返回泛型
         private void button3_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send<user>("TestStr", 1, "张三丰");
+            var ret = GlobalVar.TestService.TestStr(1, "张三丰");
             listBox1.Items.Add(ret.name);
         }
 
         //新增id=1
         private void button8_Click(object sender, EventArgs e)
         {
-            var user = new user {id = 1, name = "李四"};
-            var ret = GlobalVar.TestService.Send<int>("Insert", user);
+            var user = new user { id = 1, name = "李四" };
+            var ret = GlobalVar.TestService.Insert(user);
             listBox1.Items.Add(ret);
         }
 
         //新增id根据时间来
         private void button4_Click(object sender, EventArgs e)
         {
-            var user = new user {id = Convert.ToInt32(DateTime.Now.ToString("HHmmssfff")), name = "张三"};
-            var ret = GlobalVar.TestService.Send<int>("Insert", user);
+            var user = new user { id = Convert.ToInt32(DateTime.Now.ToString("HHmmssfff")), name = "张三" };
+            var ret = GlobalVar.TestService.Insert(user);
             listBox1.Items.Add(ret);
         }
 
         //修改
         private void button9_Click(object sender, EventArgs e)
         {
-            var user = new user {id = 1, name = "山大圣诞礼物"};
-            var ret = GlobalVar.TestService.Send<int>("Update", user);
+            var user = new user { id = 1, name = "山大圣诞礼物" };
+            var ret = GlobalVar.TestService.Update(user);
             listBox1.Items.Add(ret);
         }
 
         //删除
         private void button10_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send<int>("Delete", 1);
+            var ret = GlobalVar.TestService.Delete(1);
             listBox1.Items.Add(ret);
         }
 
         //查询id=1
         private void button11_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send<List<user>>("Select", 1);
+            var ret = GlobalVar.TestService.Select(1, "");
             dataGridView1.DataSource = ret;
         }
 
         //查询id=1name=张三
         private void button12_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send<List<user>>("Select", 1, "张三");
+            var ret = GlobalVar.TestService.Select(1, "张三");
             dataGridView1.DataSource = ret;
         }
 
         //查询所有
         private void button13_Click(object sender, EventArgs e)
         {
-            var ret = GlobalVar.TestService.Send<List<user>>("SelectAll");
+            var ret = GlobalVar.TestService.SelectAll();
             dataGridView1.DataSource = ret;
         }
 
@@ -117,8 +123,11 @@ namespace Test.Client
         private void button7_Click(object sender, EventArgs e)
         {
             //var responseXml = "<PARAS><HM>E001</HM><YWFLBZ>110</YWFLBZ><XM>廖果果</XM><XB>2</XB><CSRQ>2018-9-26</CSRQ><LXDH></LXDH><SFZH></SFZH><KLX>2</KLX><SBKH>31010120181213001</SBKH><QHRQ>2018-12-13</QHRQ><SFCX>0</SFCX><BRLB>0</BRLB><DQLX>1</DQLX><GX>0</GX><JZZH></JZZH><TZSH></TZSH><TZSYXQ></TZSYXQ><GXRXM></GXRXM><GXRNL></GXRNL><GXRSFZH></GXRSFZH></PARAS>";
-            var response =new CoreClient("http://localhost:61070/Ws.asmx");
-            var ret = response.Send("test", "");
+            //var response = new CoreWebService("http://10.2.4.18:8080/JKGL2/services/MgWebService");
+            //var ret = response.Send("test", "");
+            var response = new CoreWebService("http://1.1.1.100/WebService1.asmx?WSDL");
+            var ret = response.Send("HelloWorld");
+
         }
     }
     public class ResponseXml

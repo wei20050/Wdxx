@@ -111,8 +111,7 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e, "CORE_");
-                throw;
+                throw new Exception("CoreConvert.MapCore Err", e);
             }
         }
 
@@ -174,8 +173,7 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e, "CORE_");
-                return null;
+                throw new Exception("CoreConvert.XmlToObj Err", e);
             }
         }
 
@@ -194,8 +192,7 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e, "CORE_");
-                return default(T);
+                throw new Exception("CoreConvert.XmlToObj<T> Err", e);
             }
         }
 
@@ -327,7 +324,7 @@ namespace NetFrameWork.Core
         }
 
         /// <summary>
-        /// 将任意类型对象转化为数据JSON字符串
+        /// 将任意类型对象转化为数据JsonData字符串
         /// </summary>
         /// <param name="obj">要转换的对象</param>
         /// <returns>json字符串</returns>
@@ -353,40 +350,39 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e, "CORE_");
-                return null;
+                throw new Exception("CoreConvert.ObjToJsonData Err", e);
             }
         }
 
         /// <summary>
-        /// 将JSON字符串转化为对应类型的对象
+        /// 将JsonData字符串转化为对应类型的对象
         /// </summary>
-        /// <param name="json">json字符串</param>
+        /// <param name="jsonData">json字符串</param>
         /// <returns>转换后的对象</returns>
-        public static T JsonDataToObj<T>(string json)
+        public static T JsonDataToObj<T>(string jsonData)
         {
-            return (T)JsonDataToObj(json, typeof(T));
+            return (T)JsonDataToObj(jsonData, typeof(T));
         }
 
         /// <summary>
-        /// 将JSON字符串转化为对应类型的对象
+        /// 将JsonData字符串转化为对应类型的对象
         /// </summary>
-        /// <param name="json">json字符串</param>
+        /// <param name="jsonData">json字符串</param>
         /// <param name="type"></param>
         /// <returns>转换后的对象</returns>
-        public static object JsonDataToObj(string json, Type type)
+        public static object JsonDataToObj(string jsonData, Type type)
         {
             try
             {
-                if (string.IsNullOrEmpty(json))
+                if (string.IsNullOrEmpty(jsonData))
                 {
                     return null;
                 }
                 if (type == typeof(string))
                 {
-                    return json;
+                    return jsonData;
                 }
-                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonData)))
                 {
                     var deserializer = new DataContractJsonSerializer(type);
                     return deserializer.ReadObject(ms);
@@ -394,9 +390,30 @@ namespace NetFrameWork.Core
             }
             catch (Exception e)
             {
-                CoreLog.Error(e + " 异常json=>" + json + " 异常类型=>" + type.FullName, "CORE_");
-                return null;
+                throw new Exception("CoreConvert.JsonDataToObj Err", e);
             }
+        }
+
+        /// <summary>
+        /// 将DataTable对象转化为实体集合
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public static List<T> DataTableToListEntity<T>(DataTable table)
+        {
+            var jsSerializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var parentRow = new List<Dictionary<string, object>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var childRow = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                {
+                    childRow.Add(col.ColumnName, row[col]);
+                }
+                parentRow.Add(childRow);
+            }
+            var json = jsSerializer.Serialize(parentRow);
+            return jsSerializer.Deserialize<List<T>>(json);
         }
 
         /// <summary>
@@ -409,6 +426,7 @@ namespace NetFrameWork.Core
             var fs = File.OpenRead(fileName);
             var br = new BinaryReader(fs);
             var bt = br.ReadBytes(Convert.ToInt32(fs.Length));
+            br.Dispose();
             fs.Close();
             fs.Dispose();
             return Convert.ToBase64String(bt);
@@ -429,25 +447,5 @@ namespace NetFrameWork.Core
             }
         }
 
-        /// <summary>
-        /// 将DataTable对象转化为JSON字符串
-        /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        public static string DataTableToJson(DataTable table)
-        {
-            var jsSerializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
-            var parentRow = new List<Dictionary<string, object>>();
-            foreach (DataRow row in table.Rows)
-            {
-                var childRow = new Dictionary<string, object>();
-                foreach (DataColumn col in table.Columns)
-                {
-                    childRow.Add(col.ColumnName, row[col]);
-                }
-                parentRow.Add(childRow);
-            }
-            return jsSerializer.Serialize(parentRow);
-        }
     }
 }

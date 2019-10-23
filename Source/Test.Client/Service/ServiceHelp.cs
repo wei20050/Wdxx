@@ -1,6 +1,8 @@
 ﻿using System;
+using System.ServiceModel;
 using System.Windows.Forms;
 using NetFrameWork.Core;
+using Test.Client.ServiceReference1;
 
 namespace Test.Client.Service
 {
@@ -21,8 +23,8 @@ namespace Test.Client.Service
             try
             {
                 //检测服务是否正常连接  若无法连接 开启离线模式
-                GlobalVar.TestService = new CoreClient(url);
-                GlobalVar.TestService.Send("Test");
+                GlobalVar.TestService.Endpoint.Address = new EndpointAddress(url);
+                GlobalVar.TestService.Test(TestEnum.a,null);
                 IsOnLine = true;
             }
             catch (Exception ex)
@@ -31,8 +33,9 @@ namespace Test.Client.Service
                 //离线服务开启
                 if (DialogResult.Yes != MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo)) return false;
                 IsOnLine = false;
-                var httpUrl = new CoreClientHost(typeof(Test.Service.Ws),8897).Open();
-                GlobalVar.TestService = new CoreClient(httpUrl);
+                var httpUrl = new CoreHostWebService(typeof(Test.Service.Ws)).Open();
+                GlobalVar.TestService = new WsSoapClient();
+                GlobalVar.TestService.Endpoint.Address = new EndpointAddress(httpUrl);
                 //设置本地数据库
                 LocalDatabaseHelp.SetDatabase();
             }

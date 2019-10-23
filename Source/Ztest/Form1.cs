@@ -23,7 +23,7 @@ namespace Ztest
                 new Thread(() =>
                 {
                     CoreLog.Info("xc :" + i1 + " Start");
-                    var cc = new CoreClient(textBox1.Text);
+                    var cc = new CoreWebService(textBox1.Text);
                     for (var j = 0; j < xccs; j++)
                     {
                         CoreLog.Info("xc :" + i1 + " j :" + j + " ks");
@@ -40,7 +40,7 @@ namespace Ztest
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var cc = new CoreClient(textBox1.Text);
+            var cc = new CoreWebService(textBox1.Text);
             CoreLog.Info(" ks");
             var n = CorePublic.GenerateId();
             var user = new user { id = n, name = "单次测试" };

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 // ReSharper disable UnusedMember.Global
 
@@ -48,19 +49,26 @@ namespace NetFrameWork.Core
         /// 新增文件事件触发
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="e"></param>
-        private void OnCreated(object source, FileSystemEventArgs e)
+        /// <param name="fse"></param>
+        private void OnCreated(object source, FileSystemEventArgs fse)
         {
-            var count = 0;
-            while (!IsFileReady(e.FullPath))
+            try
             {
-                Thread.Sleep(10);
-                if (count++ > 100)
+                var count = 0;
+                while (!IsFileReady(fse.FullPath))
                 {
-                    return;
+                    Thread.Sleep(10);
+                    if (count++ > 100)
+                    {
+                        return;
+                    }
                 }
+                OnFilePath(fse.FullPath);
             }
-            OnFilePath(e.FullPath);
+            catch (Exception e)
+            {
+                throw new Exception("CoreFile.OnCreated Err", e);
+            }
         }
 
         /// <summary>
@@ -79,7 +87,7 @@ namespace NetFrameWork.Core
         /// </summary>
         /// <param name="path">文件夹路径</param>
         /// <param name="filter">文件后缀</param>
-        public void StartWatcher(string path,string filter)
+        public void StartWatcher(string path, string filter)
         {
             Watcher = new FileSystemWatcher
             {
