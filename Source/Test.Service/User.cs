@@ -1,7 +1,6 @@
-﻿using NetFrameWork.Database;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Web.Services;
-using Tset.Entity;
+using Test.Service.Entity;
 
 namespace Test.Service
 {
@@ -17,7 +16,7 @@ namespace Test.Service
         [WebMethod]
         public bool Delete(int id)
         {
-            return _db.Delete<user>(new Sql().AddField("id").Equal(id));
+            return _db.Delete<user>(p => p.id == id);
         }
 
         [WebMethod]
@@ -29,7 +28,7 @@ namespace Test.Service
         [WebMethod]
         public List<user> Select(int id, string name)
         {
-            return _db.SelectAll<user>(new Sql().AddField("id").Equal(id).Or("name").Equal(name));
+            return _db.SelectAll<user>(p => p.id == id || p.name == name);
         }
 
         [WebMethod]

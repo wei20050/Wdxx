@@ -36,7 +36,10 @@ namespace NetFrameWork.Core
         {
             try
             {
-                var fileName = CoreEncrypt.AesEncrypt(serviceUrl, "1234567890123456");
+                var service = new Uri(serviceUrl);
+                var fileName = $"{service.Host}_{service.Port}";
+                // ReSharper disable once StringLiteralTypo
+                fileName = service.Segments.Select(s => s.Trim('/')).Where(name => !string.IsNullOrEmpty(name)).Aggregate(fileName, (current, name) => current + $"_{name}").Replace(".asmx",string.Empty);
                 var wsdlFile = Path.Combine(_webServiceWsdl, fileName);
                 if (!File.Exists(wsdlFile))
                 {
@@ -53,7 +56,7 @@ namespace NetFrameWork.Core
                 var sd = ServiceDescription.Read(stream ?? throw new InvalidOperationException());
                 var classname = sd.Services[0].Name;
                 var sdi = new ServiceDescriptionImporter();
-                sdi.AddServiceDescription(sd, "", "");
+                sdi.AddServiceDescription(sd, string.Empty, string.Empty);
                 var cn = new CodeNamespace();
                 //生成客户端代理类代码
                 var ccu = new CodeCompileUnit();

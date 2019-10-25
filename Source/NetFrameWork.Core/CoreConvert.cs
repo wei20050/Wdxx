@@ -87,32 +87,25 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         private static T MapCore<T>(object objFrom, T objTo, bool isVague = false, params MapConfig[] mapConfigs)
         {
-            try
+            var jsonStr = ObjToJson(objFrom);
+            jsonStr = JsonNull(jsonStr);
+            jsonStr = JsonMember(jsonStr, mapConfigs);
+            if (isVague)
             {
-                var jsonStr = ObjToJson(objFrom);
-                jsonStr = JsonNull(jsonStr);
-                jsonStr = JsonMember(jsonStr, mapConfigs);
-                if (isVague)
+                var regexs = Regex.Matches(jsonStr, "\"\\w+\":");
+                foreach (Match regex in regexs)
                 {
-                    var regexs = Regex.Matches(jsonStr, "\"\\w+\":");
-                    foreach (Match regex in regexs)
+                    foreach (var p in objTo.GetType().GetProperties())
                     {
-                        foreach (var p in objTo.GetType().GetProperties())
-                        {
-                            var tmp = $"\"{p.Name}\":";
-                            if (regex.Value.ToUpper().Replace("_", string.Empty) != tmp.ToUpper().Replace("_", string.Empty)) continue;
-                            jsonStr = jsonStr.Replace(regex.Value, tmp);
-                            break;
-                        }
+                        var tmp = $"\"{p.Name}\":";
+                        if (regex.Value.ToUpper().Replace("_", string.Empty) != tmp.ToUpper().Replace("_", string.Empty)) continue;
+                        jsonStr = jsonStr.Replace(regex.Value, tmp);
+                        break;
                     }
                 }
-                objTo = JsonToObj<T>(jsonStr);
-                return objTo;
             }
-            catch (Exception e)
-            {
-                throw new Exception("CoreConvert.MapCore Err", e);
-            }
+            objTo = JsonToObj<T>(jsonStr);
+            return objTo;
         }
 
         /// <summary>
@@ -163,17 +156,10 @@ namespace NetFrameWork.Core
         /// </summary>
         public static object XmlToObj(string xmlStr, Type t)
         {
-            try
+            using (var sr = new StringReader(xmlStr))
             {
-                using (var sr = new StringReader(xmlStr))
-                {
-                    var serializer = new XmlSerializer(t);
-                    return serializer.Deserialize(sr);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("CoreConvert.XmlToObj Err", e);
+                var serializer = new XmlSerializer(t);
+                return serializer.Deserialize(sr);
             }
         }
 
@@ -182,17 +168,10 @@ namespace NetFrameWork.Core
         /// </summary>
         public static T XmlToObj<T>(string xmlStr) where T : new()
         {
-            try
+            using (var sr = new StringReader(xmlStr))
             {
-                using (var sr = new StringReader(xmlStr))
-                {
-                    var serializer = new XmlSerializer(typeof(T));
-                    return (T)serializer.Deserialize(sr);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("CoreConvert.XmlToObj<T> Err", e);
+                var serializer = new XmlSerializer(typeof(T));
+                return (T)serializer.Deserialize(sr);
             }
         }
 
@@ -330,28 +309,21 @@ namespace NetFrameWork.Core
         /// <returns>json字符串</returns>
         public static string ObjToJsonData(object obj)
         {
-            try
+            if (obj is string)
             {
-                if (obj is string)
-                {
-                    return obj.ToString();
-                }
-                var js = new DataContractJsonSerializer(obj.GetType());
-                var msObj = new MemoryStream();
-                //将序列化之后的Json格式数据写入流中
-                js.WriteObject(msObj, obj);
-                msObj.Position = 0;
-                //从0这个位置开始读取流中的数据
-                var sr = new StreamReader(msObj, Encoding.UTF8);
-                var json = sr.ReadToEnd();
-                sr.Close();
-                msObj.Close();
-                return json;
+                return obj.ToString();
             }
-            catch (Exception e)
-            {
-                throw new Exception("CoreConvert.ObjToJsonData Err", e);
-            }
+            var js = new DataContractJsonSerializer(obj.GetType());
+            var msObj = new MemoryStream();
+            //将序列化之后的Json格式数据写入流中
+            js.WriteObject(msObj, obj);
+            msObj.Position = 0;
+            //从0这个位置开始读取流中的数据
+            var sr = new StreamReader(msObj, Encoding.UTF8);
+            var json = sr.ReadToEnd();
+            sr.Close();
+            msObj.Close();
+            return json;
         }
 
         /// <summary>
@@ -372,25 +344,18 @@ namespace NetFrameWork.Core
         /// <returns>转换后的对象</returns>
         public static object JsonDataToObj(string jsonData, Type type)
         {
-            try
+            if (string.IsNullOrEmpty(jsonData))
             {
-                if (string.IsNullOrEmpty(jsonData))
-                {
-                    return null;
-                }
-                if (type == typeof(string))
-                {
-                    return jsonData;
-                }
-                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonData)))
-                {
-                    var deserializer = new DataContractJsonSerializer(type);
-                    return deserializer.ReadObject(ms);
-                }
+                return null;
             }
-            catch (Exception e)
+            if (type == typeof(string))
             {
-                throw new Exception("CoreConvert.JsonDataToObj Err", e);
+                return jsonData;
+            }
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonData)))
+            {
+                var deserializer = new DataContractJsonSerializer(type);
+                return deserializer.ReadObject(ms);
             }
         }
 

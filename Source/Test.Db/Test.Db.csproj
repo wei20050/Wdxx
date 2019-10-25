@@ -93,10 +93,6 @@
       <Project>{08535C08-E1D5-43C9-B5CC-4F7F5958E00F}</Project>
       <Name>NetFrameWork.Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tset.Entity\Tset.Entity.csproj">
-      <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
-      <Name>Tset.Entity</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

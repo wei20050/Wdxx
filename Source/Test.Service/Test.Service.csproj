@@ -43,6 +43,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Entity.Design" />
+    <Reference Include="System.Data.Services.Design" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
@@ -80,6 +83,7 @@
     <Compile Include="Common.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Entity\user.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User.cs">
       <SubType>Component</SubType>
@@ -90,13 +94,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetFrameWork.Core\NetFrameWork.Core.csproj">
+      <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>
+      <Name>NetFrameWork.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NetFrameWork.Database\NetFrameWork.Database.csproj">
       <Project>{08535C08-E1D5-43C9-B5CC-4F7F5958E00F}</Project>
       <Name>NetFrameWork.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Tset.Entity\Tset.Entity.csproj">
-      <Project>{36c0a618-4f1f-4a44-bf6e-2930fa7f045b}</Project>
-      <Name>Tset.Entity</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

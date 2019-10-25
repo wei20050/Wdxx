@@ -49,19 +49,12 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static string AesEncrypt(string text, string key)
         {
-            try
-            {
-                var keyArray = Encoding.UTF8.GetBytes(key);
-                var toEncryptArray = Encoding.UTF8.GetBytes(text);
-                var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
-                var cTransform = rDel.CreateEncryptor();
-                var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
-                return BytesToHex(resultArray);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("CoreEncrypt.AesEncrypt Err", e);
-            }
+            var keyArray = Encoding.UTF8.GetBytes(key);
+            var toEncryptArray = Encoding.UTF8.GetBytes(text);
+            var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
+            var cTransform = rDel.CreateEncryptor();
+            var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return BytesToHex(resultArray);
         }
 
         /// <summary>
@@ -72,20 +65,12 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static string AesDecrypt(string text, string key)
         {
-            try
-            {
-                var keyArray = Encoding.UTF8.GetBytes(key);
-                var toEncryptArray = HexToBytes(text);
-                var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
-                var cTransform = rDel.CreateDecryptor();
-                var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
-                return Encoding.UTF8.GetString(resultArray);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("CoreEncrypt.AesDecrypt Err", e);
-            }
-
+            var keyArray = Encoding.UTF8.GetBytes(key);
+            var toEncryptArray = HexToBytes(text);
+            var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
+            var cTransform = rDel.CreateDecryptor();
+            var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return Encoding.UTF8.GetString(resultArray);
         }
 
         /// <summary>

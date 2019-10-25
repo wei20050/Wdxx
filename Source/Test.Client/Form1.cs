@@ -18,16 +18,16 @@ namespace Test.Client
         {
         }
 
-        //无参返回字符串
+        //无参无返回
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                var ret = GlobalVar.TestService.Test(TestEnum.c, new ArrayOfDateTime { DateTime.Now, DateTime.MaxValue, DateTime.MinValue });
-                listBox1.Items.Add(ret);
+                GlobalVar.TestService.Test();
             }
             catch (Exception exception)
             {
+                listBox1.Items.Add(exception.Message);
                 Console.WriteLine(exception);
             }
         }
@@ -39,11 +39,11 @@ namespace Test.Client
             listBox1.Items.Add(ret.ToString("yyyy-MM-dd HH:mm:ss"));
         }
 
-        //带参数返回泛型
+        //带参数返回字符串
         private void button3_Click(object sender, EventArgs e)
         {
             var ret = GlobalVar.TestService.TestStr(1, "张三丰");
-            listBox1.Items.Add(ret.name);
+            listBox1.Items.Add(ret);
         }
 
         //新增id=1
@@ -57,7 +57,7 @@ namespace Test.Client
         //新增id根据时间来
         private void button4_Click(object sender, EventArgs e)
         {
-            var user = new user { id = Convert.ToInt32(DateTime.Now.ToString("HHmmssfff")), name = "张三" };
+            var user = new user { id = CorePublic.GenerateId(), name = "张三" };
             var ret = GlobalVar.TestService.Insert(user);
             listBox1.Items.Add(ret);
         }
@@ -125,8 +125,9 @@ namespace Test.Client
             //var responseXml = "<PARAS><HM>E001</HM><YWFLBZ>110</YWFLBZ><XM>廖果果</XM><XB>2</XB><CSRQ>2018-9-26</CSRQ><LXDH></LXDH><SFZH></SFZH><KLX>2</KLX><SBKH>31010120181213001</SBKH><QHRQ>2018-12-13</QHRQ><SFCX>0</SFCX><BRLB>0</BRLB><DQLX>1</DQLX><GX>0</GX><JZZH></JZZH><TZSH></TZSH><TZSYXQ></TZSYXQ><GXRXM></GXRXM><GXRNL></GXRNL><GXRSFZH></GXRSFZH></PARAS>";
             //var response = new CoreWebService("http://10.2.4.18:8080/JKGL2/services/MgWebService");
             //var ret = response.Send("test", "");
-            var response = new CoreWebService("http://1.1.1.100/WebService1.asmx?WSDL");
-            var ret = response.Send("HelloWorld");
+            //var response = new CoreWebService("http://1.1.1.100:8095/queue/WebService1.asmx?WSDL");
+            //var ret = response.Send("HelloWorld");
+            var ret = CoreHttp.Send("http://localhost/Test","POST","te=123&lt=张三");
 
         }
     }

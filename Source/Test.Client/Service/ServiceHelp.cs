@@ -23,8 +23,8 @@ namespace Test.Client.Service
             try
             {
                 //检测服务是否正常连接  若无法连接 开启离线模式
-                GlobalVar.TestService.Endpoint.Address = new EndpointAddress(url);
-                GlobalVar.TestService.Test(TestEnum.a,null);
+                GlobalVar.TestService = new WsSoapClient { Endpoint = { Address = new EndpointAddress(url) } };
+                GlobalVar.TestService.Test();
                 IsOnLine = true;
             }
             catch (Exception ex)
@@ -34,8 +34,16 @@ namespace Test.Client.Service
                 if (DialogResult.Yes != MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo)) return false;
                 IsOnLine = false;
                 var httpUrl = new CoreHostWebService(typeof(Test.Service.Ws)).Open();
-                GlobalVar.TestService = new WsSoapClient();
-                GlobalVar.TestService.Endpoint.Address = new EndpointAddress(httpUrl);
+                try
+                {
+                    GlobalVar.TestService = new WsSoapClient { Endpoint = { Address = new EndpointAddress(httpUrl) } };
+                    GlobalVar.TestService.Test();
+                }
+                catch (Exception e)
+                {
+                    CoreLog.Error(e);
+                    return false;
+                }
                 //设置本地数据库
                 LocalDatabaseHelp.SetDatabase();
             }

@@ -49,7 +49,7 @@ namespace NetFrameWork.Core
         /// <param name="httpData">请求参数 例:{"value": "HttpSend"} C#格式(@"{""value"":""HttpSend""}")</param>
         /// <param name="sendParam">发送参数</param>
         /// <returns></returns>
-        public static string Send(string httpUri, string method, string httpData, SendParam sendParam = null)
+        public static string Send(string httpUri, string method, string httpData = null, SendParam sendParam = null)
         {
             try
             {

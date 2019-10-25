@@ -83,12 +83,6 @@
     <None Include="Connected Services\ServiceReference1\Test.Client.ServiceReference1.ArrayOfUser.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\ServiceReference1\Test.Client.ServiceReference1.EpdResult.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference1\Test.Client.ServiceReference1.user.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
     <None Include="Connected Services\ServiceReference1\Ws.wsdl" />
     <None Include="Data\mydb.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -30,7 +30,7 @@ namespace NetFrameWork.Core
         /// <summary>
         /// 服务地址
         /// </summary>
-        private readonly string _uri;
+        private string _uri;
 
         /// <summary>
         /// 服务类
@@ -45,7 +45,7 @@ namespace NetFrameWork.Core
         /// <summary>
         /// http协议侦听
         /// </summary>
-        private static HttpListener _httpObj;
+        private readonly HttpListener _httpListener;
 
         /// <inheritdoc />
         /// <summary>
@@ -72,9 +72,9 @@ namespace NetFrameWork.Core
         {
             _serviceClass = serviceClass;
             _serviceFunArr = _serviceClass.GetMethods();
-            _uri = "http://" + ip + ":" + port + "/";
+            _uri = $"http://{ip}:{port}/";
             //提供一个简单的、可通过编程方式控制的 HTTP 协议侦听器。此类不能被继承。
-            _httpObj = new HttpListener();
+            _httpListener = new HttpListener();
             IsOpen = false;
         }
 
@@ -122,13 +122,14 @@ namespace NetFrameWork.Core
         /// </summary>
         public string Open()
         {
+            _uri = _uri.TrimEnd('/') + '/';
             //定义url及端口号，通常设置为配置文件
-            _httpObj.Prefixes.Add(_uri.TrimEnd('/') + '/');
+            _httpListener.Prefixes.Add(_uri);
             //启动监听器
-            _httpObj.Start();
+            _httpListener.Start();
             //异步监听客户端请求，当客户端的网络请求到来时会自动执行Result委托
             //该委托没有返回值，有一个IAsyncResult接口的参数，可通过该参数获取context对象
-            _httpObj.BeginGetContext(Result, _httpObj);
+            _httpListener.BeginGetContext(Result, _httpListener);
             IsOpen = true;
             return _uri;
         }
@@ -139,7 +140,7 @@ namespace NetFrameWork.Core
         public void Close()
         {
             //关闭监听器
-            _httpObj.Stop();
+            _httpListener.Stop();
         }
 
         /// <summary>
@@ -150,9 +151,9 @@ namespace NetFrameWork.Core
         {
             //当接收到请求后程序流会走到这里
             //获得context对象
-            var context = _httpObj.EndGetContext(ar);
+            var context = _httpListener.EndGetContext(ar);
             //继续异步监听
-            _httpObj.BeginGetContext(Result, _httpObj);
+            _httpListener.BeginGetContext(Result, _httpListener);
             try
             {
                 var request = context.Request;
@@ -171,7 +172,7 @@ namespace NetFrameWork.Core
                 //设置响应的编码格式
                 context.Response.ContentEncoding = Encoding.UTF8;
                 //处理客户端发送的请求并返回处理信息
-                var retData = HandleRequest(request, response) ?? string.Empty;
+                var retData = HandleRequest(request) ?? string.Empty;
                 //设置客户端返回信息的编码
                 var retByteArr = Encoding.UTF8.GetBytes(retData);
                 using (var stream = response.OutputStream)
@@ -225,9 +226,8 @@ namespace NetFrameWork.Core
         /// 处理请求
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="response"></param>
         /// <returns></returns>
-        private string HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
+        private string HandleRequest(HttpListenerRequest request)
         {
             //过滤非post请求
             if (request.HttpMethod.ToUpper() != "POST")
@@ -252,24 +252,72 @@ namespace NetFrameWork.Core
             } while (readLen != 0);
             //获取得到数据data
             var data = Encoding.UTF8.GetString(byteList.ToArray(), 0, len);
-            //判断是否是WebService  SOAP调用
-            var funName = GetFunName(data).ToUpper();
-            //获取方法名相同的所有方法
-            var mis = _serviceFunArr.Where(f => f.Name.ToUpper() == funName).ToList();
-            //获取参数
-            var dataObj = GetParams(data);
-            //这里是参数数组
-            var objArr = new object[dataObj.Count];
-            foreach (var m in mis)
+            object[] objArr;
+            //判断是否是WebService  SOAP调用 若是/是WebService 否则是/加方法名
+            if (request.RawUrl == "/")
             {
-                var ps = m.GetParameters();
-                if (ps.Length != dataObj.Count) continue;
-                //找到参数数量对应的方法
-                mi = m;
-                for (var i = 0; i < ps.Length; i++)
+                var funName = GetFunName(data).ToUpper();
+                //获取方法名相同的所有方法
+                var mis = _serviceFunArr.Where(f => f.Name.ToUpper() == funName).ToList();
+                //获取参数
+                var dataObj = GetParams(data);
+                //这里是参数数组
+                objArr = new object[dataObj.Count];
+                foreach (var m in mis)
                 {
-                    //拆分参数字符串 获得方法名和值
-                    objArr[i] = GetParam(dataObj[i], ps[i].ParameterType);
+                    var ps = m.GetParameters();
+                    if (ps.Length != dataObj.Count) continue;
+                    //找到参数数量对应的方法
+                    mi = m;
+                    for (var i = 0; i < ps.Length; i++)
+                    {
+                        //拆分参数字符串 获得方法名和值
+                        objArr[i] = GetParam(dataObj[i], ps[i].ParameterType);
+                    }
+                }
+            }
+            else
+            {
+                //获取方法名相同的所有方法
+                var mis = _serviceFunArr.Where(f => string.Equals(f.Name, request.RawUrl.Trim('/'), StringComparison.CurrentCultureIgnoreCase)).ToList();
+                //这里为空则没有参数
+                if (string.IsNullOrEmpty(data))
+                {
+                    foreach (var m in mis)
+                    {
+                        var ps = m.GetParameters();
+                        if (ps.Length != 0) continue;
+                        //找到没有参数的方法
+                        mi = m;
+                        break;
+                    }
+                    //参数默认值null
+                    objArr = null;
+                }
+                else
+                {
+                    //获取参数
+                    var dataArr = data.Split('&');
+                    //这里是参数数组
+                    objArr = new object[dataArr.Length];
+                    foreach (var m in mis)
+                    {
+                        var ps = m.GetParameters();
+                        if (ps.Length != dataArr.Length) continue;
+                        //找到参数数量对应的方法
+                        mi = m;
+                        for (var i = 0; i < ps.Length; i++)
+                        {
+                            foreach (var d in dataArr)
+                            {
+                                //拆分参数字符串 获得方法名和值
+                                var dArr = d.Split('=');
+                                if (ps[i].Name != dArr[0]) continue;
+                                objArr[i] = dArr[1];
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             return Fun(mi, objArr);

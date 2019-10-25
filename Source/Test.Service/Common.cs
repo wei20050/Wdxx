@@ -5,11 +5,6 @@ namespace Test.Service
 {
     public partial class Ws
     {
-
-        /// <summary>
-        /// 获取服务器时间
-        /// </summary>
-        /// <returns></returns>
         [WebMethod]
         public DateTime GetTime()
         {

@@ -10,6 +10,7 @@ namespace Test.Client.Service
         /// <summary>
         /// 离线数据库文件路径(生成的源文件)
         /// </summary>
+        // ReSharper disable once StringLiteralTypo
         public static string DbName = "Data\\mydb.db";
 
         /// <summary>
@@ -18,19 +19,16 @@ namespace Test.Client.Service
         public static string AppDbName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbName);
 
         /// <summary>
-        /// 离线应用数据库连接字符串
-        /// </summary>
-        public static string DbContext = "data source=" + AppDbName;
-
-        /// <summary>
         /// 设置数据库连接字符串
         /// </summary>
         public static void SetDatabase()
         {
-            var clientConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            clientConfig.ConnectionStrings.ConnectionStrings["DbContext"].ConnectionString = DbContext;
-            clientConfig.Save(ConfigurationSaveMode.Modified, true);
-            ConfigurationManager.RefreshSection("connectionStrings");
+            ConfigurationManager.ConnectionStrings.Add(new ConnectionStringSettings
+            {
+                ConnectionString = $"Data Source={AppDbName};",
+                ProviderName = "System.Data.SQLite",
+                Name = "DbContext"
+            });
         }
 
     }

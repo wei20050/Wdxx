@@ -135,23 +135,23 @@ namespace NetFrameWork.Core
                             {
                                 continue;
                             }
-                            var w = string.Empty;
+                            var w = new StringBuilder();
                             for (var i = 0; i < items.Length; i++)
                             {
                                 if (i == n)
                                 {
-                                    w += key + "=" + value + Environment.NewLine;
+                                    w.AppendFormat("{0}={1}{2}",key,value,Environment.NewLine);
                                 }
                                 else
                                 {
-                                    w += items[i] + Environment.NewLine;
+                                    w.AppendFormat("{0}{1}", items[i], Environment.NewLine);
                                 }
                             }
-                            File.WriteAllText(path, w);
+                            File.WriteAllText(path, w.ToString());
                             ret = true;
                             return;
                         }
-                        File.AppendAllText(path, key + @"=" + value + Environment.NewLine);
+                        File.AppendAllText(path, $"{key}={value}{Environment.NewLine}");
                         ret = true;
                     }
                     else
