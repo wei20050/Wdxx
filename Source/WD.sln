@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Client", "Test.Client\Test.Client.csproj", "{B2608FEB-948F-45CA-891F-AA88C621B35A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{BEB60FD5-528B-4B8B-BA02-169EB02008DF} = {BEB60FD5-528B-4B8B-BA02-169EB02008DF}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Service", "Test.Service\Test.Service.csproj", "{BEB60FD5-528B-4B8B-BA02-169EB02008DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ztest", "Ztest\Ztest.csproj", "{D7A54EA0-4BF4-46CC-A5D0-DF809413EDE6}"
@@ -32,10 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2608FEB-948F-45CA-891F-AA88C621B35A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BEB60FD5-528B-4B8B-BA02-169EB02008DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BEB60FD5-528B-4B8B-BA02-169EB02008DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEB60FD5-528B-4B8B-BA02-169EB02008DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
