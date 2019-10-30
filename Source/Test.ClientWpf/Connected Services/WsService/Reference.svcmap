@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="98134213-0209-4cf8-bab6-ccb6c3b1c9b8" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="92fd75bd-14bc-4d79-90aa-b78ad40f5852" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <EnableDataBinding>true</EnableDataBinding>
@@ -9,7 +9,7 @@
     <GenerateMessageContracts>false</GenerateMessageContracts>
     <NamespaceMappings />
     <CollectionMappings>
-      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+      <CollectionMapping TypeName="System.Collections.Generic.List`1" Category="List" />
     </CollectionMappings>
     <GenerateSerializableTypes>true</GenerateSerializableTypes>
     <Serializer>Auto</Serializer>
@@ -23,8 +23,8 @@
     <MetadataSource Address="http://localhost:61070/Ws.asmx" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Ws.disco" MetadataType="Disco" ID="c0b8a7fd-bc26-40e2-ae5f-95a73c78da55" SourceId="1" SourceUrl="http://localhost:61070/Ws.asmx?disco" />
-    <MetadataFile FileName="Ws.wsdl" MetadataType="Wsdl" ID="feb29d3a-0ecf-4cdb-b281-df06e1f97552" SourceId="1" SourceUrl="http://localhost:61070/Ws.asmx?wsdl" />
+    <MetadataFile FileName="Ws.disco" MetadataType="Disco" ID="4faf5e14-66c8-45a4-ae77-ada293c29cf8" SourceId="1" SourceUrl="http://localhost:61070/Ws.asmx?disco" />
+    <MetadataFile FileName="Ws.wsdl" MetadataType="Wsdl" ID="86fb17ba-cafe-499d-8f6b-94ee389d53bc" SourceId="1" SourceUrl="http://localhost:61070/Ws.asmx?wsdl" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

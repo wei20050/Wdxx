@@ -1,7 +1,6 @@
-﻿using NetFrameWork.Core;
-using Test.Client.ServiceReference1;
+﻿using Test.ClientWpf.WsService;
 
-namespace Test.Client
+namespace Test.ClientWpf
 {
     public class GlobalVar
     {

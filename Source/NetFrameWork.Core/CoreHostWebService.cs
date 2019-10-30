@@ -8,7 +8,6 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
-using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
 // ReSharper disable UnusedMember.Global
@@ -49,18 +48,18 @@ namespace NetFrameWork.Core
 
         /// <inheritdoc />
         /// <summary>
-        /// 服务类 构造(默认端口{80}若不可用自动生成随机端口,默认IP{127.0.0.1})
+        /// 服务类 构造(默认端口{80}若不可用自动生成随机端口,默认开启当前电脑所有ip})
         /// </summary>
         /// <param name="serviceClass">服务类</param>
         public CoreHostWebService(Type serviceClass) : this(serviceClass, GetPort()) { }
 
         /// <inheritdoc />
         /// <summary>
-        /// 服务类 端口号 构造(默认IP{127.0.0.1})
+        /// 服务类 端口号 构造(默认开启当前电脑所有ip)
         /// </summary>
         /// <param name="serviceClass">服务类</param>
         /// <param name="port">服务端口</param>
-        public CoreHostWebService(Type serviceClass, int port) : this(serviceClass, port, "localhost") { }
+        public CoreHostWebService(Type serviceClass, int port) : this(serviceClass, port, "+") { }
 
         /// <summary>
         /// 服务类 端口 IP{ip写 + 代表所有本机ip} 构造
@@ -131,7 +130,7 @@ namespace NetFrameWork.Core
             //该委托没有返回值，有一个IAsyncResult接口的参数，可通过该参数获取context对象
             _httpListener.BeginGetContext(Result, _httpListener);
             IsOpen = true;
-            return _uri;
+            return _uri.Replace("://+", "://127.0.0.1");
         }
 
         /// <summary>
@@ -181,7 +180,7 @@ namespace NetFrameWork.Core
                     stream.Write(retByteArr, 0, retByteArr.Length);
                 }
             }
-            catch (System.Web.Services.Protocols.SoapException e)
+            catch (Exception e)
             {
                 //将发送到客户端的请求响应中的客户端的对象
                 var response = context.Response;
@@ -366,38 +365,54 @@ namespace NetFrameWork.Core
         {
             //字段的xmlDoc对象
             var dic = new XmlDocument();
-            //字段xml的根节点对象
-            var rootDic = dic.DocumentElement;
             dic.LoadXml(xml);
-            //这里检测到字段类型是System下的类型 直接反序列化内容
-            if (t.Namespace == nameof(System))
+            //这里检测到字段类型是string类型 直接返回内容
+            if (t == typeof(string))
             {
-                var obj = new JavaScriptSerializer().Deserialize(dic.InnerText, t);
-                return obj;
+                return dic.InnerText;
             }
             //这里检测到字段类型是枚举类型 直接拿到对应的枚举
-            if (t.BaseType != null && t.BaseType.Name == nameof(Enum))
+            if (t.BaseType == typeof(Enum))
             {
                 return Enum.Parse(t, dic.InnerText);
             }
-            //临时字段类型
-            var tmpObj = Activator.CreateInstance(t);
-            //临时字段类型序列化的xml
-            var tmpXml = ObjToXml(tmpObj);
-            //临时字段的xmlDoc对象
-            var tmpDic = new XmlDocument();
-            tmpDic.LoadXml(tmpXml);
-            //临时字段xml的根节点对象
-            var tmpRootDic = tmpDic.DocumentElement;
-            if (tmpRootDic == null || rootDic == null)
+            try
             {
-                return null;
+                //字段xml的根节点对象
+                var rootDic = dic.DocumentElement;
+                //临时字段类型
+                var tmpObj = Activator.CreateInstance(t);
+                //临时字段类型序列化的xml
+                var tmpXml = ObjToXml(tmpObj);
+                //临时字段的xmlDoc对象
+                var tmpDic = new XmlDocument();
+                tmpDic.LoadXml(tmpXml);
+                //临时字段xml的根节点对象
+                var tmpRootDic = tmpDic.DocumentElement;
+                if (tmpRootDic == null || rootDic == null)
+                {
+                    return null;
+                }
+                //把字段内容填充到临时字段
+                tmpRootDic.InnerXml = rootDic.InnerXml;
+                //把临时字段反序列化成字段值
+                return XmlToObj(tmpDic.InnerXml, t);
             }
-            //把字段内容填充到临时字段
-            tmpRootDic.InnerXml = rootDic.InnerXml;
-            //把临时字段反序列化成字段值
-            var retObj = XmlToObj(tmpDic.InnerXml, t);
-            return retObj;
+            catch
+            {
+                //这里异常肯定是参数无法序列化的类尝试直接改变根节点名称为类名
+                var pXmlDocument = new XmlDocument();
+                pXmlDocument.LoadXml(xml);
+                var rootElement = pXmlDocument.DocumentElement;
+                var newElement = pXmlDocument.CreateElement(t.Name);
+                if (rootElement != null)
+                {
+                    newElement.InnerXml = rootElement.InnerXml;
+                    pXmlDocument.ReplaceChild(newElement, rootElement);
+                }
+                return XmlToObj(pXmlDocument.InnerXml, t);
+            }
+
         }
 
 

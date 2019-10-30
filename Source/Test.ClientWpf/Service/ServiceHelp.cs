@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ServiceModel;
-using System.Windows.Forms;
+using System.Windows;
 using NetFrameWork.Core;
-using Test.Client.ServiceReference1;
+using Test.ClientWpf.WsService;
 
-namespace Test.Client.Service
+namespace Test.ClientWpf.Service
 {
     public static class ServiceHelp
     {
@@ -31,7 +31,7 @@ namespace Test.Client.Service
             {
                 CoreLog.Error(ex);
                 //离线服务开启
-                if (DialogResult.Yes != MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo)) return false;
+                if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return false;
                 IsOnLine = false;
                 var httpUrl = new CoreHostWebService(typeof(Test.Service.Ws)).Open();
                 try
@@ -44,8 +44,6 @@ namespace Test.Client.Service
                     CoreLog.Error(e);
                     return false;
                 }
-                //设置本地数据库
-                LocalDatabaseHelp.SetDatabase();
             }
             return true;
         }

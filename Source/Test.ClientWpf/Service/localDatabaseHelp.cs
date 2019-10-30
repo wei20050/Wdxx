@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using System.Reflection;
 
-namespace Test.Client.Service
+namespace Test.ClientWpf.Service
 {
     public static class LocalDatabaseHelp
     {
@@ -23,6 +24,20 @@ namespace Test.Client.Service
         /// </summary>
         public static void SetDatabase()
         {
+            //var clientConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            //clientConfig.ConnectionStrings.ConnectionStrings["DbContext"].ConnectionString = DbContext;
+            //clientConfig.Save(ConfigurationSaveMode.Modified, true);
+            //ConfigurationManager.RefreshSection("connectionStrings");
+
+            //配置上一版本地址
+            typeof(ConfigurationElementCollection)
+                .GetField("bReadOnly", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.SetValue(ConfigurationManager.ConnectionStrings, false);
+            ConfigurationManager.ConnectionStrings.Add(new ConnectionStringSettings
+            {
+                ConnectionString = "1",
+                Name = "SqlLog"
+            });
             ConfigurationManager.ConnectionStrings.Add(new ConnectionStringSettings
             {
                 ConnectionString = $"Data Source={AppDbName};",
@@ -30,6 +45,5 @@ namespace Test.Client.Service
                 Name = "DbContext"
             });
         }
-
     }
 }

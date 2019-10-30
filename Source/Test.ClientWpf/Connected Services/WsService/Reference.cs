@@ -8,16 +8,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Test.Client.ServiceReference1 {
+namespace Test.ClientWpf.WsService {
     using System.Runtime.Serialization;
     using System;
     
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="user", Namespace="http://tempuri.org/")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="User", Namespace="http://tempuri.org/")]
     [System.SerializableAttribute()]
-    public partial class user : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class User : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -73,15 +73,8 @@ namespace Test.Client.ServiceReference1 {
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfUser", Namespace="http://tempuri.org/", ItemName="user")]
-    [System.SerializableAttribute()]
-    public class ArrayOfUser : System.Collections.ObjectModel.ObservableCollection<Test.Client.ServiceReference1.user> {
-    }
-    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference1.WsSoap")]
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WsService.WsSoap")]
     public interface WsSoap {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/GetTime", ReplyAction="*")]
@@ -89,29 +82,30 @@ namespace Test.Client.ServiceReference1 {
         
         // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 u 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Insert", ReplyAction="*")]
-        Test.Client.ServiceReference1.InsertResponse Insert(Test.Client.ServiceReference1.InsertRequest request);
+        Test.ClientWpf.WsService.InsertResponse Insert(Test.ClientWpf.WsService.InsertRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Delete", ReplyAction="*")]
         bool Delete(int id);
         
         // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 u 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Update", ReplyAction="*")]
-        Test.Client.ServiceReference1.UpdateResponse Update(Test.Client.ServiceReference1.UpdateRequest request);
+        Test.ClientWpf.WsService.UpdateResponse Update(Test.ClientWpf.WsService.UpdateRequest request);
         
         // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 name 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Select", ReplyAction="*")]
-        Test.Client.ServiceReference1.SelectResponse Select(Test.Client.ServiceReference1.SelectRequest request);
+        Test.ClientWpf.WsService.SelectResponse Select(Test.ClientWpf.WsService.SelectRequest request);
         
         // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 SelectAllResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/SelectAll", ReplyAction="*")]
-        Test.Client.ServiceReference1.SelectAllResponse SelectAll(Test.Client.ServiceReference1.SelectAllRequest request);
+        Test.ClientWpf.WsService.SelectAllResponse SelectAll(Test.ClientWpf.WsService.SelectAllRequest request);
         
+        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 TestResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Test", ReplyAction="*")]
-        void Test();
+        Test.ClientWpf.WsService.TestResponse Test(Test.ClientWpf.WsService.TestRequest request);
         
         // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 name 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/TestStr", ReplyAction="*")]
-        Test.Client.ServiceReference1.TestStrResponse TestStr(Test.Client.ServiceReference1.TestStrRequest request);
+        Test.ClientWpf.WsService.TestStrResponse TestStr(Test.ClientWpf.WsService.TestStrRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -121,12 +115,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class InsertRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Insert", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.InsertRequestBody Body;
+        public Test.ClientWpf.WsService.InsertRequestBody Body;
         
         public InsertRequest() {
         }
         
-        public InsertRequest(Test.Client.ServiceReference1.InsertRequestBody Body) {
+        public InsertRequest(Test.ClientWpf.WsService.InsertRequestBody Body) {
             this.Body = Body;
         }
     }
@@ -138,12 +132,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class InsertRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.Client.ServiceReference1.user u;
+        public Test.ClientWpf.WsService.User u;
         
         public InsertRequestBody() {
         }
         
-        public InsertRequestBody(Test.Client.ServiceReference1.user u) {
+        public InsertRequestBody(Test.ClientWpf.WsService.User u) {
             this.u = u;
         }
     }
@@ -155,12 +149,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class InsertResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="InsertResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.InsertResponseBody Body;
+        public Test.ClientWpf.WsService.InsertResponseBody Body;
         
         public InsertResponse() {
         }
         
-        public InsertResponse(Test.Client.ServiceReference1.InsertResponseBody Body) {
+        public InsertResponse(Test.ClientWpf.WsService.InsertResponseBody Body) {
             this.Body = Body;
         }
     }
@@ -189,12 +183,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class UpdateRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Update", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.UpdateRequestBody Body;
+        public Test.ClientWpf.WsService.UpdateRequestBody Body;
         
         public UpdateRequest() {
         }
         
-        public UpdateRequest(Test.Client.ServiceReference1.UpdateRequestBody Body) {
+        public UpdateRequest(Test.ClientWpf.WsService.UpdateRequestBody Body) {
             this.Body = Body;
         }
     }
@@ -206,12 +200,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class UpdateRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.Client.ServiceReference1.user u;
+        public Test.ClientWpf.WsService.User u;
         
         public UpdateRequestBody() {
         }
         
-        public UpdateRequestBody(Test.Client.ServiceReference1.user u) {
+        public UpdateRequestBody(Test.ClientWpf.WsService.User u) {
             this.u = u;
         }
     }
@@ -223,12 +217,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class UpdateResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="UpdateResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.UpdateResponseBody Body;
+        public Test.ClientWpf.WsService.UpdateResponseBody Body;
         
         public UpdateResponse() {
         }
         
-        public UpdateResponse(Test.Client.ServiceReference1.UpdateResponseBody Body) {
+        public UpdateResponse(Test.ClientWpf.WsService.UpdateResponseBody Body) {
             this.Body = Body;
         }
     }
@@ -257,12 +251,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class SelectRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Select", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.SelectRequestBody Body;
+        public Test.ClientWpf.WsService.SelectRequestBody Body;
         
         public SelectRequest() {
         }
         
-        public SelectRequest(Test.Client.ServiceReference1.SelectRequestBody Body) {
+        public SelectRequest(Test.ClientWpf.WsService.SelectRequestBody Body) {
             this.Body = Body;
         }
     }
@@ -295,12 +289,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class SelectResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="SelectResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.SelectResponseBody Body;
+        public Test.ClientWpf.WsService.SelectResponseBody Body;
         
         public SelectResponse() {
         }
         
-        public SelectResponse(Test.Client.ServiceReference1.SelectResponseBody Body) {
+        public SelectResponse(Test.ClientWpf.WsService.SelectResponseBody Body) {
             this.Body = Body;
         }
     }
@@ -312,12 +306,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class SelectResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.Client.ServiceReference1.ArrayOfUser SelectResult;
+        public System.Collections.Generic.List<Test.ClientWpf.WsService.User> SelectResult;
         
         public SelectResponseBody() {
         }
         
-        public SelectResponseBody(Test.Client.ServiceReference1.ArrayOfUser SelectResult) {
+        public SelectResponseBody(System.Collections.Generic.List<Test.ClientWpf.WsService.User> SelectResult) {
             this.SelectResult = SelectResult;
         }
     }
@@ -329,12 +323,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class SelectAllRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="SelectAll", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.SelectAllRequestBody Body;
+        public Test.ClientWpf.WsService.SelectAllRequestBody Body;
         
         public SelectAllRequest() {
         }
         
-        public SelectAllRequest(Test.Client.ServiceReference1.SelectAllRequestBody Body) {
+        public SelectAllRequest(Test.ClientWpf.WsService.SelectAllRequestBody Body) {
             this.Body = Body;
         }
     }
@@ -356,12 +350,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class SelectAllResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="SelectAllResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.SelectAllResponseBody Body;
+        public Test.ClientWpf.WsService.SelectAllResponseBody Body;
         
         public SelectAllResponse() {
         }
         
-        public SelectAllResponse(Test.Client.ServiceReference1.SelectAllResponseBody Body) {
+        public SelectAllResponse(Test.ClientWpf.WsService.SelectAllResponseBody Body) {
             this.Body = Body;
         }
     }
@@ -373,13 +367,74 @@ namespace Test.Client.ServiceReference1 {
     public partial class SelectAllResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.Client.ServiceReference1.ArrayOfUser SelectAllResult;
+        public System.Collections.Generic.List<Test.ClientWpf.WsService.User> SelectAllResult;
         
         public SelectAllResponseBody() {
         }
         
-        public SelectAllResponseBody(Test.Client.ServiceReference1.ArrayOfUser SelectAllResult) {
+        public SelectAllResponseBody(System.Collections.Generic.List<Test.ClientWpf.WsService.User> SelectAllResult) {
             this.SelectAllResult = SelectAllResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="Test", Namespace="http://tempuri.org/", Order=0)]
+        public Test.ClientWpf.WsService.TestRequestBody Body;
+        
+        public TestRequest() {
+        }
+        
+        public TestRequest(Test.ClientWpf.WsService.TestRequestBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute()]
+    public partial class TestRequestBody {
+        
+        public TestRequestBody() {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class TestResponse {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestResponse", Namespace="http://tempuri.org/", Order=0)]
+        public Test.ClientWpf.WsService.TestResponseBody Body;
+        
+        public TestResponse() {
+        }
+        
+        public TestResponse(Test.ClientWpf.WsService.TestResponseBody Body) {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
+    public partial class TestResponseBody {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public string TestResult;
+        
+        public TestResponseBody() {
+        }
+        
+        public TestResponseBody(string TestResult) {
+            this.TestResult = TestResult;
         }
     }
     
@@ -390,12 +445,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class TestStrRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="TestStr", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.TestStrRequestBody Body;
+        public Test.ClientWpf.WsService.TestStrRequestBody Body;
         
         public TestStrRequest() {
         }
         
-        public TestStrRequest(Test.Client.ServiceReference1.TestStrRequestBody Body) {
+        public TestStrRequest(Test.ClientWpf.WsService.TestStrRequestBody Body) {
             this.Body = Body;
         }
     }
@@ -428,12 +483,12 @@ namespace Test.Client.ServiceReference1 {
     public partial class TestStrResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="TestStrResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.Client.ServiceReference1.TestStrResponseBody Body;
+        public Test.ClientWpf.WsService.TestStrResponseBody Body;
         
         public TestStrResponse() {
         }
         
-        public TestStrResponse(Test.Client.ServiceReference1.TestStrResponseBody Body) {
+        public TestStrResponse(Test.ClientWpf.WsService.TestStrResponseBody Body) {
             this.Body = Body;
         }
     }
@@ -456,12 +511,12 @@ namespace Test.Client.ServiceReference1 {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface WsSoapChannel : Test.Client.ServiceReference1.WsSoap, System.ServiceModel.IClientChannel {
+    public interface WsSoapChannel : Test.ClientWpf.WsService.WsSoap, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class WsSoapClient : System.ServiceModel.ClientBase<Test.Client.ServiceReference1.WsSoap>, Test.Client.ServiceReference1.WsSoap {
+    public partial class WsSoapClient : System.ServiceModel.ClientBase<Test.ClientWpf.WsService.WsSoap>, Test.ClientWpf.WsService.WsSoap {
         
         public WsSoapClient() {
         }
@@ -487,15 +542,15 @@ namespace Test.Client.ServiceReference1 {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.Client.ServiceReference1.InsertResponse Test.Client.ServiceReference1.WsSoap.Insert(Test.Client.ServiceReference1.InsertRequest request) {
+        Test.ClientWpf.WsService.InsertResponse Test.ClientWpf.WsService.WsSoap.Insert(Test.ClientWpf.WsService.InsertRequest request) {
             return base.Channel.Insert(request);
         }
         
-        public bool Insert(Test.Client.ServiceReference1.user u) {
-            Test.Client.ServiceReference1.InsertRequest inValue = new Test.Client.ServiceReference1.InsertRequest();
-            inValue.Body = new Test.Client.ServiceReference1.InsertRequestBody();
+        public bool Insert(Test.ClientWpf.WsService.User u) {
+            Test.ClientWpf.WsService.InsertRequest inValue = new Test.ClientWpf.WsService.InsertRequest();
+            inValue.Body = new Test.ClientWpf.WsService.InsertRequestBody();
             inValue.Body.u = u;
-            Test.Client.ServiceReference1.InsertResponse retVal = ((Test.Client.ServiceReference1.WsSoap)(this)).Insert(inValue);
+            Test.ClientWpf.WsService.InsertResponse retVal = ((Test.ClientWpf.WsService.WsSoap)(this)).Insert(inValue);
             return retVal.Body.InsertResult;
         }
         
@@ -504,59 +559,67 @@ namespace Test.Client.ServiceReference1 {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.Client.ServiceReference1.UpdateResponse Test.Client.ServiceReference1.WsSoap.Update(Test.Client.ServiceReference1.UpdateRequest request) {
+        Test.ClientWpf.WsService.UpdateResponse Test.ClientWpf.WsService.WsSoap.Update(Test.ClientWpf.WsService.UpdateRequest request) {
             return base.Channel.Update(request);
         }
         
-        public bool Update(Test.Client.ServiceReference1.user u) {
-            Test.Client.ServiceReference1.UpdateRequest inValue = new Test.Client.ServiceReference1.UpdateRequest();
-            inValue.Body = new Test.Client.ServiceReference1.UpdateRequestBody();
+        public bool Update(Test.ClientWpf.WsService.User u) {
+            Test.ClientWpf.WsService.UpdateRequest inValue = new Test.ClientWpf.WsService.UpdateRequest();
+            inValue.Body = new Test.ClientWpf.WsService.UpdateRequestBody();
             inValue.Body.u = u;
-            Test.Client.ServiceReference1.UpdateResponse retVal = ((Test.Client.ServiceReference1.WsSoap)(this)).Update(inValue);
+            Test.ClientWpf.WsService.UpdateResponse retVal = ((Test.ClientWpf.WsService.WsSoap)(this)).Update(inValue);
             return retVal.Body.UpdateResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.Client.ServiceReference1.SelectResponse Test.Client.ServiceReference1.WsSoap.Select(Test.Client.ServiceReference1.SelectRequest request) {
+        Test.ClientWpf.WsService.SelectResponse Test.ClientWpf.WsService.WsSoap.Select(Test.ClientWpf.WsService.SelectRequest request) {
             return base.Channel.Select(request);
         }
         
-        public Test.Client.ServiceReference1.ArrayOfUser Select(int id, string name) {
-            Test.Client.ServiceReference1.SelectRequest inValue = new Test.Client.ServiceReference1.SelectRequest();
-            inValue.Body = new Test.Client.ServiceReference1.SelectRequestBody();
+        public System.Collections.Generic.List<Test.ClientWpf.WsService.User> Select(int id, string name) {
+            Test.ClientWpf.WsService.SelectRequest inValue = new Test.ClientWpf.WsService.SelectRequest();
+            inValue.Body = new Test.ClientWpf.WsService.SelectRequestBody();
             inValue.Body.id = id;
             inValue.Body.name = name;
-            Test.Client.ServiceReference1.SelectResponse retVal = ((Test.Client.ServiceReference1.WsSoap)(this)).Select(inValue);
+            Test.ClientWpf.WsService.SelectResponse retVal = ((Test.ClientWpf.WsService.WsSoap)(this)).Select(inValue);
             return retVal.Body.SelectResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.Client.ServiceReference1.SelectAllResponse Test.Client.ServiceReference1.WsSoap.SelectAll(Test.Client.ServiceReference1.SelectAllRequest request) {
+        Test.ClientWpf.WsService.SelectAllResponse Test.ClientWpf.WsService.WsSoap.SelectAll(Test.ClientWpf.WsService.SelectAllRequest request) {
             return base.Channel.SelectAll(request);
         }
         
-        public Test.Client.ServiceReference1.ArrayOfUser SelectAll() {
-            Test.Client.ServiceReference1.SelectAllRequest inValue = new Test.Client.ServiceReference1.SelectAllRequest();
-            inValue.Body = new Test.Client.ServiceReference1.SelectAllRequestBody();
-            Test.Client.ServiceReference1.SelectAllResponse retVal = ((Test.Client.ServiceReference1.WsSoap)(this)).SelectAll(inValue);
+        public System.Collections.Generic.List<Test.ClientWpf.WsService.User> SelectAll() {
+            Test.ClientWpf.WsService.SelectAllRequest inValue = new Test.ClientWpf.WsService.SelectAllRequest();
+            inValue.Body = new Test.ClientWpf.WsService.SelectAllRequestBody();
+            Test.ClientWpf.WsService.SelectAllResponse retVal = ((Test.ClientWpf.WsService.WsSoap)(this)).SelectAll(inValue);
             return retVal.Body.SelectAllResult;
         }
         
-        public void Test() {
-            base.Channel.Test();
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        Test.ClientWpf.WsService.TestResponse Test.ClientWpf.WsService.WsSoap.Test(Test.ClientWpf.WsService.TestRequest request) {
+            return base.Channel.Test(request);
+        }
+        
+        public string Test() {
+            Test.ClientWpf.WsService.TestRequest inValue = new Test.ClientWpf.WsService.TestRequest();
+            inValue.Body = new Test.ClientWpf.WsService.TestRequestBody();
+            Test.ClientWpf.WsService.TestResponse retVal = ((Test.ClientWpf.WsService.WsSoap)(this)).Test(inValue);
+            return retVal.Body.TestResult;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.Client.ServiceReference1.TestStrResponse Test.Client.ServiceReference1.WsSoap.TestStr(Test.Client.ServiceReference1.TestStrRequest request) {
+        Test.ClientWpf.WsService.TestStrResponse Test.ClientWpf.WsService.WsSoap.TestStr(Test.ClientWpf.WsService.TestStrRequest request) {
             return base.Channel.TestStr(request);
         }
         
         public string TestStr(int id, string name) {
-            Test.Client.ServiceReference1.TestStrRequest inValue = new Test.Client.ServiceReference1.TestStrRequest();
-            inValue.Body = new Test.Client.ServiceReference1.TestStrRequestBody();
+            Test.ClientWpf.WsService.TestStrRequest inValue = new Test.ClientWpf.WsService.TestStrRequest();
+            inValue.Body = new Test.ClientWpf.WsService.TestStrRequestBody();
             inValue.Body.id = id;
             inValue.Body.name = name;
-            Test.Client.ServiceReference1.TestStrResponse retVal = ((Test.Client.ServiceReference1.WsSoap)(this)).TestStr(inValue);
+            Test.ClientWpf.WsService.TestStrResponse retVal = ((Test.ClientWpf.WsService.WsSoap)(this)).TestStr(inValue);
             return retVal.Body.TestStrResult;
         }
     }

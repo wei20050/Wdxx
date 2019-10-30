@@ -1,6 +1,11 @@
-﻿using NetFrameWork.Core.Mvvm;
-using System.Windows;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using NetFrameWork.Core.Mvvm;
 using System.Windows.Input;
+using Test.ClientWpf.Service;
+using Test.ClientWpf.WsService;
+using NetFrameWork.Core;
+using System;
 
 namespace Test.ClientWpf
 {
@@ -8,14 +13,163 @@ namespace Test.ClientWpf
     {
         public MainWindowModel()
         {
-            LabTxt = "初始化完成!";
+            // ReSharper disable once StringLiteralTypo
+            ServiceUrl = "http://localhost:61070/Ws.asmx";
+            Msg = string.Empty;
+            UserList = new List<User>();
         }
-        public string LabTxt { get; set; }
-        public ICommand BtnClick => new DelegateCommand(o =>
+
+        #region  属性
+
+        private string _text;
+        public string Text
         {
-            LabTxt = "修改后的显示!";
-            OnPropertyChanged(nameof(LabTxt));
-            MessageBox.Show("command调用成功!");
+            get => _text;
+            set
+            {
+                _text = value;
+                OnPropertyChanged(nameof(Text));
+            }
+        }
+
+        private string _serviceUrl;
+        public string ServiceUrl
+        {
+            get => _serviceUrl;
+            set
+            {
+                _serviceUrl = value;
+                OnPropertyChanged(nameof(ServiceUrl));
+            }
+        }
+
+        private string _msg;
+        public string Msg
+        {
+            get => _msg;
+            set
+            {
+                _msg = string.IsNullOrEmpty(value) ? value :  Environment.NewLine + value;
+                OnPropertyChanged(nameof(Msg));
+            }
+        }
+
+        private List<User> _userList;
+        public List<User> UserList
+        {
+            get => _userList;
+            set
+            {
+                _userList = value;
+                OnPropertyChanged(nameof(UserList));
+            }
+        }
+
+        private int? _editId;
+        public int? EditId
+        {
+            get => _editId;
+            set
+            {
+                _editId = value;
+                OnPropertyChanged(nameof(EditId));
+            }
+        }
+
+        #endregion
+
+        public ICommand TestService => new DelegateCommand(o =>
+        {
+            Text = ServiceHelp.ServiceIni(ServiceUrl) ? @"服务已连接!" : @"等待连接... ...";
         });
+
+        public ICommand Test => new DelegateCommand(o =>
+        {
+            Msg = GlobalVar.TestService.Test() + Msg;
+        });
+
+        public ICommand TestStr => new DelegateCommand(o =>
+        {
+            Msg = GlobalVar.TestService.TestStr(123, "一二三") + Msg;
+        });
+
+        public ICommand GetTime => new DelegateCommand(o =>
+        {
+            Msg = GlobalVar.TestService.GetTime().ToString(CultureInfo.InstalledUICulture) + Msg;
+        });
+
+        public ICommand Insert => new DelegateCommand(o =>
+        {
+            var user = new User { id = 1, name = "张三" };
+            var ret = GlobalVar.TestService.Insert(user);
+            Msg = ret.ToString() + Msg;
+        });
+
+        public ICommand InsertEx => new DelegateCommand(o =>
+        {
+            var user = new User { id = Math.Abs(CorePublic.GenerateId()), name = "李四" };
+            var ret = GlobalVar.TestService.Insert(user);
+            Msg = ret.ToString() + Msg;
+        });
+
+        public ICommand Update => new DelegateCommand(o =>
+        {
+            var user = new User { id = 1, name = "张修改" };
+            var ret = GlobalVar.TestService.Update(user);
+            Msg = ret.ToString() + Msg;
+        });
+
+        public ICommand UpdateEx => new DelegateCommand(o =>
+        {
+            var user = new User { id = EditId, name = "根修改" };
+            var ret = GlobalVar.TestService.Update(user);
+            Msg = ret.ToString() + Msg;
+        });
+
+        public ICommand Delete => new DelegateCommand(o =>
+        {
+            var ret = GlobalVar.TestService.Delete(1);
+            Msg = ret.ToString() + Msg;
+        });
+
+        public ICommand Select => new DelegateCommand(o =>
+        {
+            var ret = GlobalVar.TestService.Select(1, "");
+            UserList = ret;
+        });
+
+        public ICommand SelectEx => new DelegateCommand(o =>
+        {
+            var ret = GlobalVar.TestService.Select(1, "根修改");
+            UserList = ret;
+        });
+
+        public ICommand SelectAll => new DelegateCommand(o =>
+        {
+            var ret = GlobalVar.TestService.SelectAll();
+            UserList = ret;
+        });
+
+        public ICommand Test1 => new DelegateCommand(o =>
+        {
+            Msg = "Test1" + Msg;
+        });
+
+        public ICommand Test2 => new DelegateCommand(o =>
+        {
+            Msg = "Test2" + Msg;
+        });
+
+        public ICommand Test3 => new DelegateCommand(o =>
+        {
+            Msg = "Test3" + Msg;
+        });
+
+        public ICommand ClearMsg => new DelegateCommand(o =>
+        {
+            Msg = string.Empty;
+        });
+
+
     }
 }

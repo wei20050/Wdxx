@@ -1,16 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows.Threading;
+using NetFrameWork.Core;
+using Test.ClientWpf.Service;
 
 namespace Test.ClientWpf
 {
-    /// <summary>
-    /// App.xaml 的交互逻辑
-    /// </summary>
-    public partial class App : Application
+    public partial class App
     {
+        public App()
+        {
+            //设置本地数据库
+            LocalDatabaseHelp.SetDatabase();
+        }
+        // ReSharper disable once UnusedMember.Local
+        private static void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            CoreLog.Error(e);
+        }
     }
 }

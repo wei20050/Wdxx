@@ -9,8 +9,9 @@ namespace Test.Service
         private readonly ORM _db = new ORM();
 
         [WebMethod]
-        public void Test()
+        public string Test()
         {
+            return "Success";
         }
 
         [WebMethod]
@@ -19,5 +20,4 @@ namespace Test.Service
             return $"id = {id}, name = {name}";
         }
     }
-
 }

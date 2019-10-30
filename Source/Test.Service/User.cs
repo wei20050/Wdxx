@@ -8,7 +8,7 @@ namespace Test.Service
     {
 
         [WebMethod]
-        public bool Insert(user u)
+        public bool Insert(User u)
         {
             return _db.Insert(u);
         }
@@ -16,25 +16,25 @@ namespace Test.Service
         [WebMethod]
         public bool Delete(int id)
         {
-            return _db.Delete<user>(p => p.id == id);
+            return _db.Delete<User>(p => p.id == id);
         }
 
         [WebMethod]
-        public bool Update(user u)
+        public bool Update(User u)
         {
             return _db.Update(u);
         }
 
         [WebMethod]
-        public List<user> Select(int id, string name)
+        public List<User> Select(int id, string name)
         {
-            return _db.SelectAll<user>(p => p.id == id || p.name == name);
+            return _db.SelectAll<User>(p => p.id == id || p.name == name);
         }
 
         [WebMethod]
-        public List<user> SelectAll()
+        public List<User> SelectAll()
         {
-            return _db.SelectAll<user>();
+            return _db.SelectAll<User>();
         }
     }
 }
