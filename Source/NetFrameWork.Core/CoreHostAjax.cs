@@ -5,9 +5,10 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.ServiceModel;
 using System.ServiceModel.Description;
+
 // ReSharper disable UnusedMember.Global
 
-namespace WindowsFormsApp1
+namespace NetFrameWork.Core
 {
 
     /// <inheritdoc />

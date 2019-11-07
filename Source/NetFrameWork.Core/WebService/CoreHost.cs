@@ -7,18 +7,21 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
+
 // ReSharper disable UnusedMember.Global
 
-namespace NetFrameWork.Core
+namespace NetFrameWork.Core.WebService
 {
 
     /// <summary>
     /// 本地服务宿主类
     /// </summary>
-    public class CoreHostWebService
+    public class CoreHost
     {
 
         /// <summary>
@@ -51,7 +54,7 @@ namespace NetFrameWork.Core
         /// 服务类 构造(默认端口{80}若不可用自动生成随机端口,默认开启当前电脑所有ip})
         /// </summary>
         /// <param name="serviceClass">服务类</param>
-        public CoreHostWebService(Type serviceClass) : this(serviceClass, GetPort()) { }
+        public CoreHost(Type serviceClass) : this(serviceClass, GetPort()) { }
 
         /// <inheritdoc />
         /// <summary>
@@ -59,7 +62,7 @@ namespace NetFrameWork.Core
         /// </summary>
         /// <param name="serviceClass">服务类</param>
         /// <param name="port">服务端口</param>
-        public CoreHostWebService(Type serviceClass, int port) : this(serviceClass, port, "+") { }
+        public CoreHost(Type serviceClass, int port) : this(serviceClass, port, "+") { }
 
         /// <summary>
         /// 服务类 端口 IP{ip写 + 代表所有本机ip} 构造
@@ -67,7 +70,7 @@ namespace NetFrameWork.Core
         /// <param name="serviceClass">服务类</param>
         /// <param name="port">服务端口</param>
         /// <param name="ip">服务ip地址</param>
-        public CoreHostWebService(Type serviceClass, int port, string ip)
+        public CoreHost(Type serviceClass, int port, string ip)
         {
             _serviceClass = serviceClass;
             _serviceFunArr = _serviceClass.GetMethods();
@@ -158,6 +161,16 @@ namespace NetFrameWork.Core
                 var request = context.Request;
                 //将发送到客户端的请求响应中的客户端的对象
                 var response = context.Response;
+
+                if (request.Headers.AllKeys.ToList().Contains("Authorization"))
+                {
+                    HttpContext.Current = new HttpContext(new HttpRequest(null, request.Url.ToString(), null),
+                        new HttpResponse(null))
+                    {
+                        User = new GenericPrincipal(new GenericIdentity(request.Headers["Authorization"]), null)
+                    };
+                }
+
                 //后台跨域请求，通常设置为配置文件   如果是js的ajax请求，还可以设置跨域的ip地址与参数
                 //context.Response.AppendHeader("Access-Control-Allow-Origin", "*");
                 //后台跨域参数设置，通常设置为配置文件
@@ -415,7 +428,6 @@ namespace NetFrameWork.Core
 
         }
 
-
         /// <summary>
         /// 获取XML方法名
         /// </summary>
@@ -493,6 +505,39 @@ namespace NetFrameWork.Core
                 var serializer = new XmlSerializer(t);
                 return serializer.Deserialize(sr);
             }
+        }
+
+        /// <summary>
+        /// 初始化验证
+        /// </summary>
+        public static void AuthIni()
+        {
+            if (!string.IsNullOrEmpty(HttpContext.Current.User?.Identity?.Name)) return;
+            if (!HttpContext.Current.Request.Headers.AllKeys.ToList().Contains("Authorization"))
+            {
+                throw new Exception("401");
+            }
+            var authHeader = HttpContext.Current.Request.Headers["Authorization"];
+            HttpContext.Current.User = new GenericPrincipal(new GenericIdentity(authHeader), null);
+        }
+
+        /// <summary>
+        /// 获取验证字符串
+        /// </summary>
+        public static string GetAuth()
+        {
+            return string.IsNullOrEmpty(HttpContext.Current.User?.Identity?.Name) ? string.Empty : HttpContext.Current.User?.Identity?.Name;
+        }
+
+        /// <summary>
+        /// 创建验证用Behavior
+        /// </summary>
+        /// <param name="authorization">验证文本</param>
+        /// <returns></returns>
+        public static AuthHeaderBehavior CreateAuthHeaderBehavior(string authorization)
+        {
+            var inserter = new AuthHeaderInserter { Authorization = authorization };
+            return new AuthHeaderBehavior(inserter);
         }
     }
 }

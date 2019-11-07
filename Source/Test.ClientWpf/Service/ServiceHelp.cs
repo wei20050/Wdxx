@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using System.Windows;
 using NetFrameWork.Core;
+using NetFrameWork.Core.WebService;
 using Test.ClientWpf.WsService;
 
 namespace Test.ClientWpf.Service
@@ -33,7 +34,7 @@ namespace Test.ClientWpf.Service
                 //离线服务开启
                 if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return false;
                 IsOnLine = false;
-                var httpUrl = new CoreHostWebService(typeof(Test.Service.Ws)).Open();
+                var httpUrl = new CoreHost(typeof(Test.Service.Ws)).Open();
                 try
                 {
                     GlobalVar.TestService = new WsSoapClient { Endpoint = { Address = new EndpointAddress(httpUrl) } };

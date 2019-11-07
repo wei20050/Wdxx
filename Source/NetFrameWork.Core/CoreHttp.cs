@@ -49,16 +49,19 @@ namespace NetFrameWork.Core
         /// <param name="httpData">请求参数 例:{"value": "HttpSend"} C#格式(@"{""value"":""HttpSend""}")</param>
         /// <param name="sendParam">发送参数</param>
         /// <returns></returns>
-        public static string Send(string httpUri, string method, string httpData = null, SendParam sendParam = null)
+        public static string Send(string httpUri, string method = "GET", string httpData = null, SendParam sendParam = null)
         {
+            HttpWebRequest httpWebRequest = null;
+            HttpWebResponse httpWebResponse = null;
+            Stream reqStream = null;
+            Stream resStream = null;
             try
             {
                 if (sendParam == null)
                 {
                     sendParam = new SendParam();
                 }
-                string result;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
+                httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
                 if (sendParam.Headers != null)
                 {
                     httpWebRequest.Headers = sendParam.Headers;
@@ -74,9 +77,9 @@ namespace NetFrameWork.Core
                     {
                         var data = Encoding.UTF8.GetBytes(httpData);
                         httpWebRequest.ContentLength = data.Length;
-                        var outStream = httpWebRequest.GetRequestStream();
-                        outStream.Write(data, 0, data.Length);
-                        outStream.Close();
+                        reqStream = httpWebRequest.GetRequestStream();
+                        reqStream.Write(data, 0, data.Length);
+                        reqStream.Close();
                     }
                     else
                     {
@@ -84,14 +87,15 @@ namespace NetFrameWork.Core
                     }
                 }
                 var webResponse = httpWebRequest.GetResponse();
-                var httpWebResponse = (HttpWebResponse)webResponse;
-                var stream = httpWebResponse.GetResponseStream();
-                if (stream != null)
+                httpWebResponse = (HttpWebResponse)webResponse;
+                resStream = httpWebResponse.GetResponseStream();
+                string result;
+                if (resStream != null)
                 {
-                    var streamReader = new StreamReader(stream, Encoding.GetEncoding(sendParam.Encoding));
+                    var streamReader = new StreamReader(resStream, Encoding.GetEncoding(sendParam.Encoding));
                     result = streamReader.ReadToEnd();
                     streamReader.Close();
-                    stream.Close();
+                    resStream.Close();
                 }
                 else
                 {
@@ -102,6 +106,13 @@ namespace NetFrameWork.Core
             catch (Exception ex)
             {
                 throw new Exception("CoreHttp.HttpSend Err: method=>" + method + " uri=>" + httpUri + " httpData=>" + httpData + "err=>" + ex);
+            }
+            finally
+            {
+                resStream?.Close();
+                reqStream?.Close();
+                httpWebResponse?.Close();
+                httpWebRequest?.Abort();
             }
         }
     }

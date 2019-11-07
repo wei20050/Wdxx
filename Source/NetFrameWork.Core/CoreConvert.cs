@@ -382,6 +382,29 @@ namespace NetFrameWork.Core
         }
 
         /// <summary>
+        /// 将DataTable对象转化为实体集合
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="type">实体类型</param>
+        /// <returns></returns>
+        public static object DataTableToListEntity(DataTable table, Type type)
+        {
+            var jsSerializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var parentRow = new List<Dictionary<string, object>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var childRow = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                {
+                    childRow.Add(col.ColumnName, row[col]);
+                }
+                parentRow.Add(childRow);
+            }
+            var json = jsSerializer.Serialize(parentRow);
+            return jsSerializer.Deserialize(json, type);
+        }
+
+        /// <summary>
         /// 文件转Base64字符串
         /// </summary>
         /// <param name="fileName">文件路径</param>

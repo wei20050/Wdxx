@@ -54,13 +54,16 @@
     <Compile Include="CoreConfig.cs" />
     <Compile Include="CoreEncrypt.cs" />
     <Compile Include="CoreFile.cs" />
+    <Compile Include="CoreHostAjax.cs" />
     <Compile Include="CoreWebService.cs" />
     <Compile Include="CorePublic.cs" />
     <Compile Include="CoreHttp.cs" />
     <Compile Include="CoreIni.cs" />
     <Compile Include="CoreLog.cs" />
     <Compile Include="CoreSerialPort.cs" />
-    <Compile Include="CoreHostWebService.cs" />
+    <Compile Include="WebService\AuthHeaderBehavior.cs" />
+    <Compile Include="WebService\AuthHeaderInserter.cs" />
+    <Compile Include="WebService\CoreHost.cs" />
     <Compile Include="Mvvm\DelegateCommand.cs" />
     <Compile Include="Mvvm\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -39,7 +39,7 @@ namespace NetFrameWork.Core
                 var service = new Uri(serviceUrl);
                 var fileName = $"{service.Host}_{service.Port}";
                 // ReSharper disable once StringLiteralTypo
-                fileName = service.Segments.Select(s => s.Trim('/')).Where(name => !string.IsNullOrEmpty(name)).Aggregate(fileName, (current, name) => current + $"_{name}").Replace(".asmx",string.Empty);
+                fileName = service.Segments.Select(s => s.Trim('/')).Where(name => !string.IsNullOrEmpty(name)).Aggregate(fileName, (current, name) => current + $"_{name}").Replace(".asmx", string.Empty);
                 var wsdlFile = Path.Combine(_webServiceWsdl, fileName);
                 if (!File.Exists(wsdlFile))
                 {
@@ -159,6 +159,11 @@ namespace NetFrameWork.Core
             return mi.Invoke(obj, objArr);
         }
 
+        /// <summary>
+        /// 获取wsdl
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <returns></returns>
         private static string GetWsdl(string httpUri)
         {
             httpUri = httpUri.TrimEnd('/');
@@ -166,25 +171,41 @@ namespace NetFrameWork.Core
             {
                 httpUri += "?wsdl";
             }
-            string result;
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
-            httpWebRequest.Method = "GET";
-            httpWebRequest.ContentType = "text/xml";
-            var webResponse = httpWebRequest.GetResponse();
-            var httpWebResponse = (HttpWebResponse)webResponse;
-            var stream = httpWebResponse.GetResponseStream();
-            if (stream != null)
+            HttpWebRequest httpWebRequest = null;
+            HttpWebResponse httpWebResponse = null;
+            Stream resStream = null;
+            try
             {
-                var streamReader = new StreamReader(stream);
-                result = streamReader.ReadToEnd();
-                streamReader.Close();
-                stream.Close();
+                httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
+                httpWebRequest.Method = "GET";
+                httpWebRequest.ContentType = "text/xml";
+                var webResponse = httpWebRequest.GetResponse();
+                httpWebResponse = (HttpWebResponse)webResponse;
+                resStream = httpWebResponse.GetResponseStream();
+                string result;
+                if (resStream != null)
+                {
+                    var streamReader = new StreamReader(resStream);
+                    result = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    resStream.Close();
+                }
+                else
+                {
+                    result = string.Empty;
+                }
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                result = string.Empty;
+                throw new Exception("CoreWebService.GetWsdl Err: uri=>" + httpUri + "err=>" + ex);
             }
-            return result;
+            finally
+            {
+                resStream?.Close();
+                httpWebResponse?.Close();
+                httpWebRequest?.Abort();
+            }
         }
 
         #region 序列化反序列化
