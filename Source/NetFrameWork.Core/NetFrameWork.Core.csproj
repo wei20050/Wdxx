@@ -63,6 +63,7 @@
     <Compile Include="CoreSerialPort.cs" />
     <Compile Include="WebService\AuthHeaderBehavior.cs" />
     <Compile Include="WebService\AuthHeaderInserter.cs" />
+    <Compile Include="WebService\AuthHelper.cs" />
     <Compile Include="WebService\CoreHost.cs" />
     <Compile Include="Mvvm\DelegateCommand.cs" />
     <Compile Include="Mvvm\ViewModelBase.cs" />
