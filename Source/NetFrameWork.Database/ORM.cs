@@ -16,7 +16,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
-using NetFrameWork.Core;
 // ReSharper disable UnusedMember.Global
 
 #pragma warning disable 618
@@ -1730,12 +1729,12 @@ namespace NetFrameWork.Database
 
         private static void Info(object o)
         {
-            CoreLog.Info(o, "DB_");
+            DatabaseLog.Info(o, "DB_");
         }
 
         private static void Error(object o)
         {
-            CoreLog.Error(o, "DB_");
+            DatabaseLog.Error(o, "DB_");
         }
 
         #endregion

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using NetFrameWork.Database.WhereExpression;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Database
 {

@@ -1,4 +1,5 @@
 ﻿using NetFrameWork.Database.SqlFunction;
+// ReSharper disable UnusedMember.Global
 
 namespace NetFrameWork.Database
 {
