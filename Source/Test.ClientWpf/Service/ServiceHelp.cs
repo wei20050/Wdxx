@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ServiceModel;
 using System.Windows;
 using NetFrameWork.Core;
 using NetFrameWork.Core.WebService;
-using Test.ClientWpf.WsService;
+using Test.ClientWpf.WsServiceReference;
 
 namespace Test.ClientWpf.Service
 {
@@ -24,8 +23,9 @@ namespace Test.ClientWpf.Service
             try
             {
                 //检测服务是否正常连接  若无法连接 开启离线模式
-                GlobalVar.TestService = new WsSoapClient { Endpoint = { Address = new EndpointAddress(url) } };
-                GlobalVar.TestService.Test();
+                GlobalVar.ServiceBaseUrl = url;
+                App.CreateWsService().Test();
+                GlobalVar.UserInfo = App.CreateWsService().GetUserInfo(new UserInfo { UserName = "Admin" });
                 IsOnLine = true;
             }
             catch (Exception ex)
@@ -37,8 +37,9 @@ namespace Test.ClientWpf.Service
                 var httpUrl = new CoreHost(typeof(Test.Service.Ws)).Open();
                 try
                 {
-                    GlobalVar.TestService = new WsSoapClient { Endpoint = { Address = new EndpointAddress(httpUrl) } };
-                    GlobalVar.TestService.Test();
+                    GlobalVar.ServiceBaseUrl = httpUrl;
+                    App.CreateWsService().Test();
+                    GlobalVar.UserInfo = App.CreateWsService().GetUserInfo(new UserInfo { UserName = "Admin" });
                 }
                 catch (Exception e)
                 {

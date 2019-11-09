@@ -44,6 +44,7 @@
                 <TextBox
                     Width="360"
                     Margin="5"
+                    VerticalAlignment="Center"
                     Text="{Binding ServiceUrl}" />
                 <Button
                     Margin="0,5"

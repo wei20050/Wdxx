@@ -3,9 +3,9 @@ using System.Globalization;
 using NetFrameWork.Core.Mvvm;
 using System.Windows.Input;
 using Test.ClientWpf.Service;
-using Test.ClientWpf.WsService;
 using NetFrameWork.Core;
 using System;
+using Test.ClientWpf.WsServiceReference;
 
 namespace Test.ClientWpf
 {
@@ -16,7 +16,7 @@ namespace Test.ClientWpf
             // ReSharper disable once StringLiteralTypo
             ServiceUrl = "http://localhost:61070/Ws.asmx";
             Msg = string.Empty;
-            UserList = new List<User>();
+            UserList = new List<user>();
         }
 
         #region  属性
@@ -54,8 +54,8 @@ namespace Test.ClientWpf
             }
         }
 
-        private List<User> _userList;
-        public List<User> UserList
+        private List<user> _userList;
+        public List<user> UserList
         {
             get => _userList;
             set
@@ -85,68 +85,68 @@ namespace Test.ClientWpf
 
         public ICommand Test => new DelegateCommand(o =>
         {
-            Msg = GlobalVar.TestService.Test() + Msg;
+            Msg = App.CreateWsService().Test() + Msg;
         });
 
         public ICommand TestStr => new DelegateCommand(o =>
         {
-            Msg = GlobalVar.TestService.TestStr(123, "一二三") + Msg;
+            Msg = App.CreateWsService().TestStr(123, "一二三") + Msg;
         });
 
         public ICommand GetTime => new DelegateCommand(o =>
         {
-            Msg = GlobalVar.TestService.GetTime().ToString(CultureInfo.InstalledUICulture) + Msg;
+            Msg = App.CreateWsService().GetTime().ToString(CultureInfo.InstalledUICulture) + Msg;
         });
 
         public ICommand Insert => new DelegateCommand(o =>
         {
-            var user = new User { id = 1, name = "张三" };
-            var ret = GlobalVar.TestService.Insert(user);
+            var user = new user { id = 1, name = "张三" };
+            var ret = App.CreateWsService().Insert(user);
             Msg = ret.ToString() + Msg;
         });
 
         public ICommand InsertEx => new DelegateCommand(o =>
         {
-            var user = new User { id = Math.Abs(CorePublic.GenerateId()), name = "李四" };
-            var ret = GlobalVar.TestService.Insert(user);
+            var user = new user { id = Math.Abs(CorePublic.GenerateId()), name = "李四" };
+            var ret = App.CreateWsService().Insert(user);
             Msg = ret.ToString() + Msg;
         });
 
         public ICommand Update => new DelegateCommand(o =>
         {
-            var user = new User { id = 1, name = "张修改" };
-            var ret = GlobalVar.TestService.Update(user);
+            var user = new user { id = 1, name = "张修改" };
+            var ret = App.CreateWsService().Update(user);
             Msg = ret.ToString() + Msg;
         });
 
         public ICommand UpdateEx => new DelegateCommand(o =>
         {
-            var user = new User { id = EditId, name = "根修改" };
-            var ret = GlobalVar.TestService.Update(user);
+            var user = new user { id = EditId, name = "根修改" };
+            var ret = App.CreateWsService().Update(user);
             Msg = ret.ToString() + Msg;
         });
 
         public ICommand Delete => new DelegateCommand(o =>
         {
-            var ret = GlobalVar.TestService.Delete(1);
+            var ret = App.CreateWsService().Delete(1);
             Msg = ret.ToString() + Msg;
         });
 
         public ICommand Select => new DelegateCommand(o =>
         {
-            var ret = GlobalVar.TestService.Select(1, "");
+            var ret = App.CreateWsService().Select(1, "");
             UserList = ret;
         });
 
         public ICommand SelectEx => new DelegateCommand(o =>
         {
-            var ret = GlobalVar.TestService.Select(1, "根修改");
+            var ret = App.CreateWsService().Select(1, "根修改");
             UserList = ret;
         });
 
         public ICommand SelectAll => new DelegateCommand(o =>
         {
-            var ret = GlobalVar.TestService.SelectAll();
+            var ret = App.CreateWsService().SelectAll();
             UserList = ret;
         });
 

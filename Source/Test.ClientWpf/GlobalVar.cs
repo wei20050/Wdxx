@@ -1,10 +1,17 @@
-﻿using Test.ClientWpf.WsService;
+﻿using Test.ClientWpf.WsServiceReference;
 
 namespace Test.ClientWpf
 {
     public class GlobalVar
     {
-        //服务对象
-        public static WsSoapClient TestService = new WsSoapClient();
+        /// <summary>
+        /// 服务地址
+        /// </summary>
+        public static string ServiceBaseUrl { get; set; }
+
+        /// <summary>
+        /// 用户信息
+        /// </summary>
+        public static UserInfo UserInfo { get; set; }
     }
 }
