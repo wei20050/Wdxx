@@ -6,3 +6,4 @@ logs
 /Source/HttpService/Web.Release.config
 *.user
 /Source/Test.Service/Properties/PublishProfiles
+Output

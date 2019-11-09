@@ -51,7 +51,7 @@ namespace CardReading.ServiceHost
             var bdip = string.Empty;
             foreach (var ip in ips)
             {
-                bdip += ip + Environment.NewLine;
+                bdip += Environment.NewLine + ip;
             }
             if (string.IsNullOrEmpty(ServicePort))
             {
@@ -72,7 +72,7 @@ namespace CardReading.ServiceHost
             try
             {
                 var hh = new CoreClientHost(typeof(CardRead), Convert.ToInt32(ServicePort));
-                richTextBox1.Text = string.Format("服务已开启 ... ... {0}时间:{1}{0} 本机IPV4 IP地址:{0}{2}", Environment.NewLine, DateTime.Now, bdip);
+                richTextBox1.Text = string.Format("服务已开启 ... ... {0}时间:{1}{0} 本机IPV4 IP地址:{2}", Environment.NewLine, DateTime.Now, bdip);
                 hh.Open();
             }
             catch (Exception ex)

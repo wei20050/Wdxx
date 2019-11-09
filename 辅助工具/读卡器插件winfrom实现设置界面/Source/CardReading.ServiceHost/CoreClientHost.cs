@@ -49,11 +49,11 @@ namespace CardReading.ServiceHost
 
         /// <inheritdoc />
         /// <summary>
-        /// 服务类 端口号 构造(默认IP{127.0.0.1})
+        /// 服务类 端口号 构造(默认IP{+} 代表本地所有IP)
         /// </summary>
         /// <param name="serviceClass">服务类</param>
         /// <param name="port">服务端口</param>
-        public CoreClientHost(Type serviceClass, int port) : this(serviceClass, port, "127.0.0.1") { }
+        public CoreClientHost(Type serviceClass, int port) : this(serviceClass, port, "+") { }
 
         /// <summary>
         /// 服务类 端口 IP{ip写 + 代表所有本机ip} 构造
@@ -72,7 +72,7 @@ namespace CardReading.ServiceHost
         }
 
         /// <summary>
-        /// 判断端口是否被占用
+        /// 判断端口是否可用
         /// </summary>
         /// <param name="port"></param>
         /// <returns></returns>
@@ -110,7 +110,7 @@ namespace CardReading.ServiceHost
         private static int GetPort()
         {
             var port = 80;
-            if (IsPortAvailble(80))
+            if (!IsPortAvailble(80))
             {
                 port = GetFreeTcpPort();
             }
@@ -123,14 +123,14 @@ namespace CardReading.ServiceHost
         public string Open()
         {
             //定义url及端口号，通常设置为配置文件
-            _httpobj.Prefixes.Add(_uri.TrimEnd('/') + '/');
+            _httpobj.Prefixes.Add(_uri);
             //启动监听器
             _httpobj.Start();
             //异步监听客户端请求，当客户端的网络请求到来时会自动执行Result委托
             //该委托没有返回值，有一个IAsyncResult接口的参数，可通过该参数获取context对象
             _httpobj.BeginGetContext(Result, _httpobj);
             IsOpen = true;
-            return _uri;
+            return _uri.Replace("+","127.0.0.1");
         }
 
         /// <summary>

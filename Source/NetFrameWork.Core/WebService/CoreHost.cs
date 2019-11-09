@@ -32,7 +32,7 @@ namespace NetFrameWork.Core.WebService
         /// <summary>
         /// 服务地址
         /// </summary>
-        private string _uri;
+        private readonly string _uri;
 
         /// <summary>
         /// 服务类
@@ -124,7 +124,6 @@ namespace NetFrameWork.Core.WebService
         /// </summary>
         public string Open()
         {
-            _uri = _uri.TrimEnd('/') + '/';
             //定义url及端口号，通常设置为配置文件
             _httpListener.Prefixes.Add(_uri);
             //启动监听器
