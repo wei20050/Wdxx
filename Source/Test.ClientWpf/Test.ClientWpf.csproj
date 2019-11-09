@@ -113,7 +113,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
-    <None Include="Connected Services\WsServiceReference\Test.ClientWpf.WsServiceReference.User.datasource">
+    <None Include="Connected Services\WsServiceReference\Test.ClientWpf.WsServiceReference.ArrayOfUser.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\WsServiceReference\Test.ClientWpf.WsServiceReference.UserInfo.datasource">
@@ -153,13 +153,6 @@
     <None Include="Connected Services\WsServiceReference\configuration.svcinfo" />
     <None Include="Connected Services\WsServiceReference\configuration91.svcinfo" />
     <None Include="Connected Services\WsServiceReference\Ws.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Connected Services\WsServiceReference\" />
