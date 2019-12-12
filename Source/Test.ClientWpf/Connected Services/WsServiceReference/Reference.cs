@@ -9,644 +9,138 @@
 //------------------------------------------------------------------------------
 
 namespace Test.ClientWpf.WsServiceReference {
-    using System.Runtime.Serialization;
-    using System;
     
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="UserInfo", Namespace="http://tempuri.org/")]
-    [System.SerializableAttribute()]
-    public partial class UserInfo : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string UserNameField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string TokenField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string UserName {
-            get {
-                return this.UserNameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
-                    this.UserNameField = value;
-                    this.RaisePropertyChanged("UserName");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string Token {
-            get {
-                return this.TokenField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
-                    this.TokenField = value;
-                    this.RaisePropertyChanged("Token");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="user", Namespace="http://tempuri.org/")]
-    [System.SerializableAttribute()]
-    public partial class user : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        private System.Nullable<int> idField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string nameField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public System.Nullable<int> id {
-            get {
-                return this.idField;
-            }
-            set {
-                if ((this.idField.Equals(value) != true)) {
-                    this.idField = value;
-                    this.RaisePropertyChanged("id");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.nameField, value) != true)) {
-                    this.nameField = value;
-                    this.RaisePropertyChanged("name");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfUser", Namespace="http://tempuri.org/", ItemName="user")]
-    [System.SerializableAttribute()]
-    public class ArrayOfUser : System.Collections.Generic.List<Test.ClientWpf.WsServiceReference.user> {
-    }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WsServiceReference.WsSoap")]
     public interface WsSoap {
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 TestResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Test", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.TestResponse Test(Test.ClientWpf.WsServiceReference.TestRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        string Test();
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 userInfo 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/GetUserInfo", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.GetUserInfoResponse GetUserInfo(Test.ClientWpf.WsServiceReference.GetUserInfoRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        Test.ClientWpf.WsServiceReference.UserInfo GetUserInfo(Test.ClientWpf.WsServiceReference.UserInfo userInfo);
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 name 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/TestStr", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.TestStrResponse TestStr(Test.ClientWpf.WsServiceReference.TestStrRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        string TestStr(int id, string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/GetTime", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         System.DateTime GetTime();
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 u 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Insert", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.InsertResponse Insert(Test.ClientWpf.WsServiceReference.InsertRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        bool Insert(Test.ClientWpf.WsServiceReference.user u);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Delete", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         bool Delete(int id);
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 u 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Update", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.UpdateResponse Update(Test.ClientWpf.WsServiceReference.UpdateRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        bool Update(Test.ClientWpf.WsServiceReference.user u);
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 name 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Select", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.SelectResponse Select(Test.ClientWpf.WsServiceReference.SelectRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        Test.ClientWpf.WsServiceReference.user[] Select(int id, string name);
         
-        // CODEGEN: 命名空间 http://tempuri.org/ 的元素名称 SelectAllResult 以后生成的消息协定未标记为 nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/SelectAll", ReplyAction="*")]
-        Test.ClientWpf.WsServiceReference.SelectAllResponse SelectAll(Test.ClientWpf.WsServiceReference.SelectAllRequest request);
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        Test.ClientWpf.WsServiceReference.user[] SelectAll();
     }
     
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class TestRequest {
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/")]
+    public partial class UserInfo : object, System.ComponentModel.INotifyPropertyChanged {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="Test", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.TestRequestBody Body;
+        private string userNameField;
         
-        public TestRequest() {
+        private string tokenField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UserName {
+            get {
+                return this.userNameField;
+            }
+            set {
+                this.userNameField = value;
+                this.RaisePropertyChanged("UserName");
+            }
         }
         
-        public TestRequest(Test.ClientWpf.WsServiceReference.TestRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
-    public partial class TestRequestBody {
-        
-        public TestRequestBody() {
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class TestResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.TestResponseBody Body;
-        
-        public TestResponse() {
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string Token {
+            get {
+                return this.tokenField;
+            }
+            set {
+                this.tokenField = value;
+                this.RaisePropertyChanged("Token");
+            }
         }
         
-        public TestResponse(Test.ClientWpf.WsServiceReference.TestResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class TestResponseBody {
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string TestResult;
-        
-        public TestResponseBody() {
-        }
-        
-        public TestResponseBody(string TestResult) {
-            this.TestResult = TestResult;
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
         }
     }
     
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class GetUserInfoRequest {
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/")]
+    public partial class user : object, System.ComponentModel.INotifyPropertyChanged {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetUserInfo", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.GetUserInfoRequestBody Body;
+        private System.Nullable<int> idField;
         
-        public GetUserInfoRequest() {
+        private string nameField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=0)]
+        public System.Nullable<int> id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+                this.RaisePropertyChanged("id");
+            }
         }
         
-        public GetUserInfoRequest(Test.ClientWpf.WsServiceReference.GetUserInfoRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class GetUserInfoRequestBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.ClientWpf.WsServiceReference.UserInfo userInfo;
-        
-        public GetUserInfoRequestBody() {
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+                this.RaisePropertyChanged("name");
+            }
         }
         
-        public GetUserInfoRequestBody(Test.ClientWpf.WsServiceReference.UserInfo userInfo) {
-            this.userInfo = userInfo;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class GetUserInfoResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetUserInfoResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.GetUserInfoResponseBody Body;
-        
-        public GetUserInfoResponse() {
-        }
-        
-        public GetUserInfoResponse(Test.ClientWpf.WsServiceReference.GetUserInfoResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class GetUserInfoResponseBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.ClientWpf.WsServiceReference.UserInfo GetUserInfoResult;
-        
-        public GetUserInfoResponseBody() {
-        }
-        
-        public GetUserInfoResponseBody(Test.ClientWpf.WsServiceReference.UserInfo GetUserInfoResult) {
-            this.GetUserInfoResult = GetUserInfoResult;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class TestStrRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestStr", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.TestStrRequestBody Body;
-        
-        public TestStrRequest() {
-        }
-        
-        public TestStrRequest(Test.ClientWpf.WsServiceReference.TestStrRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class TestStrRequestBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public int id;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string name;
-        
-        public TestStrRequestBody() {
-        }
-        
-        public TestStrRequestBody(int id, string name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class TestStrResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="TestStrResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.TestStrResponseBody Body;
-        
-        public TestStrResponse() {
-        }
-        
-        public TestStrResponse(Test.ClientWpf.WsServiceReference.TestStrResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class TestStrResponseBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string TestStrResult;
-        
-        public TestStrResponseBody() {
-        }
-        
-        public TestStrResponseBody(string TestStrResult) {
-            this.TestStrResult = TestStrResult;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class InsertRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="Insert", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.InsertRequestBody Body;
-        
-        public InsertRequest() {
-        }
-        
-        public InsertRequest(Test.ClientWpf.WsServiceReference.InsertRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class InsertRequestBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.ClientWpf.WsServiceReference.user u;
-        
-        public InsertRequestBody() {
-        }
-        
-        public InsertRequestBody(Test.ClientWpf.WsServiceReference.user u) {
-            this.u = u;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class InsertResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="InsertResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.InsertResponseBody Body;
-        
-        public InsertResponse() {
-        }
-        
-        public InsertResponse(Test.ClientWpf.WsServiceReference.InsertResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class InsertResponseBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public bool InsertResult;
-        
-        public InsertResponseBody() {
-        }
-        
-        public InsertResponseBody(bool InsertResult) {
-            this.InsertResult = InsertResult;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class UpdateRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="Update", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.UpdateRequestBody Body;
-        
-        public UpdateRequest() {
-        }
-        
-        public UpdateRequest(Test.ClientWpf.WsServiceReference.UpdateRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class UpdateRequestBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.ClientWpf.WsServiceReference.user u;
-        
-        public UpdateRequestBody() {
-        }
-        
-        public UpdateRequestBody(Test.ClientWpf.WsServiceReference.user u) {
-            this.u = u;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class UpdateResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="UpdateResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.UpdateResponseBody Body;
-        
-        public UpdateResponse() {
-        }
-        
-        public UpdateResponse(Test.ClientWpf.WsServiceReference.UpdateResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class UpdateResponseBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public bool UpdateResult;
-        
-        public UpdateResponseBody() {
-        }
-        
-        public UpdateResponseBody(bool UpdateResult) {
-            this.UpdateResult = UpdateResult;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class SelectRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="Select", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.SelectRequestBody Body;
-        
-        public SelectRequest() {
-        }
-        
-        public SelectRequest(Test.ClientWpf.WsServiceReference.SelectRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class SelectRequestBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public int id;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string name;
-        
-        public SelectRequestBody() {
-        }
-        
-        public SelectRequestBody(int id, string name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class SelectResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SelectResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.SelectResponseBody Body;
-        
-        public SelectResponse() {
-        }
-        
-        public SelectResponse(Test.ClientWpf.WsServiceReference.SelectResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class SelectResponseBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.ClientWpf.WsServiceReference.ArrayOfUser SelectResult;
-        
-        public SelectResponseBody() {
-        }
-        
-        public SelectResponseBody(Test.ClientWpf.WsServiceReference.ArrayOfUser SelectResult) {
-            this.SelectResult = SelectResult;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class SelectAllRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SelectAll", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.SelectAllRequestBody Body;
-        
-        public SelectAllRequest() {
-        }
-        
-        public SelectAllRequest(Test.ClientWpf.WsServiceReference.SelectAllRequestBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
-    public partial class SelectAllRequestBody {
-        
-        public SelectAllRequestBody() {
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class SelectAllResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SelectAllResponse", Namespace="http://tempuri.org/", Order=0)]
-        public Test.ClientWpf.WsServiceReference.SelectAllResponseBody Body;
-        
-        public SelectAllResponse() {
-        }
-        
-        public SelectAllResponse(Test.ClientWpf.WsServiceReference.SelectAllResponseBody Body) {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class SelectAllResponseBody {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Test.ClientWpf.WsServiceReference.ArrayOfUser SelectAllResult;
-        
-        public SelectAllResponseBody() {
-        }
-        
-        public SelectAllResponseBody(Test.ClientWpf.WsServiceReference.ArrayOfUser SelectAllResult) {
-            this.SelectAllResult = SelectAllResult;
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
         }
     }
     
@@ -677,103 +171,40 @@ namespace Test.ClientWpf.WsServiceReference {
                 base(binding, remoteAddress) {
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.TestResponse Test.ClientWpf.WsServiceReference.WsSoap.Test(Test.ClientWpf.WsServiceReference.TestRequest request) {
-            return base.Channel.Test(request);
-        }
-        
         public string Test() {
-            Test.ClientWpf.WsServiceReference.TestRequest inValue = new Test.ClientWpf.WsServiceReference.TestRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.TestRequestBody();
-            Test.ClientWpf.WsServiceReference.TestResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).Test(inValue);
-            return retVal.Body.TestResult;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.GetUserInfoResponse Test.ClientWpf.WsServiceReference.WsSoap.GetUserInfo(Test.ClientWpf.WsServiceReference.GetUserInfoRequest request) {
-            return base.Channel.GetUserInfo(request);
+            return base.Channel.Test();
         }
         
         public Test.ClientWpf.WsServiceReference.UserInfo GetUserInfo(Test.ClientWpf.WsServiceReference.UserInfo userInfo) {
-            Test.ClientWpf.WsServiceReference.GetUserInfoRequest inValue = new Test.ClientWpf.WsServiceReference.GetUserInfoRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.GetUserInfoRequestBody();
-            inValue.Body.userInfo = userInfo;
-            Test.ClientWpf.WsServiceReference.GetUserInfoResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).GetUserInfo(inValue);
-            return retVal.Body.GetUserInfoResult;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.TestStrResponse Test.ClientWpf.WsServiceReference.WsSoap.TestStr(Test.ClientWpf.WsServiceReference.TestStrRequest request) {
-            return base.Channel.TestStr(request);
+            return base.Channel.GetUserInfo(userInfo);
         }
         
         public string TestStr(int id, string name) {
-            Test.ClientWpf.WsServiceReference.TestStrRequest inValue = new Test.ClientWpf.WsServiceReference.TestStrRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.TestStrRequestBody();
-            inValue.Body.id = id;
-            inValue.Body.name = name;
-            Test.ClientWpf.WsServiceReference.TestStrResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).TestStr(inValue);
-            return retVal.Body.TestStrResult;
+            return base.Channel.TestStr(id, name);
         }
         
         public System.DateTime GetTime() {
             return base.Channel.GetTime();
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.InsertResponse Test.ClientWpf.WsServiceReference.WsSoap.Insert(Test.ClientWpf.WsServiceReference.InsertRequest request) {
-            return base.Channel.Insert(request);
-        }
-        
         public bool Insert(Test.ClientWpf.WsServiceReference.user u) {
-            Test.ClientWpf.WsServiceReference.InsertRequest inValue = new Test.ClientWpf.WsServiceReference.InsertRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.InsertRequestBody();
-            inValue.Body.u = u;
-            Test.ClientWpf.WsServiceReference.InsertResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).Insert(inValue);
-            return retVal.Body.InsertResult;
+            return base.Channel.Insert(u);
         }
         
         public bool Delete(int id) {
             return base.Channel.Delete(id);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.UpdateResponse Test.ClientWpf.WsServiceReference.WsSoap.Update(Test.ClientWpf.WsServiceReference.UpdateRequest request) {
-            return base.Channel.Update(request);
-        }
-        
         public bool Update(Test.ClientWpf.WsServiceReference.user u) {
-            Test.ClientWpf.WsServiceReference.UpdateRequest inValue = new Test.ClientWpf.WsServiceReference.UpdateRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.UpdateRequestBody();
-            inValue.Body.u = u;
-            Test.ClientWpf.WsServiceReference.UpdateResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).Update(inValue);
-            return retVal.Body.UpdateResult;
+            return base.Channel.Update(u);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.SelectResponse Test.ClientWpf.WsServiceReference.WsSoap.Select(Test.ClientWpf.WsServiceReference.SelectRequest request) {
-            return base.Channel.Select(request);
+        public Test.ClientWpf.WsServiceReference.user[] Select(int id, string name) {
+            return base.Channel.Select(id, name);
         }
         
-        public Test.ClientWpf.WsServiceReference.ArrayOfUser Select(int id, string name) {
-            Test.ClientWpf.WsServiceReference.SelectRequest inValue = new Test.ClientWpf.WsServiceReference.SelectRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.SelectRequestBody();
-            inValue.Body.id = id;
-            inValue.Body.name = name;
-            Test.ClientWpf.WsServiceReference.SelectResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).Select(inValue);
-            return retVal.Body.SelectResult;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Test.ClientWpf.WsServiceReference.SelectAllResponse Test.ClientWpf.WsServiceReference.WsSoap.SelectAll(Test.ClientWpf.WsServiceReference.SelectAllRequest request) {
-            return base.Channel.SelectAll(request);
-        }
-        
-        public Test.ClientWpf.WsServiceReference.ArrayOfUser SelectAll() {
-            Test.ClientWpf.WsServiceReference.SelectAllRequest inValue = new Test.ClientWpf.WsServiceReference.SelectAllRequest();
-            inValue.Body = new Test.ClientWpf.WsServiceReference.SelectAllRequestBody();
-            Test.ClientWpf.WsServiceReference.SelectAllResponse retVal = ((Test.ClientWpf.WsServiceReference.WsSoap)(this)).SelectAll(inValue);
-            return retVal.Body.SelectAllResult;
+        public Test.ClientWpf.WsServiceReference.user[] SelectAll() {
+            return base.Channel.SelectAll();
         }
     }
 }

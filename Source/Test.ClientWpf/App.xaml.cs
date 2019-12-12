@@ -25,7 +25,7 @@ namespace Test.ClientWpf
         /// 创建服务对象
         /// </summary>
         /// <returns></returns>
-        public static WsSoapClient CreateWsService(string url = null, TimeSpan timeout = new TimeSpan())
+        public static WsSoap CreateWsService(string url = null, TimeSpan timeout = new TimeSpan())
         {
             var client = new WsSoapClient();
             client.Endpoint.Address = new EndpointAddress(url ?? GlobalVar.ServiceBaseUrl);

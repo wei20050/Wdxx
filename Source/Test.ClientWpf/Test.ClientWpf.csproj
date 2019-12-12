@@ -113,7 +113,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
-    <None Include="Connected Services\WsServiceReference\Test.ClientWpf.WsServiceReference.ArrayOfUser.datasource">
+    <None Include="Connected Services\WsServiceReference\Test.ClientWpf.WsServiceReference.user.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\WsServiceReference\Test.ClientWpf.WsServiceReference.UserInfo.datasource">
