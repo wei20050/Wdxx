@@ -116,6 +116,10 @@ namespace Model生成器.DAL
                     //dataType = column["notnull"] == "1" ? "DateTime" : "DateTime?";
                     dataType = "System.DateTime?";
                     break;
+                case "float":
+                    //dataType = column["notnull"] == "1" ? "DateTime" : "DateTime?";
+                    dataType = "float?";
+                    break;
                 default:
                     throw new Exception("Model生成器未实现数据库字段类型" + column["data_type"] + "的转换");
             }
