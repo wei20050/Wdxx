@@ -152,11 +152,12 @@ namespace NetFrameWork.Core.WebService
         {
             //当接收到请求后程序流会走到这里
             //获得context对象
-            var context = _httpListener.EndGetContext(ar);
-            //继续异步监听
-            _httpListener.BeginGetContext(Result, _httpListener);
+            HttpListenerContext context = null;
             try
             {
+                context = _httpListener.EndGetContext(ar);
+                //继续异步监听
+                _httpListener.BeginGetContext(Result, _httpListener);
                 var request = context.Request;
                 //将发送到客户端的请求响应中的客户端的对象
                 var response = context.Response;
@@ -194,6 +195,10 @@ namespace NetFrameWork.Core.WebService
             }
             catch (Exception e)
             {
+                if (context == null)
+                {
+                    return;
+                }
                 //将发送到客户端的请求响应中的客户端的对象
                 var response = context.Response;
                 response.StatusDescription = "500";
@@ -249,20 +254,12 @@ namespace NetFrameWork.Core.WebService
             if (request.InputStream == null) throw new Exception(" Err: does not allow empty submission");
             //具体要执行的方法
             MethodInfo mi = null;
-            //这里是有客户端发送的正文本数据流的请求 
-            var byteList = new List<byte>();
-            var byteArr = new byte[2048];
-            int readLen;
-            var len = 0;
             //接收客户端传过来的数据并转成字符串类型
-            do
+            string data;
+            using (var sr = new StreamReader(request.InputStream))
             {
-                readLen = request.InputStream.Read(byteArr, 0, byteArr.Length);
-                len += readLen;
-                byteList.AddRange(byteArr);
-            } while (readLen != 0);
-            //获取得到数据data
-            var data = Encoding.UTF8.GetString(byteList.ToArray(), 0, len);
+                data = sr.ReadToEnd();
+            }
             object[] objArr;
             //判断是否是WebService  SOAP调用 若是/是WebService 否则是/加方法名
             if (request.RawUrl == "/")
@@ -289,6 +286,10 @@ namespace NetFrameWork.Core.WebService
             }
             else
             {
+                if (request.ContentType != "application/x-www-form-urlencoded")
+                {
+                    throw new Exception("ContentType Err");
+                }
                 //获取方法名相同的所有方法
                 var mis = _serviceFunArr.Where(f => string.Equals(f.Name, request.RawUrl.Trim('/'), StringComparison.CurrentCultureIgnoreCase)).ToList();
                 //这里为空则没有参数
@@ -345,7 +346,12 @@ namespace NetFrameWork.Core.WebService
             //创建实例
             var o = Activator.CreateInstance(_serviceClass);
             //调用方法
-            return XmlData(mi.Name, mi.Invoke(o, pos));
+            var ret = mi.Invoke(o, pos);
+            if (ret is string && ret.ToString().StartsWith(HostHelper.WebServiceReturnJson) && ret.ToString().EndsWith(HostHelper.WebServiceReturnJson))
+            {
+                return ret.ToString().Replace(HostHelper.WebServiceReturnJson, string.Empty);
+            }
+            return XmlData(mi.Name, ret);
         }
 
         /// <summary>

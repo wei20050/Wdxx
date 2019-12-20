@@ -74,6 +74,83 @@ namespace NetFrameWork.Core
         }
 
         /// <summary>
+        /// RSA公钥私钥类
+        /// </summary>
+        public struct RsaSecretKey
+        {
+            /// <summary>
+            /// RSA公钥私钥类构造
+            /// </summary>
+            /// <param name="privateKey"></param>
+            /// <param name="publicKey"></param>
+            public RsaSecretKey(string privateKey, string publicKey)
+            {
+                PrivateKey = privateKey;
+                PublicKey = publicKey;
+            }
+            /// <summary>
+            /// 公钥
+            /// </summary>
+            public string PublicKey { get; set; }
+            /// <summary>
+            /// 私钥
+            /// </summary>
+            public string PrivateKey { get; set; }
+        }
+
+        /// <summary>
+        /// 获取RSA公钥私钥
+        /// </summary>
+        /// <param name="keySize">the size of the key,must from 384 bits to 16384 bits in increments of 8 </param>
+        /// <returns></returns>
+        public static RsaSecretKey GenerateRsaSecretKey(int keySize)
+        {
+            var rsaKey = new RsaSecretKey();
+            using (var rsa = new RSACryptoServiceProvider(keySize))
+            {
+                rsaKey.PrivateKey = rsa.ToXmlString(true);
+                rsaKey.PublicKey = rsa.ToXmlString(false);
+            }
+            return rsaKey;
+        }
+
+        /// <summary>
+        /// RSA加密
+        /// </summary>
+        /// <param name="xmlPublicKey"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static string RsaEncrypt(string xmlPublicKey, string content)
+        {
+            string encryptedContent;
+            using (var rsa = new RSACryptoServiceProvider())
+            {
+                rsa.FromXmlString(xmlPublicKey);
+                var encryptedData = rsa.Encrypt(Encoding.UTF8.GetBytes(content), false);
+                encryptedContent = Convert.ToBase64String(encryptedData);
+            }
+            return encryptedContent;
+        }
+
+        /// <summary>
+        /// RSA解密
+        /// </summary>
+        /// <param name="xmlPrivateKey"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static string RsaDecrypt(string xmlPrivateKey, string content)
+        {
+            string decryptedContent;
+            using (var rsa = new RSACryptoServiceProvider())
+            {
+                rsa.FromXmlString(xmlPrivateKey);
+                var decryptedData = rsa.Decrypt(Convert.FromBase64String(content), false);
+                decryptedContent = Encoding.GetEncoding("utf-8").GetString(decryptedData);
+            }
+            return decryptedContent;
+        }
+
+        /// <summary>
         /// 16进制字符串转Byte数组
         /// </summary>
         /// <param name="hex"></param>

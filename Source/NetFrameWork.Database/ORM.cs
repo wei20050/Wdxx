@@ -938,7 +938,7 @@ namespace NetFrameWork.Database
                                   (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute),
                                       true)
                               where attrs.Length <= 0 || !attrs[0].EntityKeyProperty
-                              select val).Count(val => val != null);
+                              select val).Count();
             //这里定义参数化数组 长度加上where中的参数
             var parameters = new DbParameter[savedCount + sql.ParamDict.Count];
             //开始拼接写入字段
@@ -954,10 +954,6 @@ namespace NetFrameWork.Database
                 var val = propertyInfo.GetValue(obj, null);
                 var attrs = (EdmScalarPropertyAttribute[])propertyInfo.GetCustomAttributes(typeof(EdmScalarPropertyAttribute), true);
                 if (attrs.Length > 0 && attrs[0].EntityKeyProperty)
-                {
-                    continue;
-                }
-                if (val == null)
                 {
                     continue;
                 }

@@ -218,7 +218,6 @@ namespace NetFrameWork.Core
 
         #endregion
 
-
         #region 序列化反序列化
 
         /// <summary>

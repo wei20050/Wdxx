@@ -42,7 +42,25 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static T Map<T>(object objFrom, bool isVague = false, params MapConfig[] mapConfigs) where T : new()
         {
-            return MapCore(objFrom, new T(), isVague, mapConfigs);
+            var jsonStr = ObjToJson(objFrom);
+            jsonStr = JsonNull(jsonStr);
+            jsonStr = JsonMember(jsonStr, mapConfigs);
+            if (isVague)
+            {
+                var regexs = Regex.Matches(jsonStr, "\"\\w+\":");
+                foreach (Match regex in regexs)
+                {
+                    foreach (var p in typeof(T).GetProperties())
+                    {
+                        var tmp = $"\"{p.Name}\":";
+                        if (regex.Value.ToUpper().Replace("_", string.Empty) != tmp.ToUpper().Replace("_", string.Empty)) continue;
+                        jsonStr = jsonStr.Replace(regex.Value, tmp);
+                        break;
+                    }
+                }
+            }
+            var ret = JsonToObj<T>(jsonStr);
+            return ret;
         }
 
         /// <summary>
@@ -55,56 +73,89 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static T Map<T>(object objFrom, T objTo, bool isVague = false, params MapConfig[] mapConfigs)
         {
-            var tmpObj = MapCore(objFrom, objTo, isVague, mapConfigs);
-            if (tmpObj == null || objTo == null)
+            var typeFrom = objFrom.GetType();
+            var typeTo = typeof(T);
+            var propertiesFrom = typeFrom.GetProperties();
+            var propertiesTo = typeTo.GetProperties();
+            foreach (var tFrom in propertiesFrom)
             {
-                return default(T);
-            }
-            var type = tmpObj.GetType();
-            var properties = type.GetProperties();
-            foreach (var t in properties)
-            {
-                var tmp = t.GetValue(tmpObj, null);
-                if (tmp == null || tmp is DateTime time && time == default(DateTime) ||
-                    tmp is int i && i == default(int))
+                var tFromValue = tFrom.GetValue(objFrom, null);
+                var name = tFrom.Name;
+                foreach (var c in mapConfigs)
                 {
-                    continue;
+                    if (c.MapFrom == name)
+                    {
+                        name = c.MapTo;
+                    }
                 }
-
-                t.SetValue(objTo, tmp, null);
+                foreach (var tTo in propertiesTo)
+                {
+                    if (isVague)
+                    {
+                        if (name.ToUpper().Replace("_", string.Empty) == tTo.Name.ToUpper().Replace("_", string.Empty))
+                        {
+                            tTo.SetValue(objTo, tFromValue, null);
+                        }
+                    }
+                    else
+                    {
+                        if (name == tTo.Name)
+                        {
+                            tTo.SetValue(objTo, tFromValue, null);
+                        }
+                    }
+                }
             }
             return objTo;
         }
 
-
         /// <summary>
-        /// 自动转换类
+        /// 自动转换类(排除源数据中Null的值)
         /// </summary>
         /// <param name="objFrom">从 数据源</param>
         /// <param name="objTo">到 数据源</param>
         /// <param name="isVague">字段是否模糊匹配(不区分大小写去掉下划线)</param>
         /// <param name="mapConfigs">字段转换配置</param>
         /// <returns></returns>
-        private static T MapCore<T>(object objFrom, T objTo, bool isVague = false, params MapConfig[] mapConfigs)
+        public static T MapNull<T>(object objFrom, T objTo, bool isVague = false, params MapConfig[] mapConfigs)
         {
-            var jsonStr = ObjToJson(objFrom);
-            jsonStr = JsonNull(jsonStr);
-            jsonStr = JsonMember(jsonStr, mapConfigs);
-            if (isVague)
+            var typeFrom = objFrom.GetType();
+            var typeTo = typeof(T);
+            var propertiesFrom = typeFrom.GetProperties();
+            var propertiesTo = typeTo.GetProperties();
+            foreach (var tFrom in propertiesFrom)
             {
-                var regexs = Regex.Matches(jsonStr, "\"\\w+\":");
-                foreach (Match regex in regexs)
+                var tFromValue = tFrom.GetValue(objFrom, null);
+                if (tFromValue == null)
                 {
-                    foreach (var p in objTo.GetType().GetProperties())
+                    continue;
+                }
+                var name = tFrom.Name;
+                foreach (var c in mapConfigs)
+                {
+                    if (c.MapFrom == name)
                     {
-                        var tmp = $"\"{p.Name}\":";
-                        if (regex.Value.ToUpper().Replace("_", string.Empty) != tmp.ToUpper().Replace("_", string.Empty)) continue;
-                        jsonStr = jsonStr.Replace(regex.Value, tmp);
-                        break;
+                        name = c.MapTo;
+                    }
+                }
+                foreach (var tTo in propertiesTo)
+                {
+                    if (isVague)
+                    {
+                        if (name.ToUpper().Replace("_", string.Empty) == tTo.Name.ToUpper().Replace("_", string.Empty))
+                        {
+                            tTo.SetValue(objTo, tFromValue, null);
+                        }
+                    }
+                    else
+                    {
+                        if (name == tTo.Name)
+                        {
+                            tTo.SetValue(objTo, tFromValue, null);
+                        }
                     }
                 }
             }
-            objTo = JsonToObj<T>(jsonStr);
             return objTo;
         }
 
@@ -427,10 +478,50 @@ namespace NetFrameWork.Core
         /// <param name="fileName">文件路径</param>
         public static void Base64ToFile(string base64Str, string fileName)
         {
+            var directory = Path.GetDirectoryName(fileName);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
             var contents = Convert.FromBase64String(base64Str);
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
                 fs.Write(contents, 0, contents.Length);
+                fs.Flush();
+            }
+        }
+
+        /// <summary>
+        /// 文件转字节集
+        /// </summary>
+        /// <param name="fileName">文件路径</param>
+        /// <returns>Base64字符串</returns>
+        public static byte[] FileToBytes(string fileName)
+        {
+            var fs = File.OpenRead(fileName);
+            var br = new BinaryReader(fs);
+            var bt = br.ReadBytes(Convert.ToInt32(fs.Length));
+            br.Dispose();
+            fs.Close();
+            fs.Dispose();
+            return bt;
+        }
+
+        /// <summary>
+        /// 字节集转文件
+        /// </summary>
+        /// <param name="bytes">Base64字符串</param>
+        /// <param name="fileName">文件路径</param>
+        public static void BytesToFile(byte[] bytes, string fileName)
+        {
+            var directory = Path.GetDirectoryName(fileName);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
+                fs.Write(bytes, 0, bytes.Length);
                 fs.Flush();
             }
         }
