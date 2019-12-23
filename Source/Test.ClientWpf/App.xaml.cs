@@ -10,22 +10,18 @@ namespace Test.ClientWpf
 {
     public partial class App
     {
+
         public App()
         {
-            //设置本地数据库
             LocalDatabaseHelp.SetDatabase();
         }
-        // ReSharper disable once UnusedMember.Local
-        // ReSharper disable once UnusedParameter.Local
+
         private static void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            CoreLog.Error(e);
+            CoreLog.Error(e.Exception);
         }
-        /// <summary>
-        /// 创建服务对象
-        /// </summary>
-        /// <returns></returns>
-        public static WsSoap CreateWsService(string url = null, TimeSpan timeout = new TimeSpan())
+
+        public static WsSoap CreateWsService(string url = null, int timeoutSeconds = 60)
         {
             var client = new WsSoapClient();
             client.Endpoint.Address = new EndpointAddress(url ?? GlobalVar.ServiceBaseUrl);
@@ -33,11 +29,11 @@ namespace Test.ClientWpf
             var userInfoJson = CoreConvert.ObjToJson(userInfo);
             var authorization = CoreEncrypt.AesEncrypt(userInfoJson, GlobalConst.AesKey);
             client.Endpoint.Behaviors.Add(AuthHelper.CreateAuthHeaderBehavior(authorization));
-            //设置超时时间
             if (client.Endpoint.Binding == null) return client;
-            client.Endpoint.Binding.ReceiveTimeout = timeout;
-            client.Endpoint.Binding.SendTimeout = timeout;
+            client.Endpoint.Binding.ReceiveTimeout = new TimeSpan(0, 0, 0, timeoutSeconds);
+            client.Endpoint.Binding.SendTimeout = new TimeSpan(0, 0, 0, timeoutSeconds);
             return client;
         }
+
     }
 }
