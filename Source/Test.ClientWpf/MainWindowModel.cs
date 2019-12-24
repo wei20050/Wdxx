@@ -20,7 +20,7 @@ namespace Test.ClientWpf
             set
             {
                 _text = value;
-                NotifyPropertyChanged(nameof(Text));
+                NotifyPropertyChanged();
             }
         }
 
@@ -31,7 +31,7 @@ namespace Test.ClientWpf
             set
             {
                 _serviceUrl = value;
-                NotifyPropertyChanged(nameof(ServiceUrl));
+                NotifyPropertyChanged();
             }
         }
 
@@ -42,7 +42,7 @@ namespace Test.ClientWpf
             set
             {
                 _msg = string.IsNullOrEmpty(value) ? value : value + Environment.NewLine + _msg;
-                NotifyPropertyChanged(nameof(Msg));
+                NotifyPropertyChanged();
             }
         }
 

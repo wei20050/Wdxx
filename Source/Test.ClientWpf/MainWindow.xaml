@@ -9,8 +9,8 @@
     Title="{Binding Text}"
     Width="800"
     Height="500"
-    WindowStartupLocation="CenterScreen"
     Closing="MainWindow_OnClosing"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.DataContext>
         <local:MainWindowModel />
@@ -40,11 +40,12 @@
                 Grid.ColumnSpan="3"
                 Orientation="Horizontal">
                 <Label
-                    Margin="5"
+                    Margin="0,5"
                     HorizontalAlignment="Right"
-                    Content="服务地址:" />
+                    Content="服务地址:"
+                    FontSize="14" />
                 <TextBox
-                    Width="384"
+                    Width="380"
                     Margin="5"
                     pu:TextBoxHelper.IsClearButtonVisible="True"
                     pu:TextBoxHelper.Watermark="http://localhost:61070/Ws.asmx"
@@ -52,7 +53,9 @@
                 <Button
                     Width="80"
                     Margin="0,5"
-                    HorizontalAlignment="Stretch"
+                    pu:ButtonHelper.ClickStyle="Sink"
+                    pu:ButtonHelper.HoverBrush="#1A8519"
+                    Background="#1AAD19"
                     Click="TestService"
                     Content="测试链接" />
             </StackPanel>
