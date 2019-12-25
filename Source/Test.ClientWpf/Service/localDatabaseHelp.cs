@@ -24,12 +24,6 @@ namespace Test.ClientWpf.Service
         /// </summary>
         public static void SetDatabase()
         {
-            //var clientConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            //clientConfig.ConnectionStrings.ConnectionStrings["DbContext"].ConnectionString = DbContext;
-            //clientConfig.Save(ConfigurationSaveMode.Modified, true);
-            //ConfigurationManager.RefreshSection("connectionStrings");
-
-            //配置上一版本地址
             typeof(ConfigurationElementCollection)
                 .GetField("bReadOnly", BindingFlags.Instance | BindingFlags.NonPublic)
                 ?.SetValue(ConfigurationManager.ConnectionStrings, false);

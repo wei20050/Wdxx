@@ -1,0 +1,215 @@
+﻿<pu:WindowX
+    x:Class="Test.ClientWpf.View.NavbarWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pu="clr-namespace:Panuon.UI.Silver;assembly=Panuon.UI.Silver"
+    Title="NavbarWindow"
+    Width="800"
+    Height="450"
+    pu:WindowXCaption.Header=" "
+    BorderThickness="0"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <pu:WindowXCaption.ExtendControl>
+        <pu:DropDown HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="40" Height="35">
+                <Ellipse
+                    Width="25"
+                    Height="25"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    pu:LayoutHelper.ColumnDefinition="0.5*"
+                    Stroke="LightGray"
+                    StrokeThickness="1" />
+            </Grid>
+            <pu:DropDown.Child>
+                <Grid Width="200" Height="170">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="55" />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid Margin="15,0">
+                        <Ellipse
+                            Width="35"
+                            Height="35"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            pu:LayoutHelper.ColumnDefinition="0.5*"
+                            Stroke="LightGray"
+                            StrokeThickness="1" />
+                        <TextBlock
+                            Margin="0,0,0,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            FontSize="15"
+                            Foreground="Gray"
+                            Text="Zeoun" />
+                    </Grid>
+                    <Border
+                        Grid.Row="0"
+                        VerticalAlignment="Bottom"
+                        BorderBrush="#EEEEEE"
+                        BorderThickness="0,0,0,1" />
+                    <Grid Grid.Row="1" Margin="15,0">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="Gray"
+                            Text="Enabled" />
+                        <CheckBox
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            pu:CheckBoxHelper.BoxHeight="25"
+                            pu:CheckBoxHelper.BoxWidth="35"
+                            pu:CheckBoxHelper.CheckBoxStyle="Switch"
+                            pu:CheckBoxHelper.CheckedBackground="#74C178"
+                            pu:CheckBoxHelper.CornerRadius="2"
+                            FontFamily="/Panuon.UI.Silver;component/Resources/#fontawesome"
+                            Foreground="Gray"
+                            IsChecked="True" />
+                    </Grid>
+                    <Border
+                        Grid.Row="1"
+                        VerticalAlignment="Bottom"
+                        BorderBrush="#EEEEEE"
+                        BorderThickness="0,0,0,1" />
+                    <Grid Grid.Row="2" Margin="15,0">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="Gray"
+                            Text="Notifycation" />
+                        <CheckBox
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            pu:CheckBoxHelper.BoxHeight="25"
+                            pu:CheckBoxHelper.BoxWidth="35"
+                            pu:CheckBoxHelper.CheckBoxStyle="Switch"
+                            pu:CheckBoxHelper.CheckedBackground="#74C178"
+                            pu:CheckBoxHelper.CornerRadius="2"
+                            FontFamily="/Panuon.UI.Silver;component/Resources/#fontawesome"
+                            Foreground="Gray" />
+                    </Grid>
+                    <Border
+                        Grid.Row="2"
+                        VerticalAlignment="Bottom"
+                        BorderBrush="#EEEEEE"
+                        BorderThickness="0,0,0,1" />
+                    <Grid Grid.Row="3">
+                        <Button
+                            Height="30"
+                            VerticalAlignment="Center"
+                            pu:ButtonHelper.ButtonStyle="Link"
+                            Content="&#xf08b; Sign out"
+                            FontFamily="/Panuon.UI.Silver;component/Resources/#fontawesome" />
+                    </Grid>
+                </Grid>
+            </pu:DropDown.Child>
+        </pu:DropDown>
+    </pu:WindowXCaption.ExtendControl>
+    <Grid>
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Foreground="Gray"
+            Opacity="0.5"
+            Text="Examples/NavbarWindow.xaml" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Margin="0,-35,0,0" Background="#3E3E3E">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Margin="10,5,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    FontFamily="Segoe UI"
+                    FontSize="20"
+                    FontWeight="Light"
+                    Foreground="White">
+                    <Run>后台</Run>
+                    <Run Foreground="#FF67DA82">管理端</Run>
+                    <TextBlock.Effect>
+                        <DropShadowEffect
+                            BlurRadius="10"
+                            Opacity="0.5"
+                            ShadowDepth="0"
+                            Color="White" />
+                    </TextBlock.Effect>
+                </TextBlock>
+                <TreeView
+                    Grid.Row="1"
+                    pu:TreeViewHelper.ItemHeight="40"
+                    pu:TreeViewHelper.SelectedBackground="#22FFFFFF"
+                    pu:TreeViewHelper.TreeViewStyle="Modern"
+                    Background="Transparent"
+                    BorderBrush="White"
+                    Foreground="#AAFFFFFF">
+                    <TreeViewItem
+                        Padding="10,0,0,0"
+                        pu:TreeViewHelper.ItemIcon="&#xf015;"
+                        Header="主页"
+                        IsSelected="True" />
+                    <TreeViewItem
+                        Padding="10,0,0,0"
+                        pu:TreeViewHelper.ItemIcon="&#xf022;"
+                        Header="Departments"
+                        IsExpanded="True">
+                        <TreeViewItem Padding="40,0,0,0" Header="General Manager" />
+                        <TreeViewItem Padding="40,0,0,0" Header="Human Resource" />
+                        <TreeViewItem Padding="40,0,0,0" Header="Development" />
+                        <TreeViewItem Padding="40,0,0,0" Header="Sales" />
+                    </TreeViewItem>
+                    <TreeViewItem
+                        Padding="10,0,0,0"
+                        pu:TreeViewHelper.ItemIcon="&#xf013;"
+                        Header="设置" />
+                </TreeView>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Width="300" HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="17*" />
+                        <ColumnDefinition Width="43*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox
+                        Grid.ColumnSpan="2"
+                        Height="40"
+                        Margin="10,10"
+                        Padding="15,0,30,0"
+                        pu:TextBoxHelper.CornerRadius="20"
+                        pu:TextBoxHelper.Watermark="Search ..." />
+                    <Button
+                        Grid.Column="1"
+                        Width="30"
+                        Margin="0,0,15,0"
+                        HorizontalAlignment="Right"
+                        pu:ButtonHelper.ButtonStyle="Link"
+                        Content="&#xf002;"
+                        FontFamily="{StaticResource FontAwesome}" />
+                </Grid>
+                <Grid Grid.Row="1">
+                    <DataGrid Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Width="40" />
+                            <DataGridTextColumn Width="*" Header="Name" />
+                            <DataGridTextColumn Width="*" Header="PhoneNumber" />
+                            <DataGridTextColumn Width="*" Header="Email" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</pu:WindowX>

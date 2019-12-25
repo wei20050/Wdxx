@@ -84,6 +84,12 @@
     <Compile Include="GlobalVar.cs" />
     <Compile Include="Service\localDatabaseHelp.cs" />
     <Compile Include="Service\ServiceHelp.cs" />
+    <Compile Include="View\NavbarWindow.xaml.cs">
+      <DependentUpon>NavbarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NeteaseMusicWindow.xaml.cs">
+      <DependentUpon>NeteaseMusicWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -96,6 +102,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Resources\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\NavbarWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\NeteaseMusicWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowModel.cs" />
@@ -150,6 +168,7 @@
       <Link>System.Data.SQLite.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\head.jpg" />
     <None Include="Connected Services\WsServiceReference\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

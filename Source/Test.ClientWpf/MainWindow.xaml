@@ -47,6 +47,7 @@
                 <TextBox
                     Width="380"
                     Margin="5"
+                    pu:TextBoxHelper.Icon="&#xf0ac;"
                     pu:TextBoxHelper.IsClearButtonVisible="True"
                     pu:TextBoxHelper.Watermark="http://localhost:61070/Ws.asmx"
                     Text="{Binding ServiceUrl}" />
@@ -114,14 +115,14 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
                 Content="ID:" />
-            <TextBox
+            <PasswordBox
                 Grid.Row="3"
                 Grid.Column="1"
                 Margin="5"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                pu:TextBoxHelper.IsClearButtonVisible="True"
-                Text="{Binding EditId}" />
+                pu:PasswordBoxHelper.Icon="&#xf11c;"
+                pu:PasswordBoxHelper.IsShowPwdButtonVisible="True"
+                pu:PasswordBoxHelper.Password="{Binding EditId, Mode=TwoWay}"
+                pu:PasswordBoxHelper.Watermark="Watermark" />
             <Button
                 Grid.Row="3"
                 Grid.Column="2"

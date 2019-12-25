@@ -8,6 +8,7 @@ using NetFrameWork.Core;
 using Panuon.UI.Silver;
 using Panuon.UI.Silver.Core;
 using Test.ClientWpf.Service;
+using Test.ClientWpf.View;
 using Test.ClientWpf.WsServiceReference;
 
 namespace Test.ClientWpf
@@ -120,6 +121,7 @@ namespace Test.ClientWpf
         public void Test3(object sender, RoutedEventArgs e)
         {
             MainWindowModel.Msg = "Test3";
+            new NavbarWindow().Show();
         }
 
         public void ClearMsg(object sender, RoutedEventArgs e)

@@ -2,6 +2,7 @@
 using System.Windows;
 using NetFrameWork.Core;
 using NetFrameWork.Core.WebService;
+using Panuon.UI.Silver;
 using Test.ClientWpf.WsServiceReference;
 
 namespace Test.ClientWpf.Service
@@ -32,7 +33,7 @@ namespace Test.ClientWpf.Service
             {
                 CoreLog.Error(ex);
                 //离线服务开启
-                if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return false;
+                if (MessageBoxX.Show(@"离线中！是否还要继续？", @"提示", null, MessageBoxButton.YesNo) != MessageBoxResult.Yes) return false;
                 IsOnLine = false;
                 var httpUrl = new CoreHost(typeof(Test.Service.Ws)).Open();
                 try

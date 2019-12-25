@@ -13,12 +13,14 @@ namespace Test.ClientWpf
 
         public App()
         {
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
             LocalDatabaseHelp.SetDatabase();
         }
 
         private static void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             CoreLog.Error(e.Exception);
+            e.Handled = true;
         }
 
         public static WsSoap CreateWsService(string url = null, int timeoutSeconds = 60)

@@ -7,7 +7,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/Control.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Test.ClientWpf;component/Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Resources/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
