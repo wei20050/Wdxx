@@ -11,6 +11,7 @@
     Height="500"
     Closing="MainWindow_OnClosing"
     WindowStartupLocation="CenterScreen"
+    WindowStyle="ToolWindow"
     mc:Ignorable="d">
     <Window.DataContext>
         <local:MainWindowModel />

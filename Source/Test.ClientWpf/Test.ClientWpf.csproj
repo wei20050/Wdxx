@@ -149,6 +149,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\NeteaseExample\iconfont.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NetFrameWork.Core\NetFrameWork.Core.csproj">

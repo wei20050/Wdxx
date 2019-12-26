@@ -22,7 +22,11 @@
                     VerticalAlignment="Center"
                     pu:LayoutHelper.ColumnDefinition="0.5*"
                     Stroke="LightGray"
-                    StrokeThickness="1" />
+                    StrokeThickness="1">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="/Test.ClientWpf;component/Resources/head.jpg" RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Ellipse.Fill>
+                </Ellipse>
             </Grid>
             <pu:DropDown.Child>
                 <Grid Width="200" Height="170">
@@ -40,7 +44,11 @@
                             VerticalAlignment="Center"
                             pu:LayoutHelper.ColumnDefinition="0.5*"
                             Stroke="LightGray"
-                            StrokeThickness="1" />
+                            StrokeThickness="1">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="/Test.ClientWpf;component/Resources/head.jpg" RenderOptions.BitmapScalingMode="HighQuality" />
+                            </Ellipse.Fill>
+                        </Ellipse>
                         <TextBlock
                             Margin="0,0,0,0"
                             HorizontalAlignment="Right"

@@ -121,7 +121,7 @@ namespace Test.ClientWpf
         public void Test3(object sender, RoutedEventArgs e)
         {
             MainWindowModel.Msg = "Test3";
-            new NavbarWindow().Show();
+            new NeteaseMusicWindow().Show();
         }
 
         public void ClearMsg(object sender, RoutedEventArgs e)
