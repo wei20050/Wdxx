@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Threading;
 
 namespace 天域取色器
 {
@@ -13,5 +8,14 @@ namespace 天域取色器
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            //捕获全局异常
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+        }
+        private static void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }
