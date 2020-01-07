@@ -8,6 +8,8 @@
     Width="400"
     Height="300"
     AllowsTransparency="True"
+    Closed="ColorView_OnClosed"
+    Loaded="ColorView_OnLoaded"
     Topmost="True"
     WindowStyle="None"
     mc:Ignorable="d">

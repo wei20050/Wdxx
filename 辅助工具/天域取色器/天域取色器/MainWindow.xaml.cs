@@ -76,22 +76,25 @@ namespace 天域取色器
         private void SetColor()
         {
             TxtYs.Text = _cv.LabYs.Content.ToString().Substring(3);
+            var tmpColor = ColorConverter.ConvertFromString("#FF" + TxtYs.Text);
+            var c = new Color();
+            if (tmpColor != null) c = (Color)tmpColor;
+            LabTitle.Content = $"当前颜色 R:{c.R} G:{c.G} B:{c.B}";
             TxtZb.Text = _cv.LabZb.Content.ToString();
             if (_btn == 12)
             {
                 _btn = 0;
             }
-            SetBtn($"Btn{_btn++}", "#FF" + TxtYs.Text, TxtZb.Text);
+            SetBtn($"Btn{_btn++}", c, TxtZb.Text);
         }
 
-        private void SetBtn(string name, string color, string zb)
+        private void SetBtn(string name, Color color, string zb)
         {
             foreach (var c in BtnGrid.Children)
             {
                 if (!(c is System.Windows.Controls.Button btn)) continue;
                 if (btn.Name != name) continue;
-                var tmpColor = ColorConverter.ConvertFromString(color);
-                if (tmpColor != null) btn.Background = new SolidColorBrush((Color)tmpColor);
+                btn.Background = new SolidColorBrush(color);
                 btn.Tag = zb;
                 btn.Click -= Btn_OnClick;
                 btn.Click += Btn_OnClick;
@@ -108,7 +111,7 @@ namespace 天域取色器
             var h = (int)GlobalVar.H;
             var bitmap = Yx.CopyScreen(0, 0, w, h);
             _cv = new ColorView(bitmap);
-            _p = new PM(bitmap,_cv);
+            _p = new PM(bitmap, _cv);
             _cv.Show();
             _p.ShowDialog();
             if (_p.IsClose)

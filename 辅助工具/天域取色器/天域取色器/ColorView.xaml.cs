@@ -22,7 +22,6 @@ namespace 天域取色器
                 Dispatcher?.Invoke(SetBackground);
             };
             _timer.Interval = TimeSpan.FromMilliseconds(18);
-            _timer.Start();
         }
         private readonly DispatcherTimer _timer = new DispatcherTimer();
         private readonly Bitmap _bitmap;
@@ -145,6 +144,16 @@ namespace 天域取色器
                 Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0))
             };
             MainGrid.Children.Add(l2);
+        }
+
+        private void ColorView_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            _timer.Start();
+        }
+
+        private void ColorView_OnClosed(object sender, EventArgs e)
+        {
+            _timer.Stop();
         }
     }
 }

@@ -29,6 +29,11 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
+        <Label
+            Name="LabTitle"
+            Grid.ColumnSpan="2"
+            Content="当前颜色 R:255 G:255 B:255"
+            FontSize="11" />
         <StackPanel
             Grid.Row="0"
             Grid.Column="1"
