@@ -1123,31 +1123,38 @@ namespace NetFrameWork.Database
                     var index = 0;
                     foreach (var pro in propertyInfoList)
                     {
-                        switch (pro.PropertyType.Namespace)
+                        try
                         {
-                            case "System":
-                                if (!filedArr.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
-                                {
-                                    continue;
-                                }
-                                pro.SetValue(result, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
-                                break;
-                            default:
-                                var proInfoList = GetEntityProperties(pro.PropertyType);
-                                var tmp = Activator.CreateInstance(pro.PropertyType);
-                                foreach (var p in proInfoList)
-                                {
-                                    if (!filedArr.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                            switch (pro.PropertyType.Namespace)
+                            {
+                                case "System":
+                                    if (!filedArr.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
                                     {
-                                        index++;
                                         continue;
                                     }
-                                    var v = GetReaderValue(record[index], p.PropertyType);
-                                    p.SetValue(tmp, v, null);
-                                    index++;
-                                }
-                                pro.SetValue(result, tmp, null);
-                                break;
+                                    pro.SetValue(result, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
+                                    break;
+                                default:
+                                    var proInfoList = GetEntityProperties(pro.PropertyType);
+                                    var tmp = Activator.CreateInstance(pro.PropertyType);
+                                    foreach (var p in proInfoList)
+                                    {
+                                        if (!filedArr.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                        {
+                                            index++;
+                                            continue;
+                                        }
+                                        var v = GetReaderValue(record[index], p.PropertyType);
+                                        p.SetValue(tmp, v, null);
+                                        index++;
+                                    }
+                                    pro.SetValue(result, tmp, null);
+                                    break;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Error($"字段:{pro.Name} 异常=>{e}");
                         }
                     }
                 }
@@ -1628,9 +1635,14 @@ namespace NetFrameWork.Database
             {
                 Error("回滚事务:" + ex);
             }
-            if (conn.State == ConnectionState.Open)
+            finally
             {
-                conn.Close();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+                _mTran.Dispose();
+                _mTran = null;
             }
         }
 

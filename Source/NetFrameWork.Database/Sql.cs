@@ -497,40 +497,73 @@ namespace NetFrameWork.Database
         #region 排序
 
         /// <summary>
-        /// 根据单个字段升序排序
+        /// 单个字段排序
         /// </summary>
-        public virtual Sql Asc(string str)
+        /// <param name="lsPram">排序参数</param>
+        /// <returns></returns>
+        public virtual Sql Sort(SortPram lsPram)
         {
-            SqlText.AppendFormat(" ORDER BY `{0}` ASC ", str);
-            return this;
+            return Sort(new List<SortPram> { lsPram });
         }
 
         /// <summary>
-        /// 根据单个字段降序排序
+        /// 多个字段排序
         /// </summary>
-        public virtual Sql Desc(string str)
-        {
-            SqlText.AppendFormat(" ORDER BY `{0}` DESC ", str);
-            return this;
-        }
-
-        /// <summary>
-        /// 多个字段排序 Dictionary 排序字段,是否升序
-        /// </summary>
-        public virtual Sql Sort(Dictionary<string, bool> strDic)
+        /// <param name="lsPrams">排序参数</param>
+        /// <returns></returns>
+        public virtual Sql Sort(List<SortPram> lsPrams)
         {
             var str = new StringBuilder();
-            foreach (var v in strDic)
+            foreach (var p in lsPrams)
             {
-                var sort = v.Value ? " ASC" : " DESC";
-                str.AppendFormat("`{0}` {1},", v.Key, sort);
+                var sort = p.SortType.ToString().ToUpper();
+                var t = string.IsNullOrEmpty(p.TableName) ? string.Empty : $"{p.TableName}.";
+                str.AppendFormat("{0}`{1}` {2},", t, p.ColumnName, sort);
             }
             str.Remove(str.Length - 1, 1);
-            SqlText.AppendFormat(" ORDER BY `{0}`", str);
+            SqlText.AppendFormat(" ORDER BY {0}", str);
             return this;
         }
 
         #endregion
+
+        /// <summary>
+        /// 排序参数
+        /// </summary>
+        public struct SortPram
+        {
+
+            /// <summary>
+            /// 表名
+            /// </summary>
+            public string TableName { get; set; }
+
+            /// <summary>
+            /// 列名
+            /// </summary>
+            public string ColumnName { get; set; }
+
+            /// <summary>
+            /// 排序类型
+            /// </summary>
+            public SortTypeEnum SortType { get; set; }
+
+        }
+
+        /// <summary>
+        /// 排序枚举
+        /// </summary>
+        public enum SortTypeEnum
+        {
+            /// <summary>
+            /// 升序
+            /// </summary>
+            Asc = 0,
+            /// <summary>
+            /// 降序
+            /// </summary>
+            Desc = 1
+        }
 
     }
 }
