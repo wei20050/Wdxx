@@ -80,6 +80,7 @@ namespace NetFrameWork.Core
             foreach (var tFrom in propertiesFrom)
             {
                 var tFromValue = tFrom.GetValue(objFrom, null);
+                var tFromValueJson = ObjToJson(tFromValue);
                 var name = tFrom.Name;
                 foreach (var c in mapConfigs)
                 {
@@ -94,14 +95,14 @@ namespace NetFrameWork.Core
                     {
                         if (name.ToUpper().Replace("_", string.Empty) == tTo.Name.ToUpper().Replace("_", string.Empty))
                         {
-                            tTo.SetValue(objTo, tFromValue, null);
+                            tTo.SetValue(objTo, JsonToObj(tFromValueJson, tTo.PropertyType), null);
                         }
                     }
                     else
                     {
                         if (name == tTo.Name)
                         {
-                            tTo.SetValue(objTo, tFromValue, null);
+                            tTo.SetValue(objTo, JsonToObj(tFromValueJson, tTo.PropertyType), null);
                         }
                     }
                 }
@@ -126,6 +127,7 @@ namespace NetFrameWork.Core
             foreach (var tFrom in propertiesFrom)
             {
                 var tFromValue = tFrom.GetValue(objFrom, null);
+                var tFromValueJson = ObjToJson(tFromValue);
                 if (tFromValue == null)
                 {
                     continue;
@@ -144,14 +146,14 @@ namespace NetFrameWork.Core
                     {
                         if (name.ToUpper().Replace("_", string.Empty) == tTo.Name.ToUpper().Replace("_", string.Empty))
                         {
-                            tTo.SetValue(objTo, tFromValue, null);
+                            tTo.SetValue(objTo, JsonToObj(tFromValueJson, tTo.PropertyType), null);
                         }
                     }
                     else
                     {
                         if (name == tTo.Name)
                         {
-                            tTo.SetValue(objTo, tFromValue, null);
+                            tTo.SetValue(objTo, JsonToObj(tFromValueJson, tTo.PropertyType), null);
                         }
                     }
                 }
@@ -300,6 +302,15 @@ namespace NetFrameWork.Core
         /// <returns>转换后的对象</returns>
         public static T JsonToObj<T>(string json)
         {
+            if (typeof(T) == typeof(string))
+            {
+                return (T)(object)json;
+            }
+            if (typeof(T) == typeof(DateTime))
+            {
+                DateTime.TryParse(json, out var ret);
+                return (T)(object)ret;
+            }
             var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             return string.IsNullOrEmpty(json) ? default(T) : js.Deserialize<T>(json);
         }
@@ -316,6 +327,11 @@ namespace NetFrameWork.Core
             {
                 return json;
             }
+            if (type == typeof(DateTime))
+            {
+                DateTime.TryParse(json, out var ret);
+                return ret;
+            }
             var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             return string.IsNullOrEmpty(json) ? default(object) : js.Deserialize(json, type);
         }
@@ -328,7 +344,15 @@ namespace NetFrameWork.Core
         public static string ObjToJsonTime(object obj)
         {
             var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
-            return obj is string ? obj.ToString() : js.Serialize(obj);
+            switch (obj)
+            {
+                case string _:
+                    return obj.ToString();
+                case DateTime _:
+                    return js.Serialize(obj).Trim('"');
+                default:
+                    return js.Serialize(obj);
+            }
         }
 
         /// <summary>

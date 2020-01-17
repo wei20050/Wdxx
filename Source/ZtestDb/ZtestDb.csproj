@@ -89,6 +89,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetFrameWork.Core\NetFrameWork.Core.csproj">
+      <Project>{085779a7-1a49-437d-abb7-b5c1aed8fb50}</Project>
+      <Name>NetFrameWork.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NetFrameWork.Database\NetFrameWork.Database.csproj">
       <Project>{08535C08-E1D5-43C9-B5CC-4F7F5958E00F}</Project>
       <Name>NetFrameWork.Database</Name>
