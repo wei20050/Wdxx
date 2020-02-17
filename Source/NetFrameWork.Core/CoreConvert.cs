@@ -235,7 +235,7 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static string JsonTimeAddZone(string jsonStr)
         {
-            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\)\\/", match =>
+            return Regex.Replace(jsonStr, @"\\/Date\((-?\d+)\)\\/", match =>
             {
                 var zone = DateTime.Now.ToString("zz00");
                 var math = match.Groups[1].Value;
@@ -250,37 +250,12 @@ namespace NetFrameWork.Core
         /// <returns></returns>
         public static string JsonTime(string jsonStr)
         {
-            return Regex.Replace(jsonStr, @"\\/Date\((\d+)\)\\/", match =>
+            return Regex.Replace(jsonStr, @"\\/Date\((-?\d+)\)\\/", match =>
             {
                 var dt = new DateTime(1970, 1, 1);
                 dt = dt.AddMilliseconds(long.Parse(match.Groups[1].Value));
                 dt = dt.ToLocalTime();
                 return dt.ToString("yyyy-MM-dd HH:mm:ss");
-            });
-        }
-
-        /// <summary>
-        /// 将json字符串中带时区的时间戳转换成字符串时间格式
-        /// </summary>
-        /// <param name="jsonStr"></param>
-        /// <returns></returns>
-        public static string JsonTimeZone(string jsonStr)
-        {
-            return Regex.Replace(jsonStr, @"\\/Date\((\d+)?(\d+)\)\\/", match =>
-            {
-                //拿到的时间戳
-                var ts = match.Groups[1].Value;
-                //时间戳double
-                var datetime = Convert.ToDouble(ts);
-                //时区秒数double
-                var zone = Convert.ToDouble(match.Groups[2].Value) * 60 * 60;
-                //这里如果判断到时间戳是13位带毫秒的
-                if (ts.Length == 13)
-                {
-                    zone *= 1000;
-                }
-                var date = datetime + zone;
-                return @"\/Date(" + date + @")\/";
             });
         }
 
@@ -302,11 +277,15 @@ namespace NetFrameWork.Core
         /// <returns>转换后的对象</returns>
         public static T JsonToObj<T>(string json)
         {
+            if (json == "null")
+            {
+                return (T)(object)null;
+            }
             if (typeof(T) == typeof(string))
             {
-                return (T)(object)json;
+                return (T)(object)json.Substring(1, json.Length - 2);
             }
-            if (typeof(T) == typeof(DateTime))
+            if (typeof(T) == typeof(DateTime) || typeof(T) == typeof(DateTime?))
             {
                 DateTime.TryParse(json, out var ret);
                 return (T)(object)ret;
@@ -323,36 +302,21 @@ namespace NetFrameWork.Core
         /// <returns>转换后的对象</returns>
         public static object JsonToObj(string json, Type type)
         {
+            if (json == "null")
+            {
+                return null;
+            }
             if (type == typeof(string))
             {
-                return json;
+                return json.Substring(1, json.Length - 2);
             }
-            if (type == typeof(DateTime))
+            if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
                 DateTime.TryParse(json, out var ret);
                 return ret;
             }
             var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             return string.IsNullOrEmpty(json) ? default(object) : js.Deserialize(json, type);
-        }
-
-        /// <summary>
-        /// 将任意类型对象转化为JSON字符串(时间为无时区的时间戳)
-        /// </summary>
-        /// <param name="obj">要转换的对象</param>
-        /// <returns>json字符串</returns>
-        public static string ObjToJsonTime(object obj)
-        {
-            var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
-            switch (obj)
-            {
-                case string _:
-                    return obj.ToString();
-                case DateTime _:
-                    return js.Serialize(obj).Trim('"');
-                default:
-                    return js.Serialize(obj);
-            }
         }
 
         /// <summary>
@@ -373,7 +337,20 @@ namespace NetFrameWork.Core
         /// <returns>json字符串</returns>
         public static string ObjToJson(object obj)
         {
-            var jsonStr = ObjToJsonTime(obj);
+            if (obj == null)
+            {
+                return "null";
+            }
+            var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var jsonStr = js.Serialize(obj);
+            if (obj is string)
+            {
+                return $"\"{obj}\"";
+            }
+            if (obj is DateTime)
+            {
+                jsonStr = jsonStr.Substring(1, jsonStr.Length - 2);
+            }
             return JsonTime(jsonStr);
         }
 
@@ -384,9 +361,13 @@ namespace NetFrameWork.Core
         /// <returns>json字符串</returns>
         public static string ObjToJsonData(object obj)
         {
+            if (obj == null)
+            {
+                return "null";
+            }
             if (obj is string)
             {
-                return obj.ToString();
+                return $"\"{obj}\"";
             }
             var js = new DataContractJsonSerializer(obj.GetType());
             var msObj = new MemoryStream();
@@ -419,13 +400,9 @@ namespace NetFrameWork.Core
         /// <returns>转换后的对象</returns>
         public static object JsonDataToObj(string jsonData, Type type)
         {
-            if (string.IsNullOrEmpty(jsonData))
+            if (jsonData == "null")
             {
                 return null;
-            }
-            if (type == typeof(string))
-            {
-                return jsonData;
             }
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonData)))
             {
