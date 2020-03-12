@@ -99,6 +99,7 @@ namespace NetFrameWork.Database
             {
                 s.ParamDict.Add(p.Key, p.Value);
             }
+
             return s;
         }
 
@@ -354,6 +355,7 @@ namespace NetFrameWork.Database
                     SqlText.Append(",");
                 }
             }
+
             SqlText.Append(" )");
             return this;
         }
@@ -372,6 +374,7 @@ namespace NetFrameWork.Database
                     SqlText.Append(",");
                 }
             }
+
             SqlText.Append(" )");
             return this;
         }
@@ -451,10 +454,12 @@ namespace NetFrameWork.Database
             {
                 SqlText.Append(" AND ");
             }
+
             if (!string.IsNullOrEmpty(str))
             {
                 SqlText.AppendFormat("`{0}`", str);
             }
+
             return this;
         }
 
@@ -476,10 +481,12 @@ namespace NetFrameWork.Database
             {
                 SqlText.Append(" OR ");
             }
+
             if (!string.IsNullOrEmpty(str))
             {
                 SqlText.AppendFormat("`{0}`", str);
             }
+
             return this;
         }
 
@@ -491,6 +498,118 @@ namespace NetFrameWork.Database
             SqlText.Append(",");
             return this;
         }
+
+        /// <summary>
+        /// 多表联合查询表暂存
+        /// </summary>
+        private readonly List<JoinTable> _multiTables = new List<JoinTable>();
+
+
+        /// <summary>
+        /// 多表联合查询
+        /// </summary>
+        /// <param name="mainType"></param>
+        /// <param name="fromType"></param>
+        /// <param name="mainField"></param>
+        /// <param name="fromField"></param>
+        /// <param name="joInType"></param>
+        /// <param name="comparisonOperator"></param>
+        /// <param name="joinFields"></param>
+        /// <returns></returns>
+        public virtual Sql MultiTableQuery(Type mainType,Type fromType ,string mainField , string fromField, JoinTypeEnum joInType = JoinTypeEnum.Join, ComparisonOperatorEnum comparisonOperator = ComparisonOperatorEnum.Equal , List<JoinField> joinFields = null)
+        {
+            _multiTables.Add(new JoinTable
+            {
+                MainType = mainType,
+                FromType= fromType,
+                MainField = mainField,
+                FromField = fromField,
+                JoInType = joInType,
+                ComparisonOperator = comparisonOperator,
+                JoinFields = joinFields
+            });
+            if (_multiTables.Count <= 0) return this;
+            Clear();
+            Select();
+            var startMainType = _multiTables[0].MainType;
+            var startMainTableName = startMainType.Name;
+            var startMainProperties = startMainType.GetProperties();
+            foreach (var p in startMainProperties)
+            {
+                var asName = $"{startMainTableName}_{p.Name}";
+                AddTf(startMainTableName, p.Name).AddBs("AS").AddBs(asName).Comma();
+            }
+            foreach (var multiTable in _multiTables)
+            {
+                var fromTableName = multiTable.FromType.Name;
+                var fromProperties = multiTable.FromType.GetProperties();
+                foreach (var p in fromProperties)
+                {
+                    var asName = $"{fromTableName}_{p.Name}";
+                    AddTf(fromTableName, p.Name).AddBs("AS").AddBs(asName).Comma();
+                }
+            }
+            SqlText.Remove(SqlText.Length - 1, 1);
+            From().Add(startMainTableName);
+            foreach (var multiTable in _multiTables)
+            {
+                switch (multiTable.JoInType)
+                {
+                    case JoinTypeEnum.Join:
+                        Join();
+                        break;
+                    case JoinTypeEnum.InnerJoin:
+                        InnerJoin();
+                        break;
+                    case JoinTypeEnum.LeftJoin:
+                        LeftJoin();
+                        break;
+                    case JoinTypeEnum.RightJoin:
+                        RightJoin();
+                        break;
+                    default:
+                        Join();
+                        break;
+                }
+                var fromTableName = multiTable.FromType.Name;
+                Add(fromTableName).On();
+                if (multiTable.JoinFields == null || multiTable.JoinFields.Count == 0)
+                {
+                    AddTf(multiTable.MainType.Name, multiTable.MainField);
+                    switch (multiTable.ComparisonOperator)
+                    {
+                        case ComparisonOperatorEnum.Equal:
+                            Equal();
+                            break;
+                        case ComparisonOperatorEnum.EqualNot:
+                            EqualNot();
+                            break;
+                        default:
+                            Equal();
+                            break;
+                    }
+                    AddTf(fromTableName, multiTable.FromField);
+                }
+                else
+                {
+                    foreach (var f in multiTable.JoinFields)
+                    {
+
+                        switch (f.LogicalOperator)
+                        {
+                            case LogicalOperatorEnum.And:
+                                And();
+                                break;
+                            case LogicalOperatorEnum.Or:
+                                Or();
+                                break;
+                        }
+                    }
+                }
+            }
+            return this;
+        }
+
 
         #endregion
 
@@ -520,6 +639,7 @@ namespace NetFrameWork.Database
                 var t = string.IsNullOrEmpty(p.TableName) ? string.Empty : $"{p.TableName}.";
                 str.AppendFormat("{0}`{1}` {2},", t, p.ColumnName, sort);
             }
+
             str.Remove(str.Length - 1, 1);
             SqlText.AppendFormat(" ORDER BY {0}", str);
             return this;
@@ -559,6 +679,7 @@ namespace NetFrameWork.Database
             /// 升序
             /// </summary>
             Asc = 0,
+
             /// <summary>
             /// 降序
             /// </summary>
@@ -566,4 +687,127 @@ namespace NetFrameWork.Database
         }
 
     }
+
+    /// <summary>
+    /// 关联表类
+    /// </summary>
+    public class JoinTable
+    {
+        /// <summary>
+        /// 关联主表类型
+        /// </summary>
+        public Type MainType { get; set; }
+
+        /// <summary>
+        /// 关联从表类型
+        /// </summary>
+        public Type FromType { get; set; }
+
+        /// <summary>
+        /// 主表关联字段
+        /// </summary>
+        public string MainField { get; set; }
+
+        /// <summary>
+        /// 从表关联字段
+        /// </summary>
+        public string FromField { get; set; }
+
+        /// <summary>
+        /// 比较运算符
+        /// </summary>
+        public ComparisonOperatorEnum ComparisonOperator { get; set; }
+
+        /// <summary>
+        /// 关联字段组(on 多个条件用 优先使用)
+        /// </summary>
+        public List<JoinField> JoinFields { get; set; }
+
+        /// <summary>
+        /// 关联类型
+        /// </summary>
+        public JoinTypeEnum JoInType { get; set; }
+
+    }
+
+    /// <summary>
+    /// 关联类型枚举
+    /// </summary>
+    public enum JoinTypeEnum
+    {
+        /// <summary>
+        /// Join
+        /// </summary>
+        Join = 0,
+        /// <summary>
+        /// InnerJoin
+        /// </summary>
+        InnerJoin = 1,
+        /// <summary>
+        /// LeftJoin
+        /// </summary>
+        LeftJoin = 2,
+        /// <summary>
+        /// RightJoin
+        /// </summary>
+        RightJoin = 3
+    }
+
+    /// <summary>
+    /// 逻辑运算符枚举
+    /// </summary>
+    public enum LogicalOperatorEnum
+    {
+        /// <summary>
+        /// And
+        /// </summary>
+        And = 0,
+        /// <summary>
+        /// Or
+        /// </summary>
+        Or = 1
+    }
+
+    /// <summary>
+    /// 运算符枚举
+    /// </summary>
+    public enum ComparisonOperatorEnum
+    {
+        /// <summary>
+        /// 等于
+        /// </summary>
+        Equal = 0,
+        /// <summary>
+        /// 不等于
+        /// </summary>
+        EqualNot = 1
+    }
+
+    /// <summary>
+    /// 关联字段类
+    /// </summary>
+    public class JoinField
+    {
+        /// <summary>
+        /// 主表关联字段
+        /// </summary>
+        public string MainField { get; set; }
+
+        /// <summary>
+        /// 从表关联字段
+        /// </summary>
+        public string FromField { get; set; }
+
+        /// <summary>
+        /// 比较运算符
+        /// </summary>
+        public ComparisonOperatorEnum ComparisonOperator { get; set; }
+
+        /// <summary>
+        /// 逻辑运算符(on 多个条件用 优先使用)
+        /// </summary>
+        public LogicalOperatorEnum LogicalOperator { get; set; }
+
+    }
+
 }

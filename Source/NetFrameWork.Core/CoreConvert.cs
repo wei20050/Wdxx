@@ -291,7 +291,7 @@ namespace NetFrameWork.Core
                 return (T)(object)ret;
             }
             var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
-            return string.IsNullOrEmpty(json) ? default(T) : js.Deserialize<T>(json);
+            return string.IsNullOrEmpty(json) ? default : js.Deserialize<T>(json);
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace NetFrameWork.Core
                 return ret;
             }
             var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
-            return string.IsNullOrEmpty(json) ? default(object) : js.Deserialize(json, type);
+            return string.IsNullOrEmpty(json) ? default : js.Deserialize(json, type);
         }
 
         /// <summary>

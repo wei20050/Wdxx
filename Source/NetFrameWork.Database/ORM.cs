@@ -1103,24 +1103,19 @@ namespace NetFrameWork.Database
             var type = typeof(T);
             var result = (T)Activator.CreateInstance(type);
             IDataReader rd = null;
-
             try
             {
                 rd = ExecuteReader(sqlString, cmdParamArr);
-
                 var propertyInfoList = GetEntityProperties(type);
-
                 var fieldCount = rd.FieldCount;
                 var filedArr = new List<string>();
                 for (var i = 0; i < fieldCount; i++)
                 {
                     filedArr.Add(rd.GetName(i).ToUpper());
                 }
-
                 if (rd.Read())
                 {
                     IDataRecord record = rd;
-                    var index = 0;
                     foreach (var pro in propertyInfoList)
                     {
                         try
@@ -1139,14 +1134,13 @@ namespace NetFrameWork.Database
                                     var tmp = Activator.CreateInstance(pro.PropertyType);
                                     foreach (var p in proInfoList)
                                     {
-                                        if (!filedArr.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                        var dataName = $"{pro.Name}_{p.Name}";
+                                        if (!filedArr.Contains(dataName.ToUpper()) || record[dataName] == DBNull.Value)
                                         {
-                                            index++;
                                             continue;
                                         }
-                                        var v = GetReaderValue(record[index], p.PropertyType);
+                                        var v = GetReaderValue(record[dataName], p.PropertyType);
                                         p.SetValue(tmp, v, null);
-                                        index++;
                                     }
                                     pro.SetValue(result, tmp, null);
                                     break;
@@ -1171,7 +1165,6 @@ namespace NetFrameWork.Database
                     rd.Dispose();
                 }
             }
-
             return result;
         }
 
@@ -1202,11 +1195,9 @@ namespace NetFrameWork.Database
         {
             var list = new List<T>();
             IDataReader rd = null;
-
             try
             {
                 rd = ExecuteReader(sql, cmdParamArr);
-
                 if (typeof(T) == typeof(int))
                 {
                     while (rd.Read())
@@ -1224,22 +1215,18 @@ namespace NetFrameWork.Database
                 else
                 {
                     var propertyInfoList = typeof(T).GetProperties();
-
                     var fieldCount = rd.FieldCount;
                     var filedArr = new List<string>();
                     for (var i = 0; i < fieldCount; i++)
                     {
                         filedArr.Add(rd.GetName(i).ToUpper());
                     }
-
                     while (rd.Read())
                     {
                         IDataRecord record = rd;
                         object obj = new T();
-                        var index = 0;
                         foreach (var pro in propertyInfoList)
                         {
-
                             switch (pro.PropertyType.Namespace)
                             {
                                 case "System":
@@ -1247,31 +1234,24 @@ namespace NetFrameWork.Database
                                     {
                                         continue;
                                     }
-                                    pro.SetValue(obj, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
+                                    pro.SetValue(obj, GetReaderValue(record[pro.Name], pro.PropertyType), null);
                                     break;
                                 default:
                                     var proInfoList = GetEntityProperties(pro.PropertyType);
                                     var tmp = Activator.CreateInstance(pro.PropertyType);
                                     foreach (var p in proInfoList)
                                     {
-                                        if (!filedArr.Contains(p.Name.ToUpper()) || record[index] == DBNull.Value)
+                                        var dataName = $"{pro.Name}_{p.Name}";
+                                        if (!filedArr.Contains(p.Name.ToUpper()) || record[dataName] == DBNull.Value)
                                         {
                                             continue;
                                         }
-                                        var v = GetReaderValue(record[index], p.PropertyType);
+                                        var v = GetReaderValue(record[dataName], p.PropertyType);
                                         p.SetValue(tmp, v, null);
-                                        index++;
                                     }
                                     pro.SetValue(obj, tmp, null);
                                     break;
                             }
-
-                            if (!filedArr.Contains(pro.Name.ToUpper()) || record[pro.Name] == DBNull.Value)
-                            {
-                                continue;
-                            }
-
-                            pro.SetValue(obj, record[pro.Name] == DBNull.Value ? null : GetReaderValue(record[pro.Name], pro.PropertyType), null);
                         }
                         list.Add((T)obj);
                     }
@@ -1291,7 +1271,6 @@ namespace NetFrameWork.Database
             }
             return list;
         }
-
 
         /// <summary>
         /// 根据sql获取列表
