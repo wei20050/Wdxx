@@ -508,20 +508,21 @@ namespace NetFrameWork.Database
         /// <summary>
         /// 多表联合查询
         /// </summary>
-        /// <param name="mainType"></param>
-        /// <param name="fromType"></param>
-        /// <param name="mainField"></param>
-        /// <param name="fromField"></param>
-        /// <param name="joInType"></param>
-        /// <param name="comparisonOperator"></param>
-        /// <param name="joinFields"></param>
+        /// <param name="mainType">关联主表</param>
+        /// <param name="fromType">关联从表</param>
+        /// <param name="mainField">主表关联字段</param>
+        /// <param name="fromField">从表关联字段</param>
+        /// <param name="joInType">连接类型</param>
+        /// <param name="isMultiTable">是否返回多表对象</param>
+        /// <param name="comparisonOperator">判断运算符</param>
+        /// <param name="joinFields">多字段对应的集合</param>
         /// <returns></returns>
-        public virtual Sql MultiTableQuery(Type mainType,Type fromType ,string mainField , string fromField, JoinTypeEnum joInType = JoinTypeEnum.Join, ComparisonOperatorEnum comparisonOperator = ComparisonOperatorEnum.Equal , List<JoinField> joinFields = null)
+        public virtual Sql MultiTableQuery(Type mainType, Type fromType, string mainField, string fromField, JoinTypeEnum joInType = JoinTypeEnum.Join, bool isMultiTable = false, ComparisonOperatorEnum comparisonOperator = ComparisonOperatorEnum.Equal, List<JoinField> joinFields = null)
         {
             _multiTables.Add(new JoinTable
             {
                 MainType = mainType,
-                FromType= fromType,
+                FromType = fromType,
                 MainField = mainField,
                 FromField = fromField,
                 JoInType = joInType,
@@ -536,7 +537,11 @@ namespace NetFrameWork.Database
             var startMainProperties = startMainType.GetProperties();
             foreach (var p in startMainProperties)
             {
-                var asName = $"{startMainTableName}_{p.Name}";
+                var asName = p.Name;
+                if (isMultiTable)
+                {
+                    asName = $"{startMainTableName}_{p.Name}";
+                }
                 AddTf(startMainTableName, p.Name).AddBs("AS").AddBs(asName).Comma();
             }
             foreach (var multiTable in _multiTables)
@@ -545,7 +550,11 @@ namespace NetFrameWork.Database
                 var fromProperties = multiTable.FromType.GetProperties();
                 foreach (var p in fromProperties)
                 {
-                    var asName = $"{fromTableName}_{p.Name}";
+                    var asName = p.Name;
+                    if (isMultiTable)
+                    {
+                        asName = $"{fromTableName}_{p.Name}";
+                    }
                     AddTf(fromTableName, p.Name).AddBs("AS").AddBs(asName).Comma();
                 }
             }
