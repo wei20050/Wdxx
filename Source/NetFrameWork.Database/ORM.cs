@@ -9,10 +9,12 @@ using System.Data.OracleClient;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
@@ -41,58 +43,102 @@ namespace NetFrameWork.Database
         /// 带连接字符串名称构造
         /// </summary>
         /// <param name="dbConnectionName">数据库连接字符串Name</param>
-        public ORM(string dbConnectionName)
+        /// <param name="isEncrypt">是否加密</param>
+        /// <param name="key">加密秘钥</param>
+        public ORM(string dbConnectionName, bool isEncrypt = false,string key = "")
         {
-            var sqlLogCm = ConfigurationManager.ConnectionStrings["SqlLog"];
-            if (sqlLogCm == null)
+            try
             {
-                Error("没有找到名为:SqlLog 的连接字符串,默认不记录Sql日志");
-            }
-            else
-            {
-                _sqlLog = sqlLogCm.ConnectionString == "1";
-            }
-            var cm = ConfigurationManager.ConnectionStrings[dbConnectionName];
-            if (cm == null)
-            {
-                Error("没有找到名为:" + dbConnectionName + " 的连接字符串");
-                throw new Exception("没有找到名为:" + dbConnectionName + " 的连接字符串");
-            }
-            var pn = cm.ProviderName;
-            if (pn.Contains("System.Data.SQLite"))
-            {
-                var sqlItePath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
-                if (File.Exists(sqlItePath))
+                var sqlLogCm = ConfigurationManager.ConnectionStrings["SqlLog"];
+                if (sqlLogCm == null)
                 {
-                    _sqlIteAss = Assembly.LoadFrom(sqlItePath);
-                    MDbType = DbTypeEnum.SqlIte;
+                    Error("没有找到名为:SqlLog 的连接字符串,默认不记录Sql日志");
                 }
                 else
                 {
-                    Error("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
-                    throw new Exception("未能加载：" + sqlItePath + " 请确认此插件是否存在！");
+                    _sqlLog = sqlLogCm.ConnectionString == "1";
                 }
+                var cm = ConfigurationManager.ConnectionStrings[dbConnectionName];
+                if (cm == null)
+                {
+                    Error("没有找到名为:" + dbConnectionName + " 的连接字符串");
+                    throw new Exception("没有找到名为:" + dbConnectionName + " 的连接字符串");
+                }
+                var connectionString = cm.ToString();
+                var pn = cm.ProviderName;
+                if (pn.Contains("System.Data.SQLite"))
+                {
+                    var sqlItePath = AppDomain.CurrentDomain.BaseDirectory + "System.Data.SQLite.dll";
+                    if (File.Exists(sqlItePath))
+                    {
+                        _sqlIteAss = Assembly.LoadFrom(sqlItePath);
+                        MDbType = DbTypeEnum.SqlIte;
+                    }
+                    else
+                    {
+                        Error("System.Data.SQLite.dll 文件不存在 无法支持SQLite");
+                        throw new Exception("未能加载：" + sqlItePath + " 请确认此插件是否存在！");
+                    }
+                }
+                else if (pn.Contains("MySql.Data.MySqlClient"))
+                {
+                    if (isEncrypt)
+                    {
+                        var uid = Regex.Matches(cm.ConnectionString, "user id=\\w+;")[0].Value;
+                        var pwd = Regex.Matches(cm.ConnectionString, "password=\\w+;")[0].Value;
+                        var u = uid.Replace("user id=", string.Empty).TrimEnd(';');
+                        var p = pwd.Replace("password=", string.Empty).TrimEnd(';');
+                        var dbu = AesDecrypt(u, key);
+                        var dbp = AesDecrypt(p, key);
+                        var cs = cm.ConnectionString.Replace(u, dbu).Replace(p, dbp);
+                        connectionString = cs;
+                    }
+                    MDbType = DbTypeEnum.Mysql;
+                }
+                else if (pn.Contains("System.Data.SqlClient"))
+                {
+                    if (isEncrypt)
+                    {
+                        var uid = Regex.Matches(cm.ConnectionString, "User ID=\\w+;")[0].Value;
+                        var pwd = Regex.Matches(cm.ConnectionString, "Password=\\w+;")[0].Value;
+                        var u = uid.Replace("user id=", string.Empty).TrimEnd(';');
+                        var p = pwd.Replace("password=", string.Empty).TrimEnd(';');
+                        var dbu = AesDecrypt(u, key);
+                        var dbp = AesDecrypt(p, key);
+                        var cs = cm.ConnectionString.Replace(u, dbu).Replace(p, dbp);
+                        connectionString = cs;
+                    }
+                    MDbType = DbTypeEnum.Mssql;
+                }
+                else if (pn.Contains("System.Data.OracleClient"))
+                {
+                    if (isEncrypt)
+                    {
+                        var uid = Regex.Matches(cm.ConnectionString, "User Id=\\w+;")[0].Value;
+                        var pwd = Regex.Matches(cm.ConnectionString, "Password=\\w+;")[0].Value;
+                        var u = uid.Replace("user id=", string.Empty).TrimEnd(';');
+                        var p = pwd.Replace("password=", string.Empty).TrimEnd(';');
+                        var dbu = AesDecrypt(u, key);
+                        var dbp = AesDecrypt(p, key);
+                        var cs = cm.ConnectionString.Replace(u, dbu).Replace(p, dbp);
+                        connectionString = cs;
+                    }
+                    MDbType = DbTypeEnum.Oracle;
+                }
+                else
+                {
+                    MDbType = DbTypeEnum.None;
+                    Error("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
+                    throw new Exception("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
+                }
+                _mConnectionString = connectionString;
+                _mParameterMark = GetParameterMark();
             }
-            else if (pn.Contains("MySql.Data.MySqlClient"))
+            catch (Exception e)
             {
-                MDbType = DbTypeEnum.Mysql;
+                Error(e); 
+                throw new Exception("数据库初始化失败,请检查数据库连接配置!");
             }
-            else if (pn.Contains("System.Data.SqlClient"))
-            {
-                MDbType = DbTypeEnum.Mssql;
-            }
-            else if (pn.Contains("System.Data.OracleClient"))
-            {
-                MDbType = DbTypeEnum.Oracle;
-            }
-            else
-            {
-                MDbType = DbTypeEnum.None;
-                Error("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
-                throw new Exception("没有在连接字符串中检测到 providerName 无法判断数据库类型!");
-            }
-            _mConnectionString = cm.ToString();
-            _mParameterMark = GetParameterMark();
         }
 
         #endregion
@@ -1640,6 +1686,11 @@ namespace NetFrameWork.Database
             var sqlStr = sqlString;
             foreach (var p in cmdParamArr)
             {
+                if (p.Value == null)
+                {
+                    sqlStr = sqlStr.Replace(p.ParameterName, "null");
+                    continue;
+                }
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (p.DbType)
                 {
@@ -1722,6 +1773,76 @@ namespace NetFrameWork.Database
         private static void Error(object o)
         {
             DatabaseLog.Error(o, "DB_");
+        }
+
+        #endregion
+
+        #region 连接字符串加解密
+
+        /// <summary>
+        /// AES加密(加密模式ECB,填充模式pk-cs5padding,数据块128位,偏移量无,输出16进制,字符集UTF8)
+        /// </summary>
+        /// <param name="text">加密字符</param>
+        /// <param name="key">加密的key(必须是16的整数倍)</param>
+        /// <returns></returns>
+        public static string AesEncrypt(string text, string key)
+        {
+            var keyArray = Encoding.UTF8.GetBytes(key);
+            var toEncryptArray = Encoding.UTF8.GetBytes(text);
+            var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
+            var cTransform = rDel.CreateEncryptor();
+            var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return BytesToHex(resultArray);
+        }
+
+        /// <summary>
+        /// AES解密(加密模式ECB,填充模式pk-cs5padding,数据块128位,偏移量无,输出16进制,字符集UTF8)
+        /// </summary>
+        /// <param name="text">解密字符</param>
+        /// <param name="key">解密的key(必须是16的整数倍)</param>
+        /// <returns></returns>
+        public static string AesDecrypt(string text, string key)
+        {
+            var keyArray = Encoding.UTF8.GetBytes(key);
+            var toEncryptArray = HexToBytes(text);
+            var rDel = new RijndaelManaged { Key = keyArray, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
+            var cTransform = rDel.CreateDecryptor();
+            var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return Encoding.UTF8.GetString(resultArray);
+        }
+
+        /// <summary>
+        /// 16进制字符串转Byte数组
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        private static byte[] HexToBytes(string hex)
+        {
+            var num = (int)Math.Round((double)hex.Length / 2);
+            var buffer = new byte[num];
+            var num3 = num - 1;
+            for (var i = 0; i <= num3; i++)
+            {
+                var s = hex.Substring(i * 2, 2);
+                buffer[i] = (byte)int.Parse(s, NumberStyles.HexNumber);
+            }
+            return buffer;
+        }
+
+        /// <summary>
+        /// Byte数组转16进制字符串
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        private static string BytesToHex(IList<byte> bytes)
+        {
+            var builder = new StringBuilder();
+            var num2 = bytes.Count - 1;
+            for (var i = 0; i <= num2; i++)
+            {
+                builder.AppendFormat("{0:X2}", bytes[i]);
+            }
+            return builder.ToString();
         }
 
         #endregion

@@ -321,10 +321,27 @@ namespace NetFrameWork.Database.WhereExpression
                 throw new Exception("不支持的Where条件(" + be.NodeType + ")Lambda表达式写法！请使用经典写法！");
             var left = (MemberExpression)expLeft;
             var w = new Where();
-            var value = $"WhereParam{GetIndex()}";
-            w.SqlText.AppendFormat(" `{0}` {1} {2} ", left.Member.Name, GetOperator(be.NodeType), value);
             var obj = FastEvaluator.Eval(expRight);
-            w.ParamDict.Add(value, obj);
+            if (obj == null)
+            {
+                switch (be.NodeType)
+                {
+                    case ExpressionType.Equal:
+                        w.SqlText.AppendFormat(" `{0}` is null ", left.Member.Name);
+                        break;
+                    case ExpressionType.NotEqual:
+                        w.SqlText.AppendFormat(" `{0}` is not null ", left.Member.Name);
+                        break;
+                    default:
+                        throw new Exception("不支持的Where条件(" + be.NodeType + ") 比较值不能为 null");
+                }
+            }
+            else
+            {
+                var value = $"WhereParam{GetIndex()}";
+                w.SqlText.AppendFormat(" `{0}` {1} {2} ", left.Member.Name, GetOperator(be.NodeType), value);
+                w.ParamDict.Add(value, obj);
+            }
             return w;
         }
 

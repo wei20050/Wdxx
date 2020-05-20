@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -159,6 +160,20 @@ namespace NetFrameWork.Core
                 }
             }
             return objTo;
+        }
+
+        /// <summary>
+        /// 判断两个对象的属性值是否全部相等
+        /// </summary>
+        /// <param name="t1">对象1</param>
+        /// <param name="t2">对象2</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool EqualsMap<T>(T t1, T t2)
+        {
+            return t1.GetType().GetProperties().All(item =>
+                Equals(item.GetValue(t1, null),
+                    t2.GetType().GetProperty(item.Name)?.GetValue(t2, null)));
         }
 
         /// <summary>

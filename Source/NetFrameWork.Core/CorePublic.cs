@@ -276,9 +276,9 @@ namespace NetFrameWork.Core
         /// 运行外部应用
         /// </summary>
         /// <param name="filePath">外部程序文件路径</param>
-        public static void RunApp(string filePath)
+        public static Process RunApp(string filePath)
         {
-            Process.Start(filePath);
+            return Process.Start(filePath);
         }
 
         /// <summary>
