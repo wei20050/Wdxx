@@ -7,3 +7,4 @@ logs
 *.user
 /Source/Test.Service/Properties/PublishProfiles
 Output
+/Source/packages

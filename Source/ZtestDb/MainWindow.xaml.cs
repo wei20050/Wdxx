@@ -13,7 +13,7 @@ namespace ZtestDb
         private readonly ORM _db = new ORM();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var s = _db.SelectAll<user>();
+            var s = _db.SelectAll<user>(p => p.name != null && p.name.StartsWith("李"));
             var sName = string.Empty;
             foreach (var sn in s)
             {
@@ -26,7 +26,7 @@ namespace ZtestDb
 
     public class user
     {
-        public string id { get; set; }
+        public int id { get; set; }
         public string name { get; set; }
     }
 }

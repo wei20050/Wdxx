@@ -2,8 +2,7 @@
 {
     internal class OracleFunction : SqlFunBase
     {
-
-        internal new string Now()
+        public override string Now()
         {
             return "SYSDATE()";
         }

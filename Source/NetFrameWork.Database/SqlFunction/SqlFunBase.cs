@@ -1,17 +1,26 @@
-﻿namespace NetFrameWork.Database.SqlFunction
+﻿// ReSharper disable UnusedMember.Global
+namespace NetFrameWork.Database.SqlFunction
 {
     /// <summary>
     /// 基于Mysql的sql函数基类
     /// </summary>
-    internal class SqlFunBase
+    public class SqlFunBase
     {
-        
-        internal string Substr(string str, int start, int length)
+
+        /// <summary>
+        /// 返回字符串截取函数
+        /// </summary>
+        /// <returns></returns>
+        public virtual string Substr(string str, int start, int length)
         {
             return $"SUBSTR({str},{start},{length}))";
         }
         
-        internal string Now()
+        /// <summary>
+        /// 返回当前时间函数
+        /// </summary>
+        /// <returns></returns>
+        public virtual string Now()
         {
             return "NOW()";
         }

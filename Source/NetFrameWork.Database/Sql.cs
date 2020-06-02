@@ -108,7 +108,7 @@ namespace NetFrameWork.Database
         #region 查询组装
 
         /// <summary>
-        /// 当前Sql文本增加字符前后不带空格, {0}
+        /// 当前Sql文本增加字符前后不带空格,等于 "{0}"
         /// </summary>
         public virtual Sql Add(string str)
         {
@@ -117,7 +117,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 当前Sql文本增加字符前后带空格, {0}
+        /// 当前Sql文本增加字符前后带空格,等于 " {0} "
         /// </summary>
         public virtual Sql AddBs(string str)
         {
@@ -126,7 +126,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 当前Sql文本增加表名与*, table.*
+        /// 当前Sql文本增加表名与*,等于 " table.* "
         /// </summary>
         public virtual Sql AddTf(string table)
         {
@@ -135,7 +135,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 当前Sql文本增加表名与字段, table.field
+        /// 当前Sql文本增加表名与字段,等于 " table.field "
         /// </summary>
         public virtual Sql AddTf(string table, string field)
         {
@@ -144,7 +144,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 当前Sql文本增加字段, `{0}`
+        /// 当前Sql文本增加字段,等于 " `{0}` "
         /// </summary>
         public virtual Sql AddField(string str)
         {
@@ -153,7 +153,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个select,等于 "select"
+        /// 增加一个select,等于 " select "
         /// </summary>
         public virtual Sql Select()
         {
@@ -171,7 +171,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个from,等于 "from"
+        /// 增加一个from,等于 " from "
         /// </summary>
         public virtual Sql From()
         {
@@ -180,7 +180,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个join,等于 "join"
+        /// 增加一个join,等于 " join "
         /// </summary>
         public virtual Sql Join()
         {
@@ -189,7 +189,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个inner join,等于 "inner join"
+        /// 增加一个inner join,等于 " inner join "
         /// </summary>
         public virtual Sql InnerJoin()
         {
@@ -198,7 +198,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个left join,等于 "left join"
+        /// 增加一个left join,等于 " left join "
         /// </summary>
         public virtual Sql LeftJoin()
         {
@@ -207,7 +207,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个right join,等于 "right join"
+        /// 增加一个right join,等于 " right join "
         /// </summary>
         public virtual Sql RightJoin()
         {
@@ -216,7 +216,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个on,等于 "on"
+        /// 增加一个on,等于 " on "
         /// </summary>
         public virtual Sql On()
         {
@@ -225,7 +225,7 @@ namespace NetFrameWork.Database
         }
 
         /// <summary>
-        /// 增加一个where,等于 "where"
+        /// 增加一个where,等于 " where "
         /// </summary>
         public virtual Sql Where()
         {

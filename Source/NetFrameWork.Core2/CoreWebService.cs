@@ -1,0 +1,213 @@
+﻿using System;
+using System.CodeDom;
+using System.CodeDom.Compiler;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Web.Services.Description;
+using Microsoft.CSharp;
+using Newtonsoft.Json;
+
+// ReSharper disable UnusedMember.Global
+
+namespace NetFrameWork.Core2
+{
+
+    /// <summary>
+    /// WebService动态调用核心
+    /// </summary>
+    public class CoreWebService
+    {
+        /// <summary>
+        /// webservice反射类
+        /// </summary>
+        private static Type _type;
+
+        /// <summary>
+        /// WebServiceWsdl文件夹
+        /// </summary>
+        private readonly string _webServiceWsdl = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WebServiceWsdl");
+
+        /// <summary>
+        /// 带服务地址构造函数
+        /// </summary>
+        /// <param name="serviceUrl">服务地址</param>
+        public CoreWebService(string serviceUrl)
+        {
+            try
+            {
+                var service = new Uri(serviceUrl);
+                var fileName = $"{service.Host}_{service.Port}";
+                // ReSharper disable once StringLiteralTypo
+                fileName = service.Segments.Select(s => s.Trim('/')).Where(name => !string.IsNullOrEmpty(name)).Aggregate(fileName, (current, name) => current + $"_{name}").Replace(".asmx", string.Empty);
+                var wsdlFile = Path.Combine(_webServiceWsdl, fileName);
+                if (!File.Exists(wsdlFile))
+                {
+                    var file = GetWsdl(serviceUrl);
+                    if (!Directory.Exists(_webServiceWsdl))
+                    {
+                        Directory.CreateDirectory(_webServiceWsdl);
+                    }
+                    File.WriteAllText(wsdlFile, file);
+                }
+                var wc = new WebClient();
+                var stream = wc.OpenRead(wsdlFile);
+                wc.Dispose();
+                var sd = ServiceDescription.Read(stream ?? throw new InvalidOperationException());
+                var classname = sd.Services[0].Name;
+                var sdi = new ServiceDescriptionImporter();
+                sdi.AddServiceDescription(sd, string.Empty, string.Empty);
+                var cn = new CodeNamespace();
+                //生成客户端代理类代码
+                var ccu = new CodeCompileUnit();
+                ccu.Namespaces.Add(cn);
+                sdi.Import(cn, ccu);
+                var csc = new CSharpCodeProvider();
+                //设定编译参数
+                var plist = new CompilerParameters
+                {
+                    GenerateExecutable = false,
+                    GenerateInMemory = true
+                };
+                //动态编译后的程序集不生成可执行文件
+                //动态编译后的程序集只存在于内存中，不在硬盘的文件上
+                plist.ReferencedAssemblies.Add("System.dll");
+                plist.ReferencedAssemblies.Add("System.XML.dll");
+                plist.ReferencedAssemblies.Add("System.Web.Services.dll");
+                plist.ReferencedAssemblies.Add("System.Data.dll");
+                //编译代理类
+                var cr = csc.CompileAssemblyFromDom(plist, ccu);
+                if (cr.Errors.HasErrors)
+                {
+                    var sb = new StringBuilder();
+                    foreach (CompilerError ce in cr.Errors)
+                    {
+                        sb.Append(ce);
+                        sb.Append(Environment.NewLine);
+                    }
+                    throw new Exception(sb.ToString());
+                }
+                //生成代理实例，并调用方法
+                var assembly = cr.CompiledAssembly;
+                _type = assembly.GetType(classname, true, true);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("CoreWebService Err", e);
+            }
+        }
+
+        /// <summary>
+        /// 发送请求(返回字符串)
+        /// </summary>
+        /// <param name="method">请求的方法</param>
+        /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
+        /// <returns></returns>
+        public string Send(string method, params object[] sendData)
+        {
+            try
+            {
+                var ret = Fun(method, sendData);
+                return ret == null ? string.Empty : JsonConvert.SerializeObject(ret);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("CoreWebService.Send Err", e);
+            }
+        }
+
+        /// <summary>
+        /// 发送请求(返回有构造函数的类)
+        /// </summary>
+        /// <param name="method">请求的方法</param>
+        /// <param name="sendData">请求参数 (可变参数与服务端参数一致)</param>
+        /// <returns></returns>
+        public T Send<T>(string method, params object[] sendData) where T : new()
+        {
+            try
+            {
+                var ret = Send(method, sendData);
+                return JsonConvert.DeserializeObject<T>(ret);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("CoreWebService.Send<T> Err", e);
+            }
+        }
+
+        private static object Fun(string method, params object[] sendData)
+        {
+            var mi = _type.GetMethod(method);
+            //方法不存在直接异常
+            if (mi == null)
+            {
+                throw new Exception("CoreWebService.Fun Err", new Exception($"There is no such method({method})"));
+            }
+            //暂存的xml参数组
+            var sendDataXml = sendData.Select(JsonConvert.SerializeObject).ToList();
+            //具体的参数数组声明
+            var objArr = new object[sendDataXml.Count];
+            //获取参数组
+            var ps = mi.GetParameters();
+            for (var i = 0; i < ps.Length; i++)
+            {
+                //根据参数组中的类型反序列化成需要的类型
+                objArr[i] = JsonConvert.DeserializeObject(sendDataXml[i], ps[i].ParameterType);
+            }
+            var obj = Activator.CreateInstance(_type);
+            //执行方法
+            return mi.Invoke(obj, objArr);
+        }
+
+        /// <summary>
+        /// 获取wsdl
+        /// </summary>
+        /// <param name="httpUri">请求地址</param>
+        /// <returns></returns>
+        private static string GetWsdl(string httpUri)
+        {
+            httpUri = httpUri.TrimEnd('/');
+            if (httpUri.LastIndexOf("?wsdl", StringComparison.CurrentCultureIgnoreCase) <= 0)
+            {
+                httpUri += "?wsdl";
+            }
+            HttpWebRequest httpWebRequest = null;
+            HttpWebResponse httpWebResponse = null;
+            Stream resStream = null;
+            try
+            {
+                httpWebRequest = (HttpWebRequest)WebRequest.Create(httpUri);
+                httpWebRequest.Method = "GET";
+                httpWebRequest.ContentType = "text/xml";
+                var webResponse = httpWebRequest.GetResponse();
+                httpWebResponse = (HttpWebResponse)webResponse;
+                resStream = httpWebResponse.GetResponseStream();
+                string result;
+                if (resStream != null)
+                {
+                    var streamReader = new StreamReader(resStream);
+                    result = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    resStream.Close();
+                }
+                else
+                {
+                    result = string.Empty;
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CoreWebService.GetWsdl Err: uri=>" + httpUri + "err=>" + ex);
+            }
+            finally
+            {
+                resStream?.Close();
+                httpWebResponse?.Close();
+                httpWebRequest?.Abort();
+            }
+        }
+
+    }
+}
