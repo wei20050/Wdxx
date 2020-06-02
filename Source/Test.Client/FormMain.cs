@@ -45,5 +45,10 @@ namespace Test.Client
             var us = Api.GetUser();
             var u = Api.GetUser("123");
         }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

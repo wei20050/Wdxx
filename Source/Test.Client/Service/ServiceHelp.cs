@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using NetFrameWork.Core2;
 
@@ -21,6 +22,10 @@ namespace Test.Client.Service
         {
             try
             {
+                if (!Debugger.IsAttached)
+                {
+                    throw new Exception("调试默认离线模式!");
+                }
                 //设定要连接的服务地址
                 Api.Url = url;
                 var test = Api.GetTest();
@@ -33,7 +38,7 @@ namespace Test.Client.Service
                 try
                 {
                     //离线服务开启
-                    if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+                    //if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
                     IsOnLine = false;
                     url = CoreWebApiHost.OpenAsync("Service\\Api\\Test.Api");
                     Api.Url = url;
