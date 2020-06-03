@@ -1,4 +1,4 @@
-﻿namespace Test.Client.View
+﻿namespace Test.Client.Form
 {
     partial class FormYuan
     {

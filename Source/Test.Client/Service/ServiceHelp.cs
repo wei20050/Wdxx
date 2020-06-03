@@ -37,8 +37,10 @@ namespace Test.Client.Service
                 CoreLog.Error("在线异常:" + ex);
                 try
                 {
+                    //初始化本地数据库
+                    LocalDatabaseHelp.SetDatabase();
                     //离线服务开启
-                    //if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+                    if (MessageBox.Show(@"离线中！是否还要继续？", @"提示", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
                     IsOnLine = false;
                     url = CoreWebApiHost.OpenAsync("Service\\Api\\Test.Api");
                     Api.Url = url;

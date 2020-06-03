@@ -63,32 +63,35 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api.cs" />
+    <Compile Include="FormModel\FromMainModel.cs" />
     <Compile Include="FormBase.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormBase.Designer.cs">
       <DependentUpon>FormBase.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormMain.cs">
+    <Compile Include="Form\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormMain.Designer.cs">
+    <Compile Include="Form\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormBaseModel.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\localDatabaseHelp.cs" />
     <Compile Include="Service\ServiceHelp.cs" />
-    <Compile Include="View\FormYuan.cs">
+    <Compile Include="Form\FormYuan.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\FormYuan.Designer.cs">
+    <Compile Include="Form\FormYuan.Designer.cs">
       <DependentUpon>FormYuan.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="FormBase.resx">
       <DependentUpon>FormBase.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormMain.resx">
+    <EmbeddedResource Include="Form\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -100,7 +103,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="View\FormYuan.resx">
+    <EmbeddedResource Include="Form\FormYuan.resx">
       <DependentUpon>FormYuan.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />

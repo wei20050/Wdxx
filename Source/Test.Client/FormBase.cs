@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace Test.Client
 {
-    public partial class FormBase : Form
+    public partial class FormBase : System.Windows.Forms.Form
     {
         [DllImport("user32.dll")]
         public static extern bool ReleaseCapture();

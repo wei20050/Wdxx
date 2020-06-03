@@ -14,37 +14,37 @@ namespace Test.Client
 
         public static string GetTest()
         {
-            return CoreWebApi.Get<string>(Url);
+            return CoreWebApi.Send<string>(Url,null,null,1);
         }
 
         public static DateTime GetTime()
         {
-            return CoreWebApi.Get<DateTime>(Url);
+            return CoreWebApi.Send<DateTime>(Url);
         }
 
         public static IEnumerable<user> GetUser()
         {
-            return CoreWebApi.Get<IEnumerable<user>>(Url);
+            return CoreWebApi.Send<IEnumerable<user>>(Url);
         }
 
         public static user GetUser(string id)
         {
-            return CoreWebApi.Get<user>(Url, id);
+            return CoreWebApi.Send<user>(Url, id);
         }
 
         public static bool PostUser(user u)
         {
-            return CoreWebApi.Post<bool>(Url, u);
+            return CoreWebApi.Send<bool>(Url, null, u);
         }
 
         public static bool DeleteUser(string id)
         {
-            return CoreWebApi.Delete<bool>(Url, id);
+            return CoreWebApi.Send<bool>(Url, id);
         }
 
         public static bool PutUser(user u)
         {
-            return CoreWebApi.Put<bool>(Url, u);
+            return CoreWebApi.Send<bool>(Url, null, u);
         }
     }
 }

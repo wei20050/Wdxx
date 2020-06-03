@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace Test.Client.View
+namespace Test.Client.Form
 {
     public partial class FormYuan : FormBase
     {
