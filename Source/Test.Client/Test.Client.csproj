@@ -36,12 +36,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NetFrameWork.Core">
-      <HintPath>..\NetFrameWork.Core\bin\Debug\NetFrameWork.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="NetFrameWork.Database">
-      <HintPath>..\NetFrameWork.Database\bin\Debug\NetFrameWork.Database.dll</HintPath>
-    </Reference>
     <Reference Include="PropertyChanged, Version=3.2.8.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyChanged.Fody.3.2.8\lib\net40\PropertyChanged.dll</HintPath>
     </Reference>
@@ -52,7 +46,6 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -126,16 +119,16 @@
       <Project>{f822ffc9-1dc5-473f-ba7d-d4b0185e45b5}</Project>
       <Name>NetFrameWork.Core2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Test.Api\Test.Api.csproj">
-      <Project>{e219863d-ffc1-48bd-8135-a4f02df11732}</Project>
-      <Name>Test.Api</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Test.Entity\Test.Entity.csproj">
       <Project>{14f05cf2-ebad-4967-9b4b-e1945527a390}</Project>
       <Name>Test.Entity</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\NetFrameWork.Database\DbDll\System.Data.SQLite.dll">
+      <Link>System.Data.SQLite.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Test.Api\bin\MySql.Data.dll">
       <Link>Service\Api\MySql.Data.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

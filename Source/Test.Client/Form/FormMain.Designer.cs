@@ -45,6 +45,7 @@
             this.dgvUsers = new System.Windows.Forms.DataGridView();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnClose = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvUsers)).BeginInit();
             this.SuspendLayout();
             // 
@@ -64,7 +65,7 @@
             // 
             this.btnQk.Location = new System.Drawing.Point(508, 14);
             this.btnQk.Name = "btnQk";
-            this.btnQk.Size = new System.Drawing.Size(280, 63);
+            this.btnQk.Size = new System.Drawing.Size(185, 63);
             this.btnQk.TabIndex = 2;
             this.btnQk.Text = "清空消息框";
             this.btnQk.UseVisualStyleBackColor = true;
@@ -121,7 +122,7 @@
             this.btnPutUser.Name = "btnPutUser";
             this.btnPutUser.Size = new System.Drawing.Size(154, 32);
             this.btnPutUser.TabIndex = 11;
-            this.btnPutUser.Text = "修改id:1 name:张修改";
+            this.btnPutUser.Text = "修改name:张修改";
             this.btnPutUser.UseVisualStyleBackColor = true;
             this.btnPutUser.Click += new System.EventHandler(this.btnPutUser_Click);
             // 
@@ -137,11 +138,11 @@
             // 
             // btnPostUser
             // 
-            this.btnPostUser.Location = new System.Drawing.Point(19, 83);
+            this.btnPostUser.Location = new System.Drawing.Point(183, 121);
             this.btnPostUser.Name = "btnPostUser";
             this.btnPostUser.Size = new System.Drawing.Size(154, 32);
             this.btnPostUser.TabIndex = 9;
-            this.btnPostUser.Text = "新增id:1 name:张三";
+            this.btnPostUser.Text = "新增name:张三";
             this.btnPostUser.UseVisualStyleBackColor = true;
             this.btnPostUser.Click += new System.EventHandler(this.btnPostUser_Click);
             // 
@@ -151,7 +152,7 @@
             this.btnPutUser2.Name = "btnPutUser2";
             this.btnPutUser2.Size = new System.Drawing.Size(154, 32);
             this.btnPutUser2.TabIndex = 14;
-            this.btnPutUser2.Text = "根据id修改name:李修改";
+            this.btnPutUser2.Text = "修改name:李修改";
             this.btnPutUser2.UseVisualStyleBackColor = true;
             this.btnPutUser2.Click += new System.EventHandler(this.btnPutUser2_Click);
             // 
@@ -161,7 +162,7 @@
             this.btnGetUser1.Name = "btnGetUser1";
             this.btnGetUser1.Size = new System.Drawing.Size(72, 32);
             this.btnGetUser1.TabIndex = 12;
-            this.btnGetUser1.Text = "查询id:1";
+            this.btnGetUser1.Text = "查询User";
             this.btnGetUser1.UseVisualStyleBackColor = true;
             this.btnGetUser1.Click += new System.EventHandler(this.btnGetUser1_Click);
             // 
@@ -181,7 +182,7 @@
             this.btnDeleteUser.Name = "btnDeleteUser";
             this.btnDeleteUser.Size = new System.Drawing.Size(72, 32);
             this.btnDeleteUser.TabIndex = 15;
-            this.btnDeleteUser.Text = "删除id:1";
+            this.btnDeleteUser.Text = "删除User";
             this.btnDeleteUser.UseVisualStyleBackColor = true;
             this.btnDeleteUser.Click += new System.EventHandler(this.btnDeleteUser_Click);
             // 
@@ -197,7 +198,7 @@
             // 
             // txtId
             // 
-            this.txtId.Location = new System.Drawing.Point(212, 128);
+            this.txtId.Location = new System.Drawing.Point(47, 89);
             this.txtId.Name = "txtId";
             this.txtId.Size = new System.Drawing.Size(125, 21);
             this.txtId.TabIndex = 20;
@@ -205,17 +206,30 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(183, 132);
+            this.label2.Location = new System.Drawing.Point(18, 93);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(23, 12);
             this.label2.TabIndex = 19;
             this.label2.Text = "ID:";
+            // 
+            // btnClose
+            // 
+            this.btnClose.BackColor = System.Drawing.Color.DarkRed;
+            this.btnClose.ForeColor = System.Drawing.SystemColors.Window;
+            this.btnClose.Location = new System.Drawing.Point(699, 14);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(89, 63);
+            this.btnClose.TabIndex = 21;
+            this.btnClose.Text = "关闭";
+            this.btnClose.UseVisualStyleBackColor = false;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 500);
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.txtId);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dgvUsers);
@@ -259,6 +273,7 @@
         private System.Windows.Forms.DataGridView dgvUsers;
         private System.Windows.Forms.TextBox txtId;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnClose;
     }
 }
 

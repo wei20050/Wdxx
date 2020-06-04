@@ -72,5 +72,10 @@ namespace Test.Client.Form
         {
             _fm.PutUser2();
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using NetFrameWork.Core;
+using NetFrameWork.Core2;
 using Test.Client.Service;
 using Test.Entity;
 
@@ -41,15 +41,15 @@ namespace Test.Client.FormModel
 
         public void GetUser1()
         {
-            var ret = Api.GetUser("1");
-            Users = new List<user>{ ret };
+            var ret = Api.GetUser(Id);
+            Users = new List<user> { ret };
         }
 
         public void PostUser()
         {
             var ret = Api.PostUser(new user
             {
-                id = "1",
+                id = Id,
                 name = "张三"
             });
             Xxk = ret + Environment.NewLine + Xxk;
@@ -58,7 +58,7 @@ namespace Test.Client.FormModel
         {
             var ret = Api.PostUser(new user
             {
-                id = CorePublic.GenerateId().ToString(),
+                id = Math.Abs(CorePublic.GenerateId()).ToString(),
                 name = "李四"
             });
             Xxk = ret + Environment.NewLine + Xxk;
@@ -67,7 +67,7 @@ namespace Test.Client.FormModel
         {
             var ret = Api.PutUser(new user
             {
-                id = "1",
+                id = Id,
                 name = "张修改"
             });
             Xxk = ret + Environment.NewLine + Xxk;
@@ -84,7 +84,7 @@ namespace Test.Client.FormModel
 
         public void DeleteUser()
         {
-            var ret = Api.DeleteUser("1");
+            var ret = Api.DeleteUser(Id);
             Xxk = ret + Environment.NewLine + Xxk;
         }
 

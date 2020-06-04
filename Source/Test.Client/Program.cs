@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
-using NetFrameWork.Core;
+using NetFrameWork.Core2;
 using Test.Client.Form;
 
 namespace Test.Client

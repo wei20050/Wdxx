@@ -46,10 +46,12 @@ namespace Test.Client.Service
                     Api.Url = url;
                     var test = Api.GetTest();
                     Console.WriteLine(test);
+                    MessageBox.Show(@"离线服务创建成功!");
                 }
                 catch (Exception e)
                 {
                     CoreLog.Error("离线异常:" + e);
+                    MessageBox.Show(@"离线服务创建失败!");
                 }
             }
 

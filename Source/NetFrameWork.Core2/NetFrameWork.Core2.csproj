@@ -53,6 +53,7 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.SelfHost.5.2.7\lib\net45\System.Web.Http.SelfHost.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,6 +67,7 @@
     <Compile Include="CoreFile.cs" />
     <Compile Include="CoreIni.cs" />
     <Compile Include="CoreLog.cs" />
+    <Compile Include="CorePublic.cs" />
     <Compile Include="CoreWebApiHost.cs" />
     <Compile Include="CoreWebApi.cs" />
     <Compile Include="CoreWebService.cs" />
